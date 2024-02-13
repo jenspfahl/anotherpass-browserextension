@@ -1,0 +1,28 @@
+{
+  "manifest_version": 2,
+  "name": "ANOTHERpass Web",
+  "version": "0.1",
+
+  "description": "Use ANOTHpass in the browser",
+  "homepage_url": "https://anotherpass.jepfa.de",
+  "icons": {
+    "48": "icons/anotherpass-48.png",
+    "96": "icons/anotherpass-96.png"
+
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+  "content_security_policy": "script-src 'self'; default-src http://*:8000; object-src 'self'",
+
+  "browser_action": {
+    "default_icon": "icons/anotherpass-512.png",
+    "default_title": "ANOTHERpass",
+    "default_popup": "popup/enter_ip.html"
+  },
+  "background": {
+    "scripts": ["background_scripts/background.js"],
+    "persistent": false
+   }
+}
