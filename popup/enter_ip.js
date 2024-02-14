@@ -26,6 +26,7 @@
 
 function handleResponse(message) {
   console.log(`Message from the background script: ${message.response}`);
+  alert(message.response);
 }
 
 function handleError(error) {
@@ -44,7 +45,7 @@ function inputIp() {
 
   console.log("there");
 
-
+/*
   var name = prompt("Enter IP address:");
 
   if (name == null || name == "") {
@@ -52,5 +53,5 @@ function inputIp() {
   }
   else {
     alert("You enterted: " + name);
-  }
+  }*/
 }

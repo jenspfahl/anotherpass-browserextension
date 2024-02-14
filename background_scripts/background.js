@@ -1,5 +1,5 @@
 // background script
-browser.runtime.onMessage.addListener(function (message, sender, senderResponse) {
+browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("in bg");
 
   fetch('http://192.168.178.27:8000/', {
@@ -12,7 +12,6 @@ browser.runtime.onMessage.addListener(function (message, sender, senderResponse)
 
     console.log("send " + res);
 
-    senderResponse(res);
-  })
+    sendResponse({ response: res }); })
   return true
 });
