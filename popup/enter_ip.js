@@ -44,7 +44,7 @@ function inputIp() {
     ip = "192.168.178.27";
   }
 
-  const sending = browser.runtime.sendMessage({
+  const sending = chrome.runtime.sendMessage({
     ip: ip,
   });
   sending.then(handleResponse, handleError);
