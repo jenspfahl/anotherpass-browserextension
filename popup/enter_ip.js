@@ -37,21 +37,22 @@ function inputIp() {
 
   console.log("here");
 
+  
+  var ip = prompt("Enter IP address:");
+
+  if (ip == null || ip == "") {
+    ip = "192.168.178.27";
+  }
+
   const sending = browser.runtime.sendMessage({
-    greeting: "Greeting from the content script",
+    ip: ip,
   });
   sending.then(handleResponse, handleError);
 
 
-  console.log("there");
+  console.log("there");  
 
-/*
-  var name = prompt("Enter IP address:");
+  
 
-  if (name == null || name == "") {
-    alert("You did not entert anything. Please enter your name again");
-  }
-  else {
-    alert("You enterted: " + name);
-  }*/
+
 }
