@@ -2,7 +2,7 @@
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("in bg");
 
-  fetch('http://'+ message.ip + ':8000/', {
+  fetch('http://'+ message.ip + ':8001/', {
     method: 'GET'
   }).then(res => {
     console.log("get " + res);
