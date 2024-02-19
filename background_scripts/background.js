@@ -1,5 +1,5 @@
 // background script
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("in bg");
 
   fetch('http://'+ message.ip + ':8001/', {

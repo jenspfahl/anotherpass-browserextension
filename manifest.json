@@ -15,12 +15,16 @@
     "activeTab"
   ],
 
+  "content_security_policy": {
+    "extension_pages": "default-src http://*:8001; script-src 'self'"
+  },
+
   "action": {
     "default_icon": "icons/anotherpass-512.png",
     "default_title": "ANOTHERpass",
     "default_popup": "popup/enter_ip.html"
   },
   "background": {
-    "service_worker": "background_scripts/background.js"
+    "scripts": ["background_scripts/background.js"]
    }
 }
