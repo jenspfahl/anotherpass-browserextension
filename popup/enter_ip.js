@@ -16,16 +16,8 @@
     }
     if (e.target.type === "reset") {
 
-      browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-        console.log("send msg " + JSON.stringify(tabs));
-  
-        chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: "123456" }, function (response) {
-          alert(response);
-        });
-      });
 
-
-      //inputIp();
+      inputIp();
     
     } 
   });

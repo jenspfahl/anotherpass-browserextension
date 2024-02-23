@@ -37,28 +37,19 @@ browser.contextMenus.create({
 browser.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "anotherpass-request") {
 
-    console.log("context click info:"+JSON.stringify(info));
-    console.log("context click tab:"+JSON.stringify(tab));
-
+    console.log("context click");
 
     let createData = {
       type: "detached_panel",
-      url: "popup/enter_ip.html",
+      url: "popup/request_password.html",
       width: 450,
       height: 300,
     };
 
-    console.log("open_dialog_box");
+    console.log("open request password dialog");
 
     let creating = browser.windows.create(createData);
 
-/*
-    browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      console.log("send msg");
-
-      chrome.tabs.sendMessage(tabs[0].id, { action: "open_dialog_box" ,p: "xxx" }, function (response) {
-      });
-    });*/
   }
 });
 

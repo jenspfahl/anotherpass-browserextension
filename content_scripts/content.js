@@ -1,17 +1,3 @@
-/*
-
-  document.body.addEventListener('click', function() {
-    console.log("clickk ");
-    dialog({
-      "body": "jQueryScript.net!",
-      "title": "jQuery Dialog Plugin Demo",
-      "show": true,
-      "width": 300,
-      "height": 500
-    });
-  }, true);  
-
-*/
 
 
 /*chrome.extension*/browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
@@ -21,7 +7,7 @@
   if (msg.action == 'paste') {
 
 
-    console.log("open_dialog_box msg=" + msg.p);
+    console.log("paste password: " + msg.p);
 
 
     let text = msg.p;
@@ -32,9 +18,9 @@
 
     var start = elem.selectionStart;
     var end = elem.selectionEnd;
-    elem.value = elem.value.slice(0, start) + text + elem.value.substr(end);
-    elem.selectionStart = start + text.length;
-    elem.selectionEnd = elem.selectionStart;
+    elem.value = text;// elem.value.slice(0, start) + text + elem.value.substr(end);
+    //elem.selectionStart = start + text.length;
+    //elem.selectionEnd = elem.selectionStart;
 
     sendResponse(text);
 
