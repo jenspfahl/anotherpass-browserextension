@@ -7,7 +7,7 @@
   if (msg.action == 'paste') {
 
 
-    console.log("paste password: " + msg.p);
+    console.log("received password to paste: '" + msg.p + "'");
 
 
     let text = msg.p;

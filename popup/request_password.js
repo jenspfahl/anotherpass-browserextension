@@ -5,6 +5,24 @@ document.addEventListener("click", (e) => {
   console.log("click");
 
 
+function handleResponse(message) {
+  console.log(`Message from the password fetch: ${message.response}`);
+  browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
+    console.log("send msg " + JSON.stringify(message.response));
+
+    chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: message.response.passwd }, function (response) {
+      //alert(response);
+      window.close();
+    });
+  });
+}
+
+function handleError(error) {
+  console.log(`Error: ${error}`);
+}
+
+
+
   /**
   * Get the active tab,
   * then call "beastify()" or "reset()" as appropriate.
@@ -15,27 +33,15 @@ document.addEventListener("click", (e) => {
   }
   if (e.target.type === "reset") {
 
-    browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-      console.log("send msg " + JSON.stringify(tabs));
-
-      chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: "123456" }, function (response) {
-        //alert(response);
-        window.close();
-      });
+    const sending = chrome.runtime.sendMessage({
+      ip: "192.168.178.27",
     });
+    sending.then(handleResponse, handleError);
+  
   }
 });
 
 
-
-function handleResponse(message) {
-  console.log(`Message from the background script: ${message.response}`);
-  alert(message.response);
-}
-
-function handleError(error) {
-  console.log(`Error: ${error}`);
-}
 
 function inputIp() {
 

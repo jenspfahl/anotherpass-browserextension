@@ -12,7 +12,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
     console.log("send " + res);
 
-    sendResponse({ response: res });
+    sendResponse({ response: JSON.parse(res) });
   })
   return true
 });
