@@ -13,7 +13,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     console.log("send " + res);
 
     sendResponse({ response: JSON.parse(res) });
-  })
+  }).catch(e => {
+    console.warn(e);
+    sendResponse({ response: null });
+  });
   return true
 });
 
