@@ -1,4 +1,4 @@
-
+// inspects all password fields and adds an Autofill icon
  var forms = document.getElementsByTagName('form');
  for (var i = 0; i < forms.length; i++) {
    var form = forms[i];
@@ -24,30 +24,28 @@
    }
  }
 
+
+
 /*chrome.extension*/browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
   console.log("receive msg from " + JSON.stringify(sender));
 
-  if (msg.action == 'paste') {
+  if (msg.action == "paste_credential") {
 
-
-    console.log("received password to paste: '" + msg.p + "'");
-
-
-    let text = msg.p;
-    let elem = document.activeElement;
-
-    console.log("elem=" + JSON.stringify(elem));
-
-
-    var start = elem.selectionStart;
-    var end = elem.selectionEnd;
-    elem.value = text;// elem.value.slice(0, start) + text + elem.value.substr(end);
-    //elem.selectionStart = start + text.length;
-    //elem.selectionEnd = elem.selectionStart;
-
-    sendResponse(text);
+    pasteCredential(msg.p, sendResponse);
 
   }
+});
+
+function pasteCredential(p, sendResponse) {
+  console.log("received password to paste: '" + p + "'");
+
+  let elem = document.activeElement;
+
+  console.log("elem=" + JSON.stringify(elem));
+
+  elem.value = p;
+
+  sendResponse(p);
 }
-);
+

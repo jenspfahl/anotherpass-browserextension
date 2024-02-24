@@ -1,29 +1,17 @@
-// background script
+// global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log("in bg, action:" + message.action);
+  console.log("background action: " + message.action);
 
   if (message.action == "request_password") {
-
-    fetch('http://' + message.ip + ':8001/', {
-      method: 'GET'
-    }).then(res => {
-      console.log("get " + res);
-
-      return res.text();
-    }).then(res => {
-
-      console.log("send " + res);
-
-      sendResponse({ response: JSON.parse(res) });
-    }).catch(e => {
-      console.warn(e);
-      sendResponse({ response: null });
-    });
+    fetchCredentials(message, sendResponse);
+    return true;
   }
   else if (message.action == "start_password_request_flow") {
     openPasswordRequestDialog();
+    return true; 
+
   }
-  return true
+  return false; 
 });
 
 
@@ -50,6 +38,24 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
+function fetchCredentials(message, sendResponse) {
+  fetch('http://' + message.ip + ':8001/', {
+    method: 'GET'
+  }).then(res => {
+    console.log("received: " + JSON.stringify(res));
+
+    return res.text();
+  }).then(res => {
+
+    console.log("send " + res);
+
+    sendResponse({ response: JSON.parse(res) });
+  }).catch(e => {
+    console.warn(e);
+    sendResponse({ response: null });
+  });
+}
+
 function openPasswordRequestDialog() {
   let createData = {
     type: "detached_panel",
@@ -60,6 +66,6 @@ function openPasswordRequestDialog() {
 
   console.log("open request password dialog");
 
-  let creating = browser.windows.create(createData);
+  browser.windows.create(createData);
 }
 

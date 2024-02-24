@@ -2,19 +2,10 @@
 document.addEventListener("click", (e) => {
 
 
-  console.log("click");
-
-
   function handleResponse(message) {
     console.log(`Message from the password fetch: ${message.response}`);
-    browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-      console.log("send msg " + JSON.stringify(message.response));
+    sendPasteCredentialMessage(message.response.passwd);
 
-      chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: message.response.passwd }, function (response) {
-        //alert(response);
-        window.close();
-      });
-    });
   }
 
   function handleError(error) {
@@ -28,6 +19,7 @@ document.addEventListener("click", (e) => {
   if (e.target.id === "fetch_passwd") {
 
     const sending = chrome.runtime.sendMessage({
+      action: "request_password",
       ip: "192.168.178.27",
     });
     sending.then(handleResponse, handleError);
@@ -37,8 +29,6 @@ document.addEventListener("click", (e) => {
     window.close();
   }
 });
-
-
 
 
 function poll(fn, timeout, interval) {
@@ -78,15 +68,21 @@ poll(async function () {
   // polling done
   console.log(`Message from the password poll: ${JSON.stringify(response)}`);
   document.getElementById("waiting_time").value = 100;
-
-    browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-      console.log("send msg " + response.passwd);
-
-      chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: response.passwd }, function () {
-        window.close();
-      });
-    });
+  sendPasteCredentialMessage(response.passwd);
 }).catch(function (e) {
   document.getElementById("waiting_time").value = 0;
-  alert("You haven't open the app in reasonable time.");
+  alert("You haven't opened the app in reasonable time.");
 });
+
+
+function sendPasteCredentialMessage(p) {
+
+  browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
+    console.log("send msg " + p);
+
+    chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", p: p }, function () {
+      window.close();
+    });
+  });
+}
+
