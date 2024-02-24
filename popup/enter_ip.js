@@ -1,28 +1,48 @@
 
-//function listenForClicks() {
-  document.addEventListener("click", (e) => {
+document.addEventListener("click", (e) => {
 
 
-    console.log("click");
+  console.log("click");
 
 
-    /**
-    * Get the active tab,
-    * then call "beastify()" or "reset()" as appropriate.
-    */
-    if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
-      // Ignore when click is not on a button within <div id="popup-content">.
-      return;
-    }
-    if (e.target.type === "reset") {
+  /**
+  * Get the active tab,
+  * then call "beastify()" or "reset()" as appropriate.
+  */
+  if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
+    // Ignore when click is not on a button within <div id="popup-content">.
+    return;
+  }
+  if (e.target.type === "reset") {
 
 
-      inputIp();
-    
-    } 
-  });
-//}
+    inputIp();
 
+  }
+});
+
+let uuid = crypto.randomUUID();
+console.log(uuid);
+const array = new Uint32Array(10);
+crypto.getRandomValues(array);
+
+console.log("Your lucky numbers:");
+for (const num of array) {
+  console.log(num);
+}
+
+let keyPair = window.crypto.subtle.generateKey(
+  {
+    name: "RSA-OAEP",
+    modulusLength: 4096,
+    publicExponent: new Uint8Array([1, 0, 1]),
+    hash: "SHA-256",
+  },
+  true,
+  ["encrypt", "decrypt"],
+).then(keyPair => {
+  console.log(keyPair);
+});
 
 
 
@@ -39,7 +59,7 @@ function inputIp() {
 
   console.log("here");
 
-  
+
   var ip = prompt("Enter IP address:");
 
   if (ip == null || ip == "") {
@@ -52,9 +72,9 @@ function inputIp() {
   sending.then(handleResponse, handleError);
 
 
-  console.log("there");  
+  console.log("there");
 
-  
+
 
 
 }

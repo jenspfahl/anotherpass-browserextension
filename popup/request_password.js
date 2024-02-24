@@ -21,17 +21,11 @@ document.addEventListener("click", (e) => {
     console.log(`Error: ${error}`);
   }
 
-
-
-  /**
-  * Get the active tab,
-  * then call "beastify()" or "reset()" as appropriate.
-  */
   if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
     // Ignore when click is not on a button within <div id="popup-content">.
     return;
   }
-  if (e.target.type === "reset") {
+  if (e.target.id === "fetch_passwd") {
 
     const sending = chrome.runtime.sendMessage({
       ip: "192.168.178.27",
@@ -39,29 +33,28 @@ document.addEventListener("click", (e) => {
     sending.then(handleResponse, handleError);
 
   }
+  else if (e.target.id === "close") {
+    window.close();
+  }
 });
 
 
 
 
-// The polling function
 function poll(fn, timeout, interval) {
   var endTime = Number(new Date()) + (timeout || 2000);
   interval = interval || 100;
   console.log(`endTime: ${new Date(endTime)}`);
   var checkCondition = async function (resolve, reject) {
-    // If the condition is met, we're done! 
     var result = await fn();
     console.log(`result: ${JSON.stringify(result)}`);
     if (result) {
       resolve(result);
     }
-    // If the condition isn't met but the timeout hasn't elapsed, go again
     else if (Number(new Date()) < endTime) {
       console.log(`new timeout: ${new Date(endTime)}`);
       setTimeout(checkCondition, interval, resolve, reject);
     }
-    // Didn't match and too much time, reject!
     else {
       console.log(`Error: ${arguments}`);
       reject(new Error('timed out for ' + fn + ': ' + arguments));
@@ -73,27 +66,27 @@ function poll(fn, timeout, interval) {
 
 
 
-// Usage:  ensure element is visible
 poll(async function () {
-  await new Promise(r => setTimeout(r, 2000));
+  //await new Promise(r => setTimeout(r, 2000));
   let response = await chrome.runtime.sendMessage({
+    action: "request_password",
     ip: "192.168.178.27",
   });
   console.log("response = " + JSON.stringify(response));
   return response.response;
 }, 20000, 1000).then(function (response) {
-  // Polling done, now do something else!
+  // polling done
   console.log(`Message from the password poll: ${JSON.stringify(response)}`);
+  document.getElementById("waiting_time").value = 100;
 
     browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
       console.log("send msg " + response.passwd);
 
       chrome.tabs.sendMessage(tabs[0].id, { action: "paste", p: response.passwd }, function () {
-        //alert(response);
         window.close();
       });
     });
 }).catch(function (e) {
-  // Polling timed out, handle the error!
-  alert("Timeout!" + e);
+  document.getElementById("waiting_time").value = 0;
+  alert("You haven't open the app in reasonable time.");
 });

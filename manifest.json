@@ -5,6 +5,8 @@
   "description": "Use ANOTHpass in the browser",
   "homepage_url": "https://anotherpass.jepfa.de",
   "icons": {
+    "24": "icons/anotherpass-24.png",
+    "36": "icons/anotherpass-36.png",
     "48": "icons/anotherpass-48.png",
     "96": "icons/anotherpass-96.png"
   },
@@ -34,6 +36,9 @@
       ],
       "js": [
         "content_scripts/content.js"
+      ],
+      "css": [
+        "content_scripts/content.css"
       ]
     }
   ]

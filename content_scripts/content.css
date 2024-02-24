@@ -1,0 +1,8 @@
+.inputFieldButton {
+    background-image: url("/icons/anotherpass-24.png");
+    cursor: pointer;
+    position: static;
+    border: none;
+    width: 24px;
+    height: 24px;
+}

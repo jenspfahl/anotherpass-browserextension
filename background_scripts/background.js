@@ -1,22 +1,28 @@
 // background script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log("in bg");
+  console.log("in bg, action:" + message.action);
 
-  fetch('http://' + message.ip + ':8001/', {
-    method: 'GET'
-  }).then(res => {
-    console.log("get " + res);
+  if (message.action == "request_password") {
 
-    return res.text();
-  }).then(res => {
+    fetch('http://' + message.ip + ':8001/', {
+      method: 'GET'
+    }).then(res => {
+      console.log("get " + res);
 
-    console.log("send " + res);
+      return res.text();
+    }).then(res => {
 
-    sendResponse({ response: JSON.parse(res) });
-  }).catch(e => {
-    console.warn(e);
-    sendResponse({ response: null });
-  });
+      console.log("send " + res);
+
+      sendResponse({ response: JSON.parse(res) });
+    }).catch(e => {
+      console.warn(e);
+      sendResponse({ response: null });
+    });
+  }
+  else if (message.action == "start_password_request_flow") {
+    openPasswordRequestDialog();
+  }
   return true
 });
 
@@ -39,20 +45,21 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "anotherpass-request") {
-
     console.log("context click");
-
-    let createData = {
-      type: "detached_panel",
-      url: "popup/request_password.html",
-      width: 450,
-      height: 300,
-    };
-
-    console.log("open request password dialog");
-
-    let creating = browser.windows.create(createData);
-
+    openPasswordRequestDialog();
   }
 });
+
+function openPasswordRequestDialog() {
+  let createData = {
+    type: "detached_panel",
+    url: "popup/request_password.html",
+    width: 800,
+    height: 300,
+  };
+
+  console.log("open request password dialog");
+
+  let creating = browser.windows.create(createData);
+}
 
