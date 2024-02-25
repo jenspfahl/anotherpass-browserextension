@@ -1,7 +1,8 @@
 
 function generateWebClientId() {
-  const rnd = window.crypto.getRandomValues(new Uint8Array(8));
-  return bytesToBase64(rnd).replace(/[^a-z0-9]/gi, '');
+  const rnd = window.crypto.getRandomValues(new Uint8Array(32));
+  const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 8).toUpperCase();
+  return [s.slice(0, 4), '-', s.slice(4)].join('');
 }
 
 function generateSessionKey() {
@@ -17,9 +18,16 @@ function generateSessionKey() {
 
 async function publicKeyToPEM(key) {
   const exported = await window.crypto.subtle.exportKey("spki", key);
-  const exportedAsString = String.fromCharCode.apply(null, new Uint8Array(exported));
-  const exportedAsBase64 = window.btoa(exportedAsString);
+  const exportedAsBase64 = bytesToBase64(new Uint8Array(exported));
   return `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
+}
+
+async function getPublicKeyFingerprint(key) {
+  const pem = await publicKeyToPEM(key);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pem);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return bytesToHex(new Uint8Array(digest));
 }
 
 async function sessionKeyToArray(sessionKey) {
@@ -99,3 +107,10 @@ function bytesToBase64(bytes) {
   const binString = String.fromCodePoint(...bytes);
   return btoa(binString);
 }
+
+function bytesToHex(bytes) {
+  return Array.from(bytes, function(byte) {
+    return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+  }).join('');
+}
+

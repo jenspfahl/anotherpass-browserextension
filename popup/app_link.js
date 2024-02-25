@@ -21,6 +21,10 @@ const keyPair = window.crypto.subtle.generateKey(
   const publicKeyAsPEM = await publicKeyToPEM(keyPair.publicKey);
   console.log(publicKeyAsPEM);
 
+  const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
+  console.log("Fingerprint: " + publicKeyFingerprint);
+
+
   const sessionKey = await generateSessionKey();
   const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
   console.log("AES Session Key = " + bytesToBase64(sessionKeyAsArray));
