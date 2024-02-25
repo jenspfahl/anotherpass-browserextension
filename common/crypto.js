@@ -1,5 +1,4 @@
 
-
 function generateWebClientId() {
   const rnd = window.crypto.getRandomValues(new Uint8Array(8));
   return bytesToBase64(rnd).replace(/[^a-z0-9]/gi, '');

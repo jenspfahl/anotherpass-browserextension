@@ -21,7 +21,7 @@
   "action": {
     "default_icon": "icons/anotherpass-512.png",
     "default_title": "ANOTHERpass",
-    "default_popup": "popup/enter_ip.html"
+    "default_popup": "popup/menu.html"
   },
   "background": {
     "scripts": [

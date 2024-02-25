@@ -2,12 +2,17 @@
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action);
 
-  if (message.action == "request_password") {
+  if (message.action === "request_password") {
     fetchCredentials(message, sendResponse);
     return true;
   }
-  else if (message.action == "start_password_request_flow") {
+  else if (message.action === "start_password_request_flow") {
     openPasswordRequestDialog();
+    return true; 
+
+  }
+  else if (message.action === "start_link_flow") {
+    openLinkTheAppDialog();
     return true; 
 
   }
@@ -69,3 +74,16 @@ function openPasswordRequestDialog() {
   browser.windows.create(createData);
 }
 
+
+function openLinkTheAppDialog() {
+  let createData = {
+    type: "detached_panel",
+    url: "popup/app_link.html",
+    width: 800,
+    height: 300,
+  };
+
+  console.log("open link the app dialog");
+
+  browser.windows.create(createData);
+}

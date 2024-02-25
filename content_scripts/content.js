@@ -31,7 +31,7 @@
 
   console.log("receive msg from " + JSON.stringify(sender));
 
-  if (msg.action == "paste_credential") {
+  if (msg.action === "paste_credential") {
 
     pasteCredential(msg.p, sendResponse);
 

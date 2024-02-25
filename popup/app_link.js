@@ -1,31 +1,14 @@
 
-document.addEventListener("click", (e) => {
+var webClientId = localStorage.getItem("web_client_id");
 
-
-  console.log("click");
-
-
-  /**
-  * Get the active tab,
-  * then call "beastify()" or "reset()" as appropriate.
-  */
-  if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
-    // Ignore when click is not on a button within <div id="popup-content">.
-    return;
-  }
-  if (e.target.type === "reset") {
-
-
-    inputIp();
-
-  }
-});
-
-let webClientId = generateWebClientId();
+if (!webClientId) {
+  webClientId = generateWebClientId();
+  localStorage.setItem("web_client_id", webClientId);
+}
 console.log("webClientId = " + webClientId);
 
 
-let keyPair = window.crypto.subtle.generateKey(
+const keyPair = window.crypto.subtle.generateKey(
   {
     name: "RSA-OAEP",
     modulusLength: 4096,
@@ -56,6 +39,21 @@ let keyPair = window.crypto.subtle.generateKey(
   const decryptedMessage = await decryptMessage(decSessionKey, encryptedMessage);
   console.log("Decrypted message = " + decryptedMessage);
   
+  document.getElementById("web_client_id").value = webClientId;
+  document.getElementById("public_key").value = publicKeyAsPEM;
+  document.getElementById("temp_session_key").value = bytesToBase64(sessionKeyAsArray);
+});
+
+
+
+
+document.addEventListener("click", (e) => {
+
+  if (e.target.id === "host") {
+
+    inputIp();
+
+  }
 });
 
 
@@ -79,15 +77,7 @@ function inputIp() {
     ip = "192.168.178.27";
   }
 
-  const sending = chrome.runtime.sendMessage({
-    ip: ip,
-  });
-  sending.then(handleResponse, handleError);
-
-
-  console.log("there");
-
-
+  // TODO save host
 
 
 }
