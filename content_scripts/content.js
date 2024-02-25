@@ -5,6 +5,7 @@
    var inputs = form.querySelectorAll("input[type=password]");
    for (var j = 0; j < inputs.length; j++) {
      var input = inputs[j];
+     // TODO only add if not present
      console.log("found password field " + input.style.width);
      var button = document.createElement('button');
      button.type="button";
