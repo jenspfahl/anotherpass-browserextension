@@ -15,7 +15,7 @@ const keyPair = window.crypto.subtle.generateKey(
     publicExponent: new Uint8Array([1, 0, 1]),
     hash: "SHA-256",
   },
-  true,
+  false,
   ["encrypt", "decrypt"],
 ).then(async keyPair => {
   const publicKeyAsPEM = await publicKeyToPEM(keyPair.publicKey);
@@ -47,6 +47,14 @@ const keyPair = window.crypto.subtle.generateKey(
   document.getElementById("public_key").value = publicKeyAsPEM;
   document.getElementById("temp_session_key").value = bytesToBase64(sessionKeyAsArray);
 
+
+  storeKeyPair("transport_keypair", keyPair);
+
+  loadKeyPair("transport_keypair", async function(keyPair) {
+    const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
+    console.log("loaded pub",publicKeyFingerprint);
+  });
+
   const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
   generateQrCode(qrCodeInput);
 });
@@ -64,6 +72,56 @@ function generateQrCode(input) {
       correctLevel : QRCode.CorrectLevel.H
   });
 } 
+
+
+function keyStoreOp(fn_) {
+
+	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
+	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+
+	// Open (or create) the database
+	var open = indexedDB.open("anotherpass-webext", 1);
+
+	// Create the schema
+	open.onupgradeneeded = function() {
+	    var db = open.result;
+	    db.createObjectStore("keyStore", {keyPath: "key"});
+	};
+
+
+	open.onsuccess = function() {
+	    // Start a new transaction
+	    var db = open.result;
+	    var tx = db.transaction("keyStore", "readwrite");
+	    var keyStore = tx.objectStore("keyStore");
+
+      fn_(keyStore);
+
+
+	    // Close the db when the transaction is done
+	    tx.oncomplete = function() {
+	        db.close();
+	    };
+	}
+}
+
+function storeKeyPair(key, keyPair) {
+
+  keyStoreOp(function (keyStore) {
+    keyStore.put({key: key, keyPair: keyPair});
+	})
+}
+
+async function loadKeyPair(key, fn_) {
+	keyStoreOp(function (keyStore) {
+    var getData = keyStore.get(key);
+    getData.onsuccess = async function() {
+    	var keyPair = getData.result.keyPair;
+			console.log("loaded keyPair", keyPair);
+      fn_(keyPair);
+	   };
+	})
+}
 
 
 document.addEventListener("click", (e) => {
