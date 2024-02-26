@@ -16,7 +16,7 @@
     "clipboardWrite"
   ],
   "content_security_policy": {
-    "extension_pages": "default-src http://*:8001; script-src 'self'"
+    "extension_pages": "default-src http://*:8001; script-src 'self'; img-src * data:;"
   },
   "action": {
     "default_icon": "icons/anotherpass-512.png",
