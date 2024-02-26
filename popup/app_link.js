@@ -1,11 +1,13 @@
 
-var webClientId = localStorage.getItem("web_client_id");
+let webClientId;
+chrome.storage.local.get(["web_client_id"]).then((result) => {
+  if (!result.key) {
+    webClientId = generateWebClientId();
+    chrome.storage.local.set({ "web_client_id": webClientId });
+  }
+  console.log("webClientId = " + webClientId);
+});
 
-if (!webClientId) {
-  webClientId = generateWebClientId();
-  localStorage.setItem("web_client_id", webClientId);
-}
-console.log("webClientId = " + webClientId);
 
 
 const keyPair = window.crypto.subtle.generateKey(
@@ -132,8 +134,8 @@ document.addEventListener("click", (e) => {
     const ip = document.getElementById("ip").value;
     const port = document.getElementById("port").value;
 
-    localStorage.setItem("server_address", ip);
-    localStorage.setItem("server_port", port);
+    chrome.storage.local.set({ "server_address": ip });
+    chrome.storage.local.set({ "server_port": port });
 
   }
 });

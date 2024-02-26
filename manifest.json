@@ -13,7 +13,8 @@
   "permissions": [
     "activeTab",
     "contextMenus",
-    "clipboardWrite"
+    "clipboardWrite",
+    "storage"
   ],
   "content_security_policy": {
     "extension_pages": "default-src http://*:8001; script-src 'self'; img-src * data:;"
@@ -24,10 +25,8 @@
     "default_popup": "popup/menu.html"
   },
   "background": {
-    "scripts": [
-      "libs/qrcodejs/1.0.0/qrcode.min.js",
-      "background_scripts/background.js"
-    ]
+    
+    "service_worker": "background_scripts/background.js"
   },
   "content_scripts": [
     {

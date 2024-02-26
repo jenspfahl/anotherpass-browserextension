@@ -10,6 +10,7 @@
      var button = document.createElement('button');
      button.type="button";
      button.className = "inputFieldButton";
+     //TODO doesn't work for Chrome
      input.parentNode.insertBefore(button, input);    
      
      button.addEventListener("click", function() {
@@ -27,7 +28,7 @@
 
 
 
-/*chrome.extension*/browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
   console.log("receive msg from " + JSON.stringify(sender));
 

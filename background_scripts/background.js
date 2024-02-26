@@ -25,28 +25,31 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 // Callback reads runtime.lastError to prevent an unchecked error from being 
 // logged when the extension attempt to register the already-registered menu 
 // again. Menu registrations in event pages persist across extension restarts.
-browser.contextMenus.create({
+chrome.contextMenus.create({
   id: "anotherpass-request",
   title: "Request credential from ANOTHERpass",
-  contexts: ["password"], // or "editable"?
+  contexts: ["editable"], // or "editable"?
 },
   // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
   // for information on the purpose of this error capture.
-  () => void browser.runtime.lastError,
+  () => void chrome.runtime.lastError,
 );
 
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "anotherpass-request") {
     console.log("context click");
     openPasswordRequestDialog();
   }
 });
 
-function fetchCredentials(message, sendResponse) {
-  const server = localStorage.getItem("server_address");
-  const port = localStorage.getItem("server_port");
-  const address = server + ":" + port;
+async function fetchCredentials(message, sendResponse) {
+  const server = await chrome.storage.local.get(["server_address"]);
+  const port = await chrome.storage.local.get(["server_port"]);
+  console.log(JSON.stringify(server));
+  console.log(JSON.stringify(port));
+
+  const address = server.server_address + ":" + port.server_port;
   console.log("fetch from", address);
   fetch('http://' + address + '/', {
     method: 'GET'
@@ -67,7 +70,7 @@ function fetchCredentials(message, sendResponse) {
 
 function openPasswordRequestDialog() {
   let createData = {
-    type: "detached_panel",
+    type: "popup",
     url: "popup/request_password.html",
     width: 800,
     height: 300,
@@ -75,13 +78,13 @@ function openPasswordRequestDialog() {
 
   console.log("open request password dialog");
 
-  browser.windows.create(createData);
+  chrome.windows.create(createData);
 }
 
 
 function openLinkTheAppDialog() {
   let createData = {
-    type: "detached_panel",
+    type: "popup",
     url: "popup/app_link.html",
     width: 800,
     height: 800,
@@ -89,5 +92,5 @@ function openLinkTheAppDialog() {
 
   console.log("open link the app dialog");
 
-  browser.windows.create(createData);
+  chrome.windows.create(createData);
 }

@@ -74,7 +74,7 @@ poll(async function () {
 
 function sendPasteCredentialMessage(p) {
 
-  browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
+  chrome.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
     console.log("send msg " + p);
 
     chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", p: p }, function () {
