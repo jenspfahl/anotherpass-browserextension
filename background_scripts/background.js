@@ -44,7 +44,11 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 function fetchCredentials(message, sendResponse) {
-  fetch('http://' + message.ip + ':8001/', {
+  const server = localStorage.getItem("server_address");
+  const port = localStorage.getItem("server_port");
+  const address = server + ":" + port;
+  console.log("fetch from", address);
+  fetch('http://' + address + '/', {
     method: 'GET'
   }).then(res => {
     console.log("received: " + JSON.stringify(res));

@@ -20,7 +20,6 @@ document.addEventListener("click", (e) => {
 
     const sending = chrome.runtime.sendMessage({
       action: "request_password",
-      ip: "192.168.178.27",
     });
     sending.then(handleResponse, handleError);
 
@@ -57,10 +56,8 @@ function poll(fn, timeout, interval) {
 
 
 poll(async function () {
-  //await new Promise(r => setTimeout(r, 2000));
   let response = await chrome.runtime.sendMessage({
     action: "request_password",
-    ip: "192.168.178.27",
   });
   console.log("response = " + JSON.stringify(response));
   return response.response;

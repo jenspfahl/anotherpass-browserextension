@@ -129,6 +129,11 @@ document.addEventListener("click", (e) => {
   if (e.target.id === "next") {
 
     // TODO check and save data
+    const ip = document.getElementById("ip").value;
+    const port = document.getElementById("port").value;
+
+    localStorage.setItem("server_address", ip);
+    localStorage.setItem("server_port", port);
 
   }
 });
