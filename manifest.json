@@ -25,6 +25,7 @@
   },
   "background": {
     "scripts": [
+      "libs/qrcodejs/1.0.0/qrcode.min.js",
       "background_scripts/background.js"
     ]
   },
@@ -35,6 +36,7 @@
         "https://*/*"
       ],
       "js": [
+        "libs/qrcodejs/1.0.0/qrcode.min.js",
         "content_scripts/content.js"
       ],
       "css": [

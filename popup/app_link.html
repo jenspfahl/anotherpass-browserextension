@@ -6,14 +6,22 @@
   </head>
 
   <body>
+    <h3>Scan this QR code with ANOTHERpass app and enter the IP / hostname provided by the app</h3>
     <div id="popup-content">
       <input readonly="true" id="web_client_id"/>
       <input readonly="true" id="public_key"/>
       <input readonly="true" id="temp_session_key"/>
 
-      <button type="button" id="host">Input IP / hostname</button>
+      <div class="qr-code"></div>
+
+      <input id="ip"/>
+      <input id="port" value="8001"/>
+
+      <button type="button" id="next">Next step</button>
+
     </div>
     <script src="../common/crypto.js"></script>
+    <script src="../libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="app_link.js"></script>
   </body>
 </html>

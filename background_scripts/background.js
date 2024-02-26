@@ -80,7 +80,7 @@ function openLinkTheAppDialog() {
     type: "detached_panel",
     url: "popup/app_link.html",
     width: 800,
-    height: 300,
+    height: 800,
   };
 
   console.log("open link the app dialog");

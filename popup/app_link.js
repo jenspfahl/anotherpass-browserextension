@@ -46,42 +46,33 @@ const keyPair = window.crypto.subtle.generateKey(
   document.getElementById("web_client_id").value = webClientId;
   document.getElementById("public_key").value = publicKeyAsPEM;
   document.getElementById("temp_session_key").value = bytesToBase64(sessionKeyAsArray);
+
+  const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
+  generateQrCode(qrCodeInput);
 });
 
 
+
+function generateQrCode(input) {
+  const qrCodeDiv = document.querySelector(".qr-code");
+  var qrcode = new QRCode(qrCodeDiv, {
+      text: input,
+      width: 400, //default 128
+      height: 400,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+  });
+} 
 
 
 document.addEventListener("click", (e) => {
 
-  if (e.target.id === "host") {
+  if (e.target.id === "next") {
 
-    inputIp();
+    // TODO check and save data
 
   }
 });
 
 
-function handleResponse(message) {
-  console.log(`Message from the background script: ${message.response}`);
-  alert(message.response);
-}
-
-function handleError(error) {
-  console.log(`Error: ${error}`);
-}
-
-function inputIp() {
-
-  console.log("here");
-
-
-  var ip = prompt("Enter IP address:");
-
-  if (ip == null || ip == "") {
-    ip = "192.168.178.27";
-  }
-
-  // TODO save host
-
-
-}
