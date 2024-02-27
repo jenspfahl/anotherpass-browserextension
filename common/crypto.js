@@ -30,6 +30,15 @@ async function getPublicKeyFingerprint(key) {
   return bytesToHex(new Uint8Array(digest));
 }
 
+
+async function getPublicKeyShortenedFingerprint(key) {
+  const pem = await publicKeyToPEM(key);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pem);
+  const digest = await crypto.subtle.digest("SHA-256", data);
+  return bytesToBase64(new Uint8Array(digest)).replace(/[^a-z]/gi, '').substring(0, 6).toLocaleLowerCase();
+}
+
 async function sessionKeyToArray(sessionKey) {
   const exported = await window.crypto.subtle.exportKey("raw", sessionKey);
   return new Uint8Array(exported); 
@@ -118,6 +127,13 @@ function storeKeyPair(key, keyPair) {
 
   keyStoreOp(function (keyStore) {
     keyStore.put({key: key, keyPair: keyPair});
+	})
+}
+
+function deleteKeyPair(key) {
+
+  keyStoreOp(function (keyStore) {
+    keyStore.delete(key);
 	})
 }
 
