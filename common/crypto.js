@@ -114,3 +114,52 @@ function bytesToHex(bytes) {
   }).join('');
 }
 
+function storeKeyPair(key, keyPair) {
+
+  keyStoreOp(function (keyStore) {
+    keyStore.put({key: key, keyPair: keyPair});
+	})
+}
+
+async function loadKeyPair(key, fn_) {
+	keyStoreOp(function (keyStore) {
+    var getData = keyStore.get(key);
+    getData.onsuccess = async function() {
+    	var keyPair = getData.result.keyPair;
+			console.log("loaded keyPair", keyPair);
+      fn_(keyPair);
+	   };
+	})
+}
+
+
+function keyStoreOp(fn_) {
+
+	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
+	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+
+	// Open (or create) the database
+	var open = indexedDB.open("anotherpass-webext", 1);
+
+	// Create the schema
+	open.onupgradeneeded = function() {
+	    var db = open.result;
+	    db.createObjectStore("keyStore", {keyPath: "key"});
+	};
+
+
+	open.onsuccess = function() {
+	    // Start a new transaction
+	    var db = open.result;
+	    var tx = db.transaction("keyStore", "readwrite");
+	    var keyStore = tx.objectStore("keyStore");
+
+      fn_(keyStore);
+
+
+	    // Close the db when the transaction is done
+	    tx.oncomplete = function() {
+	        db.close();
+	    };
+	}
+}

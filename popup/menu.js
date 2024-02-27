@@ -1,3 +1,4 @@
+
 document.addEventListener("click", (e) => {
 
   if (e.target.id === "link") {
@@ -10,3 +11,14 @@ document.addEventListener("click", (e) => {
 
   }
 });
+
+
+var webClientId = localStorage.getItem("web_client_id");
+
+if (webClientId) {
+  document.getElementById("state").innerText = "Coupled";
+  document.getElementById("link").innerText = "Decouple from app";
+}
+else {
+  document.getElementById("state").innerText = "Not coupled";
+}

@@ -45,6 +45,7 @@ const keyPair = window.crypto.subtle.generateKey(
   
   document.getElementById("web_client_id").value = webClientId;
   document.getElementById("public_key").value = publicKeyAsPEM;
+  document.getElementById("public_key_fingerprint").value = publicKeyFingerprint;
   document.getElementById("temp_session_key").value = bytesToBase64(sessionKeyAsArray);
 
 
@@ -65,63 +66,13 @@ function generateQrCode(input) {
   const qrCodeDiv = document.querySelector(".qr-code");
   var qrcode = new QRCode(qrCodeDiv, {
       text: input,
-      width: 400, //default 128
-      height: 400,
+      width: 512,
+      height: 512,
       colorDark : "#000000",
       colorLight : "#ffffff",
       correctLevel : QRCode.CorrectLevel.H
   });
 } 
-
-
-function keyStoreOp(fn_) {
-
-	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
-	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
-
-	// Open (or create) the database
-	var open = indexedDB.open("anotherpass-webext", 1);
-
-	// Create the schema
-	open.onupgradeneeded = function() {
-	    var db = open.result;
-	    db.createObjectStore("keyStore", {keyPath: "key"});
-	};
-
-
-	open.onsuccess = function() {
-	    // Start a new transaction
-	    var db = open.result;
-	    var tx = db.transaction("keyStore", "readwrite");
-	    var keyStore = tx.objectStore("keyStore");
-
-      fn_(keyStore);
-
-
-	    // Close the db when the transaction is done
-	    tx.oncomplete = function() {
-	        db.close();
-	    };
-	}
-}
-
-function storeKeyPair(key, keyPair) {
-
-  keyStoreOp(function (keyStore) {
-    keyStore.put({key: key, keyPair: keyPair});
-	})
-}
-
-async function loadKeyPair(key, fn_) {
-	keyStoreOp(function (keyStore) {
-    var getData = keyStore.get(key);
-    getData.onsuccess = async function() {
-    	var keyPair = getData.result.keyPair;
-			console.log("loaded keyPair", keyPair);
-      fn_(keyPair);
-	   };
-	})
-}
 
 
 document.addEventListener("click", (e) => {

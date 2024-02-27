@@ -30,29 +30,16 @@ document.addEventListener("click", (e) => {
 });
 
 
-function poll(fn, timeout, interval) {
-  var endTime = Number(new Date()) + (timeout || 2000);
-  interval = interval || 100;
-  console.log(`endTime: ${new Date(endTime)}`);
-  var checkCondition = async function (resolve, reject) {
-    var result = await fn();
-    console.log(`result: ${JSON.stringify(result)}`);
-    if (result) {
-      resolve(result);
-    }
-    else if (Number(new Date()) < endTime) {
-      console.log(`new timeout: ${new Date(endTime)}`);
-      setTimeout(checkCondition, interval, resolve, reject);
-    }
-    else {
-      console.log(`Error: ${arguments}`);
-      reject(new Error('timed out for ' + fn + ': ' + arguments));
-    }
-  };
+var webClientId = localStorage.getItem("web_client_id");
+const address = getAddress();
 
-  return new Promise(checkCondition);
+if (webClientId) {
+  loadKeyPair("transport_keypair", async function(keyPair) {
+    const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
+    document.getElementById("web_client_id").innerText = "Requesting " + address + " as " + webClientId + " with fingerprint " + publicKeyFingerprint;
+  });
+
 }
-
 
 
 poll(async function () {

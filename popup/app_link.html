@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="common.css" />
+    <link rel="stylesheet" href="app_link.css" />
   </head>
 
   <body>
@@ -10,6 +11,7 @@
     <div id="popup-content">
       <input readonly="true" id="web_client_id"/>
       <input readonly="true" id="public_key"/>
+      <input readonly="true" id="public_key_fingerprint"/>
       <input readonly="true" id="temp_session_key"/>
 
       <div class="qr-code"></div>
@@ -21,6 +23,7 @@
 
     </div>
     <script src="../common/crypto.js"></script>
+    <script src="../common/remote.js"></script>
     <script src="../libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="app_link.js"></script>
   </body>

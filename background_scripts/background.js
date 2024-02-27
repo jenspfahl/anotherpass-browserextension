@@ -44,26 +44,14 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 function fetchCredentials(message, sendResponse) {
-  const server = localStorage.getItem("server_address");
-  const port = localStorage.getItem("server_port");
-  const address = server + ":" + port;
-  console.log("fetch from", address);
-  fetch('http://' + address + '/', {
-    method: 'GET'
-  }).then(res => {
-    console.log("received: " + JSON.stringify(res));
-
-    return res.text();
-  }).then(res => {
-
-    console.log("send " + res);
-
-    sendResponse({ response: JSON.parse(res) });
-  }).catch(e => {
-    console.warn(e);
-    sendResponse({ response: null });
-  });
+  const request = {
+    action: "request_password",
+    sessionKey: "mock", 
+  };
+  
+  remoteCall(request, sendResponse);
 }
+
 
 function openPasswordRequestDialog() {
   let createData = {
