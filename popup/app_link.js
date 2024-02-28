@@ -58,10 +58,8 @@ else {
     const decryptedMessage = await decryptMessage(decSessionKey, encryptedMessage);
     console.log("Decrypted message = " + decryptedMessage);
 
-    document.getElementById("web_client_id").value = webClientId;
-    document.getElementById("public_key").value = publicKeyAsPEM;
-    document.getElementById("public_key_fingerprint").value = publicKeyFingerprint;
-    document.getElementById("temp_session_key").value = bytesToBase64(sessionKeyAsArray);
+    document.getElementById("web_client_id").innerText = webClientId;
+  
     /*
     
         storeKeyPair("transport_keypair", keyPair);

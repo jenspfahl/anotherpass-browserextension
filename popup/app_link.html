@@ -7,21 +7,24 @@
   </head>
 
   <body>
-    <h3>Scan this QR code with ANOTHERpass app and enter the IP / hostname provided by the app</h3>
+    Request from
+    <h1 id="web_client_id"></h1>
+    <h2>Scan this QR code with the ANOTHERpass app and enter the IP / hostname provided by the app.</h2>
     <div id="popup-content">
-      <input readonly="true" id="web_client_id"/>
-      <input readonly="true" id="public_key"/>
-      <input readonly="true" id="public_key_fingerprint"/>
-      <input readonly="true" id="temp_session_key"/>
 
       <div class="qr-code"><img id="loading_icon" src="../icons/loading_icon-512.gif"/></div>
 
+      <p></p>
+      IP / hostname and port of the app:
       <input id="ip"/>
       <input id="port"/>
+      
+      <p></p>
 
-      <button type="button" id="next">Save</button>
 
     </div>
+    <button type="button" id="next">Save</button>
+
     <script src="../common/crypto.js"></script>
     <script src="../common/remote.js"></script>
     <script src="../libs/qrcodejs/1.0.0/qrcode.min.js"></script>
