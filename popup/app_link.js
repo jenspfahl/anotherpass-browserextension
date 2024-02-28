@@ -83,13 +83,22 @@ else {
         const ip = document.getElementById("ip").value;
         const port = document.getElementById("port").value;
 
-        localStorage.setItem("server_address", ip);
-        localStorage.setItem("server_port", port);
-        localStorage.setItem("web_client_id", webClientId);
+        if (!ip) {
+          alert("A host is required");
+        }
+        else if (!port) {
+          alert("A port is required");
+        }
+        else {
 
-        storeKeyPair("transport_keypair", keyPair);
+          localStorage.setItem("server_address", ip);
+          localStorage.setItem("server_port", port);
+          localStorage.setItem("web_client_id", webClientId);
 
-        window.close();
+          storeKeyPair("transport_keypair", keyPair);
+
+          window.close();
+        }
       }
     });
   });
@@ -97,6 +106,7 @@ else {
 
 
   function generateQrCode(input) {
+    document.getElementById("loading_icon").remove();
     const qrCodeDiv = document.querySelector(".qr-code");
     var qrcode = new QRCode(qrCodeDiv, {
       text: input,

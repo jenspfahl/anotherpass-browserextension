@@ -29,12 +29,20 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "update") {
 
-    // TODO check and save data
+    // TODO check and save data --> function
     const ip = document.getElementById("ip").value;
     const port = document.getElementById("port").value;
 
-    localStorage.setItem("server_address", ip);
-    localStorage.setItem("server_port", port);
+    if (!ip) {
+      alert("A host is required");
+    }
+    else if (!port) {
+      alert("A port is required");
+    }
+    else {
+      localStorage.setItem("server_address", ip);
+      localStorage.setItem("server_port", port);
+    }
 
   }
 });
