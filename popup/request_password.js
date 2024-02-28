@@ -12,7 +12,7 @@ document.addEventListener("click", (e) => {
     console.log(`Error: ${error}`);
   }
 
-  if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) {
+  if (e.target.tagName !== "BUTTON") {
     // Ignore when click is not on a button within <div id="popup-content">.
     return;
   }
@@ -25,6 +25,7 @@ document.addEventListener("click", (e) => {
 
   }
   else if (e.target.id === "close") {
+    //TODO turn this button to retry after end
     window.close();
   }
   else if (e.target.id === "update") {
@@ -64,7 +65,9 @@ else {
 
   loadKeyPair("transport_keypair", async function (keyPair) {
     const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(keyPair.publicKey);
-    document.getElementById("web_client_id").innerText = "Requesting as " + webClientId + " with fingerprint " + publicKeyFingerprint + " from:";
+    document.getElementById("web_client_id").innerText = webClientId;
+    document.getElementById("fingerprint").innerText = publicKeyFingerprint;
+
 
 
     poll(async function () {
@@ -80,7 +83,7 @@ else {
       sendPasteCredentialMessage(response.passwd);
     }).catch(function (e) {
       document.getElementById("waiting_time").value = 0;
-      alert("You haven't opened the app in reasonable time.");
+      alert("You haven't opened the app in reasonable time or the host or port is wrong.");
     });
 
 

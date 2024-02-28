@@ -57,8 +57,8 @@ function openPasswordRequestDialog() {
   let createData = {
     type: "detached_panel",
     url: "popup/request_password.html",
-    width: 800,
-    height: 300,
+    width: 820,
+    height: 380,
   };
 
   console.log("open request password dialog");
