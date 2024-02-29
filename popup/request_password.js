@@ -16,14 +16,6 @@ document.addEventListener("click", (e) => {
     // Ignore when click is not on a button within <div id="popup-content">.
     return;
   }
-  if (e.target.id === "fetch_passwd") {
-
-    const sending = chrome.runtime.sendMessage({
-      action: "request_password",
-    });
-    sending.then(handleResponse, handleError);
-
-  }
   else if (e.target.id === "close") {
     //TODO turn this button to retry after end
     window.close();
@@ -63,7 +55,7 @@ else {
   document.getElementById("port").value = port;
 
 
-  loadKeyPair("transport_keypair", async function (keyPair) {
+  loadKeyPair("client_keypair", async function (keyPair) {
     const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(keyPair.publicKey);
     document.getElementById("web_client_id").innerText = webClientId;
     document.getElementById("fingerprint").innerText = publicKeyFingerprint;
@@ -76,13 +68,19 @@ else {
       });
       console.log("response = " + JSON.stringify(response));
       return response.response;
-    }, 20000, 1000).then(function (response) {
+    }, 30000, 1000).then(function (response) { // TODO make timeout configurable (default 30 sec)
       // polling done
       console.log(`Message from the password poll: ${JSON.stringify(response)}`);
       document.getElementById("waiting_time").value = 100;
+
+      //TODO store nextKeyPair
+      
       sendPasteCredentialMessage(response.passwd);
     }).catch(function (e) {
       document.getElementById("waiting_time").value = 0;
+      document.getElementById("instruction").innerText = "Unable to receive credentials!";
+      document.getElementById("close").innerText = "Close";
+
       alert("You haven't opened the app in reasonable time or the host or port is wrong.");
     });
 

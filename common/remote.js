@@ -35,21 +35,48 @@ function remoteCall(message, sendResponse) {
 
   const address = getAddress();
   console.log("fetch from", address);
-  fetch('http://' + address + '/', {
-    method: 'POST',
-    headers: { "X-WebClientId": webClientId},
-    body: JSON.stringify(message)
-  }).then(res => {
-    console.log("received: " + JSON.stringify(res));
 
-    return res.text();
-  }).then(res => {
 
-    console.log("send " + res);
+  loadKeyPair("client_keypair", async function (keyPair) { // TODO later load app public key
+    const appPublicKey = keyPair.publicKey; //TODO later load app public key
 
-    sendResponse({ response: JSON.parse(res) });
-  }).catch(e => {
-    console.warn(e);
-    sendResponse({ response: null });
+    const sessionKey = await generateOrGetSessionKey(); 
+    console.log("sK=" + sessionKey);
+    const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
+    const encSessionKey = await encryptWithPublicKey(appPublicKey, sessionKeyAsArray);
+    const encryptedMessage = await encryptMessage(sessionKey, JSON.stringify(message));
+
+
+    const request = {
+      encSessionKey: bytesToBase64(encSessionKey),
+      envelope: encryptedMessage
+    };
+    console.log("sending request:", JSON.stringify(request));
+
+
+    fetch('http://' + address + '/', {
+      method: 'POST',
+      headers: { "X-WebClientId": webClientId},
+      body: JSON.stringify(request)
+    }).then(res => {
+      console.log("received: " + JSON.stringify(res));
+
+      if (res.status == 401) {
+        console.warn("App said Unauthorized");
+        return null;
+      }
+      //TODO decrypt payload with sessionKey
+      // response looks allways like { "envelope", "signature"(optional) }
+      return res.text();
+    }).then(res => {
+
+      console.log("send " + res);
+
+      sendResponse({ response: JSON.parse(res) });
+    }).catch(e => {
+      console.warn(e);
+      sendResponse({ response: null });
+    });
   });
+
 }

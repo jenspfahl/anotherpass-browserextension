@@ -1,18 +1,25 @@
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action);
+  console.log("sender: " + JSON.stringify(sender));
 
-  if (message.action === "request_password") {
-    fetchCredentials(message, sendResponse);
-    return true;
-  }
-  else if (message.action === "start_password_request_flow") {
+
+  if (message.action === "start_password_request_flow") {
     openPasswordRequestDialog();
     return true; 
 
   }
+  else if (message.action === "request_password") {
+    fetchCredentials(sendResponse);
+    return true;
+  }
   else if (message.action === "start_link_flow") {
     openLinkTheAppDialog();
+    return true; 
+
+  }
+  else if (message.action === "link_to_app") {
+    linkToApp(sendResponse);
     return true; 
 
   }
@@ -43,13 +50,40 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function fetchCredentials(message, sendResponse) {
-  const request = {
-    action: "request_password",
-    sessionKey: "mock", 
-  };
-  
-  remoteCall(request, sendResponse);
+function fetchCredentials(sendResponse) {
+
+  generateOrGetClientKeyPair().then(clientKeyPair => {
+    const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
+    const request = {
+      action: "request_password",
+      website: "https://example.org", // TODO, take this from the content script,
+      nextClientPublicKey: nextClientPublicKey
+    };
+    
+    remoteCall(request, sendResponse);
+  });
+
+}
+
+
+function linkToApp(sendResponse) {
+
+
+  console.log("linkToApp");
+
+  loadKeyPair("client_keypair", async function (keyPair) { 
+    const clientPublicKey = keyPair.publicKey;
+    const clientPublicKeyAsPEM = await publicKeyToPEM(clientPublicKey);
+
+    const request = {
+      action: "link_app",
+      clientPublicKey: clientPublicKeyAsPEM
+    };
+
+    console.log("linkToApp send: " + JSON.stringify(request));
+    
+    remoteCall(request, sendResponse);
+  });
 }
 
 
@@ -68,14 +102,32 @@ function openPasswordRequestDialog() {
 
 
 function openLinkTheAppDialog() {
-  let createData = {
-    type: "detached_panel",
-    url: "popup/app_link.html",
-    width: 800,
-    height: 800,
-  };
+  const webClientId = localStorage.getItem("web_client_id");
 
-  console.log("open link the app dialog");
+  if (webClientId) {
+    let createData = {
+      type: "detached_panel",
+      url: "popup/app_unlink.html",
+      width: 700,
+      height: 300,
+    };
+  
+    console.log("open link the app dialog");
+  
+    browser.windows.create(createData);
+  }
+  else {
+    let createData = {
+      type: "detached_panel",
+      url: "popup/app_link.html",
+      width: 800,
+      height: 800,
+    };
+  
+    console.log("open link the app dialog");
+  
+    browser.windows.create(createData);
+  }
 
-  browser.windows.create(createData);
+  
 }

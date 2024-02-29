@@ -1,3 +1,5 @@
+var currentSessionKey;
+var clientKeyPair;
 
 function generateWebClientId() {
   const rnd = window.crypto.getRandomValues(new Uint8Array(32));
@@ -5,15 +7,44 @@ function generateWebClientId() {
   return [s.slice(0, 4), '-', s.slice(4)].join('');
 }
 
-function generateSessionKey() {
-  return window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 128,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
+async function generateOrGetSessionKey() {
+  if (currentSessionKey == null) {
+    currentSessionKey = await window.crypto.subtle.generateKey(
+      {
+        name: "AES-GCM",
+        length: 128,
+      },
+      true,
+      ["encrypt", "decrypt"]
+    );
+  }
+
+  return currentSessionKey;
+}
+
+function destroyCurrentSessionKey() {
+  currentSessionKey = null;
+}
+
+async function generateOrGetClientKeyPair() {
+  if (clientKeyPair == null) {
+    clientKeyPair = await window.crypto.subtle.generateKey(
+      {
+        name: "RSA-OAEP",
+        modulusLength: 4096,
+        publicExponent: new Uint8Array([1, 0, 1]),
+        hash: "SHA-256",
+      },
+      false,
+      ["encrypt", "decrypt"],
+    )
+  }
+
+  return clientKeyPair;
+}
+
+function destroyClientKeyPair() {
+  clientKeyPair = null;
 }
 
 async function publicKeyToPEM(key) {

@@ -1,38 +1,21 @@
 
 var webClientId = localStorage.getItem("web_client_id");
 
-if (webClientId) {
-  localStorage.removeItem("web_client_id");
-  localStorage.removeItem("server_address");
-  localStorage.removeItem("server_port");
-  deleteKeyPair("transport_keypair");
+if (!webClientId) {
 
-
-  alert("Extension decoupled");
-  window.close();
-
-}
-else {
   webClientId = generateWebClientId();
 
   console.log("webClientId = " + webClientId);
 
   const ip = localStorage.getItem("server_address");
   const port = localStorage.getItem("server_port");
+  document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app and enter the IP / hostname provided by the app.";
   document.getElementById("ip").value = ip;
   document.getElementById("port").value = port || 8001;
 
 
-  const keyPair = window.crypto.subtle.generateKey(
-    {
-      name: "RSA-OAEP",
-      modulusLength: 4096,
-      publicExponent: new Uint8Array([1, 0, 1]),
-      hash: "SHA-256",
-    },
-    false,
-    ["encrypt", "decrypt"],
-  ).then(async keyPair => {
+  destroyClientKeyPair(); // ensure regeneration
+  generateOrGetClientKeyPair().then(async keyPair => {
     const publicKeyAsPEM = await publicKeyToPEM(keyPair.publicKey);
     console.log(publicKeyAsPEM);
 
@@ -40,7 +23,7 @@ else {
     console.log("Fingerprint: " + publicKeyFingerprint);
 
 
-    const sessionKey = await generateSessionKey();
+    const sessionKey = await generateOrGetSessionKey();
     const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
     console.log("AES Session Key = " + bytesToBase64(sessionKeyAsArray));
 
@@ -59,15 +42,6 @@ else {
     console.log("Decrypted message = " + decryptedMessage);
 
     document.getElementById("web_client_id").innerText = webClientId;
-  
-    /*
-    
-        storeKeyPair("transport_keypair", keyPair);
-    
-        loadKeyPair("transport_keypair", async function (keyPair) {
-          const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
-          console.log("loaded pub", publicKeyFingerprint);
-        });*/
 
     const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
     generateQrCode(qrCodeInput);
@@ -93,7 +67,11 @@ else {
           localStorage.setItem("server_port", port);
           localStorage.setItem("web_client_id", webClientId);
 
-          storeKeyPair("transport_keypair", keyPair);
+          storeKeyPair("client_keypair", keyPair);
+
+          const sending = chrome.runtime.sendMessage({
+            action: "link_to_app"
+          });
 
           window.close();
         }
