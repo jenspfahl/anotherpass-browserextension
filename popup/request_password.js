@@ -61,7 +61,6 @@ else {
     document.getElementById("fingerprint").innerText = publicKeyFingerprint;
 
 
-
     poll(async function () {
       let response = await chrome.runtime.sendMessage({
         action: "request_password",

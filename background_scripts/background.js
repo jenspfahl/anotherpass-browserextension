@@ -1,3 +1,4 @@
+let currentRequesterUrl;
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action);
@@ -5,6 +6,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
   if (message.action === "start_password_request_flow") {
+    currentRequesterUrl = message.url;
+
     openPasswordRequestDialog();
     return true; 
 
@@ -56,7 +59,7 @@ function fetchCredentials(sendResponse) {
     const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
     const request = {
       action: "request_password",
-      website: "https://example.org", // TODO, take this from the content script,
+      website: currentRequesterUrl,
       nextClientPublicKey: nextClientPublicKey
     };
     
@@ -87,7 +90,7 @@ function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog() {
+function openPasswordRequestDialog(url) {
   let createData = {
     type: "detached_panel",
     url: "popup/request_password.html",

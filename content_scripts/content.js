@@ -15,10 +15,12 @@
      button.addEventListener("click", function() {
       input.focus();
       
-      console.log("button click");
+      const parsedUrl = new URL(window.location.href);
+      console.log("current url=" + parsedUrl);
 
       const sending = chrome.runtime.sendMessage({
         action: "start_password_request_flow",
+        url: parsedUrl.toString()
       });
 
   }, false);

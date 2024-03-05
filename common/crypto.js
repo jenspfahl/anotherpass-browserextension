@@ -194,6 +194,9 @@ function keyStoreOp(fn_) {
 	    db.createObjectStore("keyStore", {keyPath: "key"});
 	};
 
+  open.onerror = function(e) {
+    console.error("cannot load key", e)
+  }
 
 	open.onsuccess = function() {
 	    // Start a new transaction
