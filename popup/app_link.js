@@ -74,10 +74,22 @@ if (!linked) {
             action: "link_to_app"
           }).then(response => {
             console.log("linking response: " + JSON.stringify(response))
+            if (response.response == null) {
+              console.log("linking error from server, see previous logs");
+              alert("Cannot link with the app. Check whether the IP is correct.");
+            }
+            else {
             localStorage.setItem("linked", true);
+            currentSessionKey = null
+            window.close();
+            }
+
+          },
+          error => {
+            console.log("unknown linking error from server: ", error);
+            alert("Cannot link with the app due to an unknown problem");
           });
 
-          window.close();
         }
       }
     });
