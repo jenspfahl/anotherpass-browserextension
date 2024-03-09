@@ -1,9 +1,8 @@
+const linked = localStorage.getItem("linked");
 
-var webClientId = localStorage.getItem("web_client_id");
+if (!linked) {
 
-if (!webClientId) {
-
-  webClientId = generateWebClientId();
+  const webClientId = generateWebClientId();
 
   console.log("webClientId = " + webClientId);
 
@@ -26,7 +25,7 @@ if (!webClientId) {
     const sessionKey = await generateOrGetSessionKey();
     const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
     console.log("AES Session Key = " + bytesToBase64(sessionKeyAsArray));
-
+/*
     const encryptedMessage = await encryptMessage(sessionKey, "secret");
     console.log("Encrypted message = " + encryptedMessage);
 
@@ -40,8 +39,13 @@ if (!webClientId) {
     const decSessionKey = await arrayToSessionKey(decSessionKeyAsArray);
     const decryptedMessage = await decryptMessage(decSessionKey, encryptedMessage);
     console.log("Decrypted message = " + decryptedMessage);
-
+*/
     document.getElementById("web_client_id").innerText = webClientId;
+
+    localStorage.setItem("web_client_id", webClientId);
+
+    storeKeyPair("client_keypair", keyPair);
+
 
     const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
     generateQrCode(qrCodeInput);
@@ -65,12 +69,12 @@ if (!webClientId) {
 
           localStorage.setItem("server_address", ip);
           localStorage.setItem("server_port", port);
-          localStorage.setItem("web_client_id", webClientId);
-
-          storeKeyPair("client_keypair", keyPair);
-
+          
           const sending = chrome.runtime.sendMessage({
             action: "link_to_app"
+          }).then(response => {
+            console.log("linking response: " + JSON.stringify(response))
+            localStorage.setItem("linked", true);
           });
 
           window.close();
@@ -94,4 +98,7 @@ if (!webClientId) {
     });
   }
 
+}
+else {
+  alert("Something went wrong :(")
 }

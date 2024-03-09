@@ -57,10 +57,12 @@ function fetchCredentials(sendResponse) {
 
   generateOrGetClientKeyPair().then(clientKeyPair => {
     const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
+    const server = localStorage.getItem("server_address");
     const request = {
       action: "request_password",
       website: currentRequesterUrl,
-      nextClientPublicKey: nextClientPublicKey
+      nextClientPublicKey: nextClientPublicKey,
+      configuredServer: server 
     };
     
     remoteCall(request, sendResponse);
@@ -77,10 +79,11 @@ function linkToApp(sendResponse) {
   loadKeyPair("client_keypair", async function (keyPair) { 
     const clientPublicKey = keyPair.publicKey;
     const clientPublicKeyAsPEM = await publicKeyToPEM(clientPublicKey);
-
+    const server = localStorage.getItem("server_address");
     const request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsPEM
+      clientPublicKey: clientPublicKeyAsPEM,
+      configuredServer: server
     };
 
     console.log("linkToApp send: " + JSON.stringify(request));
@@ -105,9 +108,9 @@ function openPasswordRequestDialog(url) {
 
 
 function openLinkTheAppDialog() {
-  const webClientId = localStorage.getItem("web_client_id");
+  const linked = localStorage.getItem("linked");
 
-  if (webClientId) {
+  if (linked) {
     let createData = {
       type: "detached_panel",
       url: "popup/app_unlink.html",

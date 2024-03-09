@@ -44,7 +44,7 @@ document.addEventListener("click", (e) => {
 var webClientId = localStorage.getItem("web_client_id");
 
 if (!webClientId) {
-  alert("Extension not coudpled with an app! Please first couple it.");
+  alert("Extension not linked with an app! Please first link it.");
   window.close();
 } 
 else {

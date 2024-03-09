@@ -13,12 +13,13 @@ document.addEventListener("click", (e) => {
 });
 
 
-var webClientId = localStorage.getItem("web_client_id");
+const webClientId = localStorage.getItem("web_client_id");
+const linked = localStorage.getItem("linked");
 
-if (webClientId) {
-  document.getElementById("state").innerText = "Coupled (" + webClientId + ")";
-  document.getElementById("link").innerText = "Decouple from app";
+if (webClientId && linked) {
+  document.getElementById("state").innerText = "Linked (" + webClientId + ")";
+  document.getElementById("link").innerText = "Unlink from app";
 }
 else {
-  document.getElementById("state").innerText = "Not coupled";
+  document.getElementById("state").innerText = "Not linked";
 }

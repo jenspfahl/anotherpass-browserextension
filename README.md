@@ -157,6 +157,7 @@ WebExtensionEntity
 - webClientUuid
 - extensionPublicKeyAlias
 - serverKeyPairAlias
+- state
 
 
 

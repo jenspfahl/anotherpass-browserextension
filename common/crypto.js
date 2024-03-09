@@ -96,7 +96,7 @@ async function encryptMessage(sessionKey, message) {
   console.log(iv);
   console.log(new Uint8Array(ciphertext));
 
-  return bytesToBase64(iv) + ":" + bytesToBase64(new Uint8Array(ciphertext));
+  return "EWM:" + bytesToBase64(iv) + ":" + bytesToBase64(new Uint8Array(ciphertext));
 }
 
 async function decryptMessage(sessionKey, encrypted) {
@@ -172,6 +172,8 @@ async function loadKeyPair(key, fn_) {
 	keyStoreOp(function (keyStore) {
     var getData = keyStore.get(key);
     getData.onsuccess = async function() {
+      console.log("result=" + JSON.stringify(getData.result));
+
     	var keyPair = getData.result.keyPair;
 			console.log("loaded keyPair", keyPair);
       fn_(keyPair);

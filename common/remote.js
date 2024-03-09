@@ -48,7 +48,7 @@ function remoteCall(message, sendResponse) {
 
 
     const request = {
-      encSessionKey: bytesToBase64(encSessionKey),
+      encSessionKey: bytesToBase64(encSessionKey), // null if in linking phase because we don't have yet a server pubkey
       envelope: encryptedMessage,
       signature: null // TODO always sign the message with the app's public key (if available)
     };
