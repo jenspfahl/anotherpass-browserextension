@@ -21,7 +21,7 @@ if (!linked) {
     const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
     console.log("Fingerprint: " + publicKeyFingerprint);
 
-
+    destroyCurrentSessionKey();
     const sessionKey = await generateOrGetSessionKey();
     const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
     console.log("AES Session Key = " + bytesToBase64(sessionKeyAsArray));
@@ -80,7 +80,7 @@ if (!linked) {
             }
             else {
             localStorage.setItem("linked", true);
-            currentSessionKey = null
+            destroyCurrentSessionKey();
             window.close();
             }
 

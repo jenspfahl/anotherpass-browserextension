@@ -1,4 +1,3 @@
-var currentSessionKey;
 var clientKeyPair;
 
 function generateWebClientId() {
@@ -8,8 +7,15 @@ function generateWebClientId() {
 }
 
 async function generateOrGetSessionKey() {
-  if (currentSessionKey == null) {
-    currentSessionKey = await window.crypto.subtle.generateKey(
+  const currentSessionKey = localStorage.getItem("session_key");
+  if (currentSessionKey != null) {
+    console.log("Current session key found in mem");
+    const bytes = base64ToBytes(currentSessionKey);
+    return arrayToSessionKey(bytes);
+  }
+  else {
+    console.log("No session key in mem, generate new");
+    const sessionKey = await window.crypto.subtle.generateKey(
       {
         name: "AES-GCM",
         length: 128,
@@ -17,13 +23,14 @@ async function generateOrGetSessionKey() {
       true,
       ["encrypt", "decrypt"]
     );
+    const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
+    localStorage.setItem("session_key", bytesToBase64(new Uint8Array(sessionKeyAsArray)));
+    return sessionKey;
   }
-
-  return currentSessionKey;
 }
 
 function destroyCurrentSessionKey() {
-  currentSessionKey = null;
+  localStorage.removeItem("session_key");
 }
 
 async function generateOrGetClientKeyPair() {
