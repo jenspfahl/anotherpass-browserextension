@@ -44,7 +44,7 @@ if (!linked) {
 
     localStorage.setItem("web_client_id", webClientId);
 
-    storeKeyPair("client_keypair", keyPair);
+    await setKey("client_keypair", keyPair);
 
 
     const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
@@ -76,7 +76,7 @@ if (!linked) {
             console.log("linking response: " + JSON.stringify(response))
             if (response.response == null) {
               console.log("linking error from server, see previous logs");
-              alert("Cannot link with the app. Check whether the IP is correct.");
+              alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
             }
             else {
             localStorage.setItem("linked", true);

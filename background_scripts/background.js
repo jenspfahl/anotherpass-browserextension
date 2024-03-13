@@ -76,8 +76,8 @@ function linkToApp(sendResponse) {
 
   console.log("linkToApp");
 
-  loadKeyPair("client_keypair", async function (keyPair) { 
-    const clientPublicKey = keyPair.publicKey;
+  getKey("client_keypair").then(async value => {
+    const clientPublicKey = value.publicKey;
     const clientPublicKeyAsPEM = await publicKeyToPEM(clientPublicKey);
     const server = localStorage.getItem("server_address");
     const request = {

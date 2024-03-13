@@ -7,11 +7,10 @@ function generateWebClientId() {
 }
 
 async function generateOrGetSessionKey() {
-  const currentSessionKey = localStorage.getItem("session_key");
+  const currentSessionKey = await getKey("session_key");
   if (currentSessionKey != null) {
     console.log("Current session key found in mem");
-    const bytes = base64ToBytes(currentSessionKey);
-    return arrayToSessionKey(bytes);
+    return currentSessionKey;
   }
   else {
     console.log("No session key in mem, generate new");
@@ -23,14 +22,13 @@ async function generateOrGetSessionKey() {
       true,
       ["encrypt", "decrypt"]
     );
-    const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
-    localStorage.setItem("session_key", bytesToBase64(new Uint8Array(sessionKeyAsArray)));
+    await setKey("session_key", sessionKey);
     return sessionKey;
   }
 }
 
 function destroyCurrentSessionKey() {
-  localStorage.removeItem("session_key");
+  deleteKey("session_key");
 }
 
 async function generateOrGetClientKeyPair() {
@@ -161,64 +159,94 @@ function bytesToHex(bytes) {
   }).join('');
 }
 
-function storeKeyPair(key, keyPair) {
 
-  keyStoreOp(function (keyStore) {
-    keyStore.put({key: key, keyPair: keyPair});
-	})
+function openDb() {
+  return new Promise((resolve, reject) => {
+
+    // This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
+    var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
+
+    // Open (or create) the database
+    var open = indexedDB.open("anotherpass-webext", 1);
+
+    // Create the schema
+    open.onupgradeneeded = function() {
+        var db = open.result;
+        db.createObjectStore("keyStore", {keyPath: "key"});
+    };
+
+    open.onerror = event => reject(event.target.error);
+    open.onsuccess = function() {
+      var db = open.result;
+      resolve(db);
+    };
+  });
 }
 
-function deleteKeyPair(key) {
+function setKey(key, value) {
+  return new Promise(async (resolve, reject) => {
+    const db = await openDb();
+    const tx = db.transaction("keyStore", 'readwrite');
+    let result;    
 
-  keyStoreOp(function (keyStore) {
-    keyStore.delete(key);
-	})
+    tx.onerror = event => {
+      console.error("Cannot store key " + key, event.target.error);
+      return reject(event.target.error);
+    };
+    
+    const store = tx.objectStore("keyStore");
+    const request = store.put({key: key, value: value});
+    request.onsuccess = _ => result = request.result;
+    
+    tx.oncomplete = function() {
+      db.close();
+      resolve(result);
+    };
+  });
 }
 
-async function loadKeyPair(key, fn_) {
-	keyStoreOp(function (keyStore) {
-    var getData = keyStore.get(key);
-    getData.onsuccess = async function() {
-      console.log("result=" + JSON.stringify(getData.result));
-
-    	var keyPair = getData.result.keyPair;
-			console.log("loaded keyPair", keyPair);
-      fn_(keyPair);
-	   };
-	})
+function getKey(key) {
+  return new Promise(async (resolve, reject) => {
+    const db = await openDb();
+    const tx = db.transaction("keyStore", 'readwrite');
+   
+    let result;    
+    tx.onerror = event => reject(event.target.error);
+    
+    const store = tx.objectStore("keyStore");
+    const data = store.get(key);
+    data.onsuccess = () => {
+      console.log("Got back: " + JSON.stringify(data.result));
+      if (data.result) {
+        result = data.result.value;
+      }
+      else {
+        result = null;
+      }
+    };
+    
+    tx.oncomplete = function () {
+      db.close();
+      resolve(result);
+    };
+  });
 }
 
-
-function keyStoreOp(fn_) {
-
-	// This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
-	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
-
-	// Open (or create) the database
-	var open = indexedDB.open("anotherpass-webext", 1);
-
-	// Create the schema
-	open.onupgradeneeded = function() {
-	    var db = open.result;
-	    db.createObjectStore("keyStore", {keyPath: "key"});
-	};
-
-  open.onerror = function(e) {
-    console.error("cannot load key", e)
-  }
-
-	open.onsuccess = function() {
-	    // Start a new transaction
-	    var db = open.result;
-	    var tx = db.transaction("keyStore", "readwrite");
-	    var keyStore = tx.objectStore("keyStore");
-
-      fn_(keyStore);
-
-
-	    // Close the db when the transaction is done
-	    tx.oncomplete = function() {
-	        db.close();
-	    };
-	}
+function deleteKey(key) {
+  return new Promise(async (resolve, reject) => {
+    const db = await openDb();
+    const tx = db.transaction("keyStore", 'readwrite');
+   
+    let result;    
+    tx.onerror = event => reject(event.target.error);
+    
+    const store = tx.objectStore("keyStore");
+    const request = store.delete(key);
+    request.onsuccess = _ => result = request.result;
+    
+    tx.oncomplete = function() {
+      resolve(result);
+      db.close();
+    };
+  });
 }

@@ -37,8 +37,8 @@ function remoteCall(message, sendResponse) {
   console.log("fetch from", address);
 
 
-  loadKeyPair("client_keypair", async function (keyPair) { // TODO later load app public key
-    const appPublicKey = keyPair.publicKey; //TODO later load app public key
+  getKey("client_keypair").then(async value => { // TODO later load app public key
+    const appPublicKey = value.publicKey; //TODO later load app public key
 
     const sessionKey = await generateOrGetSessionKey(); 
     const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
@@ -60,7 +60,11 @@ function remoteCall(message, sendResponse) {
 
     fetch('http://' + address + '/', {
       method: 'POST',
-      headers: { "X-WebClientId": webClientId},
+      headers: { 
+        "X-WebClientId": webClientId, 
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
       body: JSON.stringify(request)
     }).then(res => {
       console.log("received: " + JSON.stringify(res));
