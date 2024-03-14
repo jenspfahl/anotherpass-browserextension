@@ -7,24 +7,28 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
   if (message.action === "start_password_request_flow") {
     currentRequesterUrl = message.url;
-
     openPasswordRequestDialog();
     return true; 
-
   }
   else if (message.action === "request_password") {
     fetchCredentials(sendResponse);
     return true;
   }
   else if (message.action === "start_link_flow") {
-    openLinkTheAppDialog();
+    openLinkWithQrCodeDialog();
     return true; 
-
+  }
+  else if (message.action === "continue_link_flow") {
+    openLinkWithPollDialog();
+    return true; 
   }
   else if (message.action === "link_to_app") {
     linkToApp(sendResponse);
     return true; 
-
+  }
+  else if (message.action === "approve_link") {
+    approveLink(sendResponse);
+    return true;
   }
   return false; 
 });
@@ -92,6 +96,23 @@ function linkToApp(sendResponse) {
   });
 }
 
+function approveLink(sendResponse) {
+
+  generateOrGetClientKeyPair().then(clientKeyPair => {
+    const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
+    const server = localStorage.getItem("server_address");
+    const request = {
+      action: "approve_link",
+      website: currentRequesterUrl,
+      nextClientPublicKey: nextClientPublicKey,
+      configuredServer: server 
+    };
+    
+    remoteCall(request, sendResponse);
+  });
+
+}
+
 
 function openPasswordRequestDialog(url) {
   let createData = {
@@ -107,7 +128,7 @@ function openPasswordRequestDialog(url) {
 }
 
 
-function openLinkTheAppDialog() {
+function openLinkWithQrCodeDialog() {
   const linked = localStorage.getItem("linked");
 
   if (linked) {
@@ -134,6 +155,18 @@ function openLinkTheAppDialog() {
   
     browser.windows.create(createData);
   }
+}
 
-  
+function openLinkWithPollDialog() {
+
+  let createData = {
+    type: "detached_panel",
+    url: "popup/app_link_approve.html",
+    width: 800,
+    height: 600,
+  };
+
+  console.log("open link the app dialog");
+
+  browser.windows.create(createData);
 }

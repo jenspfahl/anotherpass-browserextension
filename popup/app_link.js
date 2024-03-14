@@ -79,9 +79,11 @@ if (!linked) {
               alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
             }
             else {
-            localStorage.setItem("linked", true);
-            destroyCurrentSessionKey();
-            window.close();
+              window.close();
+
+              chrome.runtime.sendMessage({
+                action: "continue_link_flow",
+              });
             }
 
           },
