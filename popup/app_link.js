@@ -15,8 +15,8 @@ if (!linked) {
 
   destroyClientKeyPair(); // ensure regeneration
   generateOrGetClientKeyPair().then(async keyPair => {
-    const publicKeyAsPEM = await publicKeyToPEM(keyPair.publicKey);
-    console.log(publicKeyAsPEM);
+   // const publicKeyAsJWK = await publicKeyToJWK(keyPair.publicKey);
+   // console.log(publicKeyAsJWK);
 
     const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
     console.log("Fingerprint: " + publicKeyFingerprint);

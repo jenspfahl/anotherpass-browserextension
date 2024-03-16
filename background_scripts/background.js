@@ -60,7 +60,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 function fetchCredentials(sendResponse) {
 
   generateOrGetClientKeyPair().then(clientKeyPair => {
-    const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
+    const nextClientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
     const server = localStorage.getItem("server_address");
     const request = {
       action: "request_password",
@@ -82,11 +82,11 @@ function linkToApp(sendResponse) {
 
   getKey("client_keypair").then(async value => {
     const clientPublicKey = value.publicKey;
-    const clientPublicKeyAsPEM = await publicKeyToPEM(clientPublicKey);
+    const clientPublicKeyAsJWK = await publicKeyToJWK(clientPublicKey);
     const server = localStorage.getItem("server_address");
     const request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsPEM,
+      clientPublicKey: clientPublicKeyAsJWK,
       configuredServer: server
     };
 
@@ -99,7 +99,7 @@ function linkToApp(sendResponse) {
 function approveLink(sendResponse) {
 
   generateOrGetClientKeyPair().then(clientKeyPair => {
-    const nextClientPublicKey = publicKeyToPEM(clientKeyPair.publicKey);
+    const nextClientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
     const server = localStorage.getItem("server_address");
     const request = {
       action: "approve_link",

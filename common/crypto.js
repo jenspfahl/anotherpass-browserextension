@@ -1,4 +1,3 @@
-var clientKeyPair;
 
 function generateWebClientId() {
   const rnd = window.crypto.getRandomValues(new Uint8Array(32));
@@ -9,11 +8,11 @@ function generateWebClientId() {
 async function generateOrGetSessionKey() {
   const currentSessionKey = await getKey("session_key");
   if (currentSessionKey != null) {
-    console.log("Current session key found in mem");
+    console.log("Current session key found");
     return currentSessionKey;
   }
   else {
-    console.log("No session key in mem, generate new");
+    console.log("No session key, generate new");
     const sessionKey = await window.crypto.subtle.generateKey(
       {
         name: "AES-GCM",
@@ -32,7 +31,13 @@ function destroyCurrentSessionKey() {
 }
 
 async function generateOrGetClientKeyPair() {
-  if (clientKeyPair == null) {
+  const currentClientKeyPair = await getKey("client_keypair");
+  if (currentClientKeyPair != null) {
+    console.log("Current client keypair found");
+    return currentClientKeyPair;
+  }
+  else {
+    console.log("No client keypair, generate new");
     clientKeyPair = await window.crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
@@ -40,39 +45,38 @@ async function generateOrGetClientKeyPair() {
         publicExponent: new Uint8Array([1, 0, 1]),
         hash: "SHA-256",
       },
-      false,
+      true,
       ["encrypt", "decrypt"],
-    )
+    );
+    await setKey("client_keypair", clientKeyPair);
+    
+    return clientKeyPair;
   }
-
-  return clientKeyPair;
 }
 
 function destroyClientKeyPair() {
   clientKeyPair = null;
 }
 
-async function publicKeyToPEM(key) {
-  const exported = await window.crypto.subtle.exportKey("spki", key);
-  const exportedAsBase64 = bytesToBase64(new Uint8Array(exported));
-  return `-----BEGIN PUBLIC KEY-----\n${exportedAsBase64}\n-----END PUBLIC KEY-----`;
+async function publicKeyToJWK(key) {
+  return await window.crypto.subtle.exportKey("jwk", key);
 }
 
 async function getPublicKeyFingerprint(key) {
-  const pem = await publicKeyToPEM(key);
-  const encoder = new TextEncoder();
-  const data = encoder.encode(pem);
-  const digest = await crypto.subtle.digest("SHA-256", data);
+  const jwk = await publicKeyToJWK(key);
+  console.log("jwk.n=" + jwk.n);
+  const buffer = new TextEncoder().encode(jwk.n);
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
   return bytesToHex(new Uint8Array(digest));
 }
 
 
 async function getPublicKeyShortenedFingerprint(key) {
-  const pem = await publicKeyToPEM(key);
-  const encoder = new TextEncoder();
-  const data = encoder.encode(pem);
-  const digest = await crypto.subtle.digest("SHA-256", data);
-  return bytesToBase64(new Uint8Array(digest)).replace(/[^a-z]/gi, '').substring(0, 6).toLocaleLowerCase();
+  const jwk = await publicKeyToJWK(key);
+  const buffer = new TextEncoder().encode(jwk.n);
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  const f = bytesToBase64(new Uint8Array(digest)).replace(/[^a-z0-9]/gi, '').substring(0, 6).toLocaleLowerCase();
+  return f.substring(0, 2) + "-" + f.substring(2, 4) + "-" + f.substring(4, 6);
 }
 
 async function sessionKeyToArray(sessionKey) {
