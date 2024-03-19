@@ -7,8 +7,8 @@ if (webClientId) {
   const ip = localStorage.getItem("server_address");
   const port = localStorage.getItem("server_port");
 
-  getKey("client_keypair").then(async value => { //TODO get app public key
-    const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value.publicKey);
+  getKey("app_public_key").then(async value => { 
+    const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value);
     document.getElementById("fingerprint").innerText = publicKeyFingerprint;
   
 

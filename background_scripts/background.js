@@ -26,10 +26,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     linkToApp(sendResponse);
     return true; 
   }
-  else if (message.action === "approve_link") {
-    approveLink(sendResponse);
-    return true;
-  }
   return false; 
 });
 
@@ -94,23 +90,6 @@ function linkToApp(sendResponse) {
     
     remoteCall(request, sendResponse);
   });
-}
-
-function approveLink(sendResponse) {
-
-  generateOrGetClientKeyPair().then(clientKeyPair => {
-    const nextClientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
-    const server = localStorage.getItem("server_address");
-    const request = {
-      action: "approve_link",
-      website: currentRequesterUrl,
-      nextClientPublicKey: nextClientPublicKey,
-      configuredServer: server 
-    };
-    
-    remoteCall(request, sendResponse);
-  });
-
 }
 
 

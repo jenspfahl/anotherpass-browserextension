@@ -1,8 +1,8 @@
 
 function generateWebClientId() {
   const rnd = window.crypto.getRandomValues(new Uint8Array(32));
-  const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 8).toUpperCase();
-  return [s.slice(0, 4), '-', s.slice(4)].join('');
+  const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 6).toUpperCase();
+  return [s.slice(0, 3), '-', s.slice(3)].join('');
 }
 
 async function generateOrGetSessionKey() {
@@ -58,13 +58,30 @@ function destroyClientKeyPair() {
   clientKeyPair = null;
 }
 
+async function jwkToPublicKey(jwk) {
+  console.debug("JWK to import:", JSON.stringify(jwk));
+  console.log("in: jwk.n=" + jwk.n);
+  console.log("in: jwk.e=" + jwk.e);
+
+
+  return window.crypto.subtle.importKey(
+    "jwk",
+    jwk,
+    {
+      name: "RSA-OAEP",
+      hash: "SHA-256",
+    },
+    true,
+    ["encrypt"],
+  );
+}
+
 async function publicKeyToJWK(key) {
   return await window.crypto.subtle.exportKey("jwk", key);
 }
 
 async function getPublicKeyFingerprint(key) {
   const jwk = await publicKeyToJWK(key);
-  console.log("jwk.n=" + jwk.n);
   const buffer = new TextEncoder().encode(jwk.n);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
   return bytesToHex(new Uint8Array(digest));
@@ -74,6 +91,8 @@ async function getPublicKeyFingerprint(key) {
 async function getPublicKeyShortenedFingerprint(key) {
   const jwk = await publicKeyToJWK(key);
   const buffer = new TextEncoder().encode(jwk.n);
+  console.log("out: jwk.n=" + jwk.n);
+
   const digest = await crypto.subtle.digest("SHA-256", buffer);
   const f = bytesToBase64(new Uint8Array(digest)).replace(/[^a-z0-9]/gi, '').substring(0, 6).toLocaleLowerCase();
   return f.substring(0, 2) + "-" + f.substring(2, 4) + "-" + f.substring(4, 6);
@@ -110,8 +129,12 @@ async function encryptMessage(sessionKey, message) {
 
 async function decryptMessage(sessionKey, encrypted) {
   const splitted = encrypted.split(":");
-  const iv = base64ToBytes(splitted[0]);
-  const ciphertext = base64ToBytes(splitted[1]);
+  const type = splitted[0];
+  if (type !== "EWM" ) {
+    throw new Error("Unknown type");
+  }
+  const iv = base64ToBytes(splitted[1]);
+  const ciphertext = base64ToBytes(splitted[2]);
   console.log(iv);
   console.log(ciphertext);
   const decrypted = await window.crypto.subtle.decrypt(
@@ -148,6 +171,9 @@ async function decryptWithPrivateKey(privateKey, encrypted) {
 }
 
 function base64ToBytes(base64) {
+  base64 = base64
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
   const binString = atob(base64);
   return Uint8Array.from(binString, (m) => m.codePointAt(0));
 }

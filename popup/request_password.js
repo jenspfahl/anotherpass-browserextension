@@ -55,7 +55,7 @@ else {
   document.getElementById("port").value = port;
 
 
-  getKey("client_keypair").then(async value => {
+  getKey("app_public_key").then(async value => {
     const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value.publicKey);
     document.getElementById("web_client_id").innerText = webClientId;
     document.getElementById("fingerprint").innerText = publicKeyFingerprint;

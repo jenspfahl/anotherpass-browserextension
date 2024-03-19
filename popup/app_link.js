@@ -72,13 +72,31 @@ if (!linked) {
           
           const sending = chrome.runtime.sendMessage({
             action: "link_to_app"
-          }).then(response => {
-            console.log("linking response: " + JSON.stringify(response))
+          }).then(async response => {
+            console.log("linking response: " + response.response.serverPubKey.n)
             if (response.response == null) {
               console.log("linking error from server, see previous logs");
               alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
             }
             else {
+
+
+              const jwk = {
+                kty:"RSA",
+                n: response.response.serverPubKey.n,
+                e: response.response.serverPubKey.e,
+                alg: "RSA-OAEP-256"
+              };
+
+        
+              console.log("jwk.n64 in:", base64ToBytes(jwk.n))
+              const appPublicKey = await jwkToPublicKey(jwk);
+              const jwk2 = await publicKeyToJWK(appPublicKey);
+                console.log("jwk.n2 out:", jwk2.n)
+                console.log("jwk.n64 out:", base64ToBytes(jwk2.n))
+
+              await setKey("app_public_key", appPublicKey);
+
               window.close();
 
               chrome.runtime.sendMessage({
