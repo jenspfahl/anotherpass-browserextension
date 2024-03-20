@@ -15,31 +15,14 @@ if (!linked) {
 
   destroyClientKeyPair(); // ensure regeneration
   generateOrGetClientKeyPair().then(async keyPair => {
-   // const publicKeyAsJWK = await publicKeyToJWK(keyPair.publicKey);
-   // console.log(publicKeyAsJWK);
-
     const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
     console.log("Fingerprint: " + publicKeyFingerprint);
 
-    destroyCurrentSessionKey();
-    const sessionKey = await generateOrGetSessionKey();
-    const sessionKeyAsArray = await sessionKeyToArray(sessionKey);
-    console.log("AES Session Key = " + bytesToBase64(sessionKeyAsArray));
-/*
-    const encryptedMessage = await encryptMessage(sessionKey, "secret");
-    console.log("Encrypted message = " + encryptedMessage);
+    destroyBaseKey();
+    const baseKey = await generateOrGetBaseKey();
+    const baseKeyAsArray = await aesKeyToArray(baseKey);
+    console.log("AES Base Key = " + bytesToBase64(baseKeyAsArray));
 
-    const encSessionKey = await encryptWithPublicKey(keyPair.publicKey, sessionKeyAsArray);
-    console.log("Encrypted AES Session Key = " + bytesToBase64(encSessionKey));
-
-
-    const decSessionKeyAsArray = await decryptWithPrivateKey(keyPair.privateKey, encSessionKey);
-    console.log("Decrypted AES Session Key = " + bytesToBase64(decSessionKeyAsArray));
-
-    const decSessionKey = await arrayToSessionKey(decSessionKeyAsArray);
-    const decryptedMessage = await decryptMessage(decSessionKey, encryptedMessage);
-    console.log("Decrypted message = " + decryptedMessage);
-*/
     document.getElementById("web_client_id").innerText = webClientId;
 
     localStorage.setItem("web_client_id", webClientId);
@@ -47,7 +30,7 @@ if (!linked) {
     await setKey("client_keypair", keyPair);
 
 
-    const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
+    const qrCodeInput = `${webClientId}:${bytesToBase64(baseKeyAsArray)}:${publicKeyFingerprint}`;
     generateQrCode(qrCodeInput);
 
 

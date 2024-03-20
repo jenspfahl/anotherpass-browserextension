@@ -5,29 +5,47 @@ function generateWebClientId() {
   return [s.slice(0, 3), '-', s.slice(3)].join('');
 }
 
-async function generateOrGetSessionKey() {
-  const currentSessionKey = await getKey("session_key");
-  if (currentSessionKey != null) {
-    console.log("Current session key found");
-    return currentSessionKey;
+async function generateOrGetBaseKey() {
+  const baseKey = await getKey("request_base_key");
+  if (baseKey) {
+    console.log("Current base key found");
+    return baseKey;
   }
   else {
-    console.log("No session key, generate new");
-    const sessionKey = await window.crypto.subtle.generateKey(
-      {
-        name: "AES-GCM",
-        length: 128,
-      },
-      true,
-      ["encrypt", "decrypt"]
-    );
-    await setKey("session_key", sessionKey);
-    return sessionKey;
+    console.log("No base key, generate new");
+    const baseKey = await generateAesKey();
+    await setKey("request_base_key", baseKey);
+    return baseKey;
   }
 }
 
-function destroyCurrentSessionKey() {
-  deleteKey("session_key");
+function destroyBaseKey() {
+  deleteKey("request_base_key");
+}
+
+async function generateAesKey() {
+  const key = window.crypto.subtle.generateKey(
+    {
+      name: "AES-GCM",
+      length: 128,
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+}
+
+
+async function hashKeys(key1, key2) {
+  var tmp = new Uint8Array(key1.byteLength + key2.byteLength);
+  tmp.set(new Uint8Array(key1), 0);
+  tmp.set(new Uint8Array(key2), key1.byteLength);
+  const key = tmp.buffer;
+
+  const buffer = new TextEncoder().encode(key);
+
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+
+  return new Uint8Array(digest);
 }
 
 async function generateOrGetClientKeyPair() {
@@ -98,12 +116,12 @@ async function getPublicKeyShortenedFingerprint(key) {
   return f.substring(0, 2) + "-" + f.substring(2, 4) + "-" + f.substring(4, 6);
 }
 
-async function sessionKeyToArray(sessionKey) {
-  const exported = await window.crypto.subtle.exportKey("raw", sessionKey);
+async function aesKeyToArray(aesKey) {
+  const exported = await window.crypto.subtle.exportKey("raw", aesKey);
   return new Uint8Array(exported); 
 }
 
-async function arrayToSessionKey(array) {
+async function arrayToAesKey(array) {
   return window.crypto.subtle.importKey("raw", array, 
   "AES-GCM", true, [
     "encrypt",
@@ -111,13 +129,13 @@ async function arrayToSessionKey(array) {
   ]);
 }
 
-async function encryptMessage(sessionKey, message) {
+async function encryptMessage(key, message) {
   const enc = new TextEncoder();
   const encoded = enc.encode(message); 
   const iv = window.crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = await window.crypto.subtle.encrypt(
     { name: "AES-GCM", iv: iv },
-    sessionKey,
+    key,
     encoded,
   );
 
@@ -127,7 +145,7 @@ async function encryptMessage(sessionKey, message) {
   return "EWM:" + bytesToBase64(iv) + ":" + bytesToBase64(new Uint8Array(ciphertext));
 }
 
-async function decryptMessage(sessionKey, encrypted) {
+async function decryptMessage(key, encrypted) {
   const splitted = encrypted.split(":");
   const type = splitted[0];
   if (type !== "EWM" ) {
@@ -139,7 +157,7 @@ async function decryptMessage(sessionKey, encrypted) {
   console.log(ciphertext);
   const decrypted = await window.crypto.subtle.decrypt(
     { name: "AES-GCM", iv }, 
-    sessionKey, 
+    key, 
     ciphertext
   );
   return new TextDecoder().decode(new Uint8Array(decrypted));
