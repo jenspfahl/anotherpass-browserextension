@@ -56,12 +56,12 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 function fetchCredentials(sendResponse) {
 
   generateOrGetClientKeyPair().then(clientKeyPair => {
-    const nextClientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
+    const clientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
     const server = localStorage.getItem("server_address");
     const request = {
       action: "request_password",
       website: currentRequesterUrl,
-      nextClientPublicKey: nextClientPublicKey,
+      clientPublicKey: clientPublicKey,
       configuredServer: server 
     };
     
@@ -115,7 +115,7 @@ function openLinkWithQrCodeDialog() {
       type: "detached_panel",
       url: "popup/app_unlink.html",
       width: 700,
-      height: 300,
+      height: 200,
     };
   
     console.log("open link the app dialog");
@@ -127,7 +127,7 @@ function openLinkWithQrCodeDialog() {
       type: "detached_panel",
       url: "popup/app_link.html",
       width: 800,
-      height: 800,
+      height: 600,
     };
   
     console.log("open link the app dialog");

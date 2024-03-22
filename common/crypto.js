@@ -5,8 +5,22 @@ function generateWebClientId() {
   return [s.slice(0, 3), '-', s.slice(3)].join('');
 }
 
-async function generateOrGetBaseKey() {
-  const baseKey = await getKey("request_base_key");
+async function generateOrGetSessionKey() {
+  const sessionKey = await getKey("session_key");
+  if (sessionKey != null) {
+    console.log("Current session key found");
+    return sessionKey;
+  }
+  else {
+    console.log("No session key, generate new");
+    const sessionKey = await generateAesKey();
+    await setKey("session_key", sessionKey);
+    return sessionKey;
+  }
+}
+
+async function getBaseKey() {
+  const baseKey = await getKey("base_key");
   if (baseKey) {
     console.log("Current base key found");
     return baseKey;
@@ -19,12 +33,8 @@ async function generateOrGetBaseKey() {
   }
 }
 
-function destroyBaseKey() {
-  deleteKey("request_base_key");
-}
-
 async function generateAesKey() {
-  const key = window.crypto.subtle.generateKey(
+  return window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: 128,
@@ -36,14 +46,17 @@ async function generateAesKey() {
 
 
 async function hashKeys(key1, key2) {
-  var tmp = new Uint8Array(key1.byteLength + key2.byteLength);
-  tmp.set(new Uint8Array(key1), 0);
-  tmp.set(new Uint8Array(key2), key1.byteLength);
-  const key = tmp.buffer;
+  var key = new Uint8Array(key1.byteLength + key2.byteLength);
+  key.set(new Uint8Array(key1), 0);
+  key.set(new Uint8Array(key2), key1.byteLength);
 
-  const buffer = new TextEncoder().encode(key);
+  const digest = await crypto.subtle.digest("SHA-256", key);
+  console.log("hashed key=" + bytesToBase64(key));
 
-  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  console.log("hashed key1=" + bytesToBase64(new Uint8Array(key1)));
+  console.log("hashed key2=" + bytesToBase64(new Uint8Array(key2)));
+
+  console.log("hashed keys=" + bytesToBase64(new Uint8Array(digest)));
 
   return new Uint8Array(digest);
 }
@@ -72,8 +85,12 @@ async function generateOrGetClientKeyPair() {
   }
 }
 
-function destroyClientKeyPair() {
+async function destroyAllKeys() {
   clientKeyPair = null;
+  await deleteKey("client_keypair");
+  await deleteKey("app_public_key");
+  await deleteKey("session_key");
+  await deleteKey("base_key");
 }
 
 async function jwkToPublicKey(jwk) {
@@ -190,6 +207,7 @@ async function decryptWithPrivateKey(privateKey, encrypted) {
 
 function base64ToBytes(base64) {
   base64 = base64
+            .replace(/=\\n/g, '')
             .replace(/-/g, '+')
             .replace(/_/g, '/');
   const binString = atob(base64);

@@ -12,16 +12,18 @@ if (!linked) {
   document.getElementById("ip").value = ip;
   document.getElementById("port").value = port || 8001;
 
+  // ensure regeneration
+  destroyAllKeys().then(async _ => {
 
-  destroyClientKeyPair(); // ensure regeneration
-  generateOrGetClientKeyPair().then(async keyPair => {
+    const keyPair = await generateOrGetClientKeyPair();
     const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
     console.log("Fingerprint: " + publicKeyFingerprint);
 
-    destroyBaseKey();
-    const baseKey = await generateOrGetBaseKey();
-    const baseKeyAsArray = await aesKeyToArray(baseKey);
-    console.log("AES Base Key = " + bytesToBase64(baseKeyAsArray));
+    const sessionKey = await generateOrGetSessionKey();
+    console.log("SK = " + sessionKey);
+
+    const sessionKeyAsArray = await aesKeyToArray(sessionKey);
+    console.log("Linking Session Key = " + bytesToBase64(sessionKeyAsArray));
 
     document.getElementById("web_client_id").innerText = webClientId;
 
@@ -30,7 +32,7 @@ if (!linked) {
     await setKey("client_keypair", keyPair);
 
 
-    const qrCodeInput = `${webClientId}:${bytesToBase64(baseKeyAsArray)}:${publicKeyFingerprint}`;
+    const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
     generateQrCode(qrCodeInput);
 
 
@@ -56,14 +58,15 @@ if (!linked) {
           const sending = chrome.runtime.sendMessage({
             action: "link_to_app"
           }).then(async response => {
-            console.log("linking response: " + response.response.serverPubKey.n)
-            if (response.response == null) {
+            if (response == null || response.response == null) {
               console.log("linking error from server, see previous logs");
               alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
             }
             else {
 
+              console.log("linking response: " + response.response.serverPubKey.n)
 
+              // read app public key
               const jwk = {
                 kty:"RSA",
                 n: response.response.serverPubKey.n,
@@ -79,6 +82,15 @@ if (!linked) {
                 console.log("jwk.n64 out:", base64ToBytes(jwk2.n))
 
               await setKey("app_public_key", appPublicKey);
+
+
+              // read app generated base key
+
+              const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
+              const baseKey = await arrayToAesKey(baseKeyAsArray);
+              await setKey("base_key", baseKey);
+
+              console.log("save shared base key:", baseKeyAsArray);
 
               window.close();
 
@@ -105,8 +117,8 @@ if (!linked) {
     const qrCodeDiv = document.querySelector(".qr-code");
     var qrcode = new QRCode(qrCodeDiv, {
       text: input,
-      width: 512,
-      height: 512,
+      width: 300,
+      height: 300,
       colorDark: "#000000",
       colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.H

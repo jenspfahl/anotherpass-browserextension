@@ -148,24 +148,58 @@ To delete a linked extension in the app
 
 
 
+## Key mechanisms:
 
-App entities:
+### Common communication between extension and app
 
-WebExtensionEntity
-- id
-- name or title
-- webClientUuid
-- extensionPublicKeyAlias
-- serverKeyPairAlias
-- state
+Common communication is secured by two layers of encryption
 
+1. AES encryption of the payload (request and response body) with a changing 128bit Transport Key (TK)
+    - TK is derived from:
+        a. a shared and on each side persisted 128bit Base Key (BK)
+        b. a randomly generated 128bit OneTimeKey (OTK) 
+        --> TKn = SHA256(BK + OTKn)
+        - the TK is derived/regenerated for each communication direction:
+        a. request (extension to app): Request Transport Key (TKrq = SHA256(BK + OTKrq)
+        b. response (app to extension): Response Transport Key (TKrs = SHA256(BK + OTKrs)
+2. RSA encryption of the OneTimeKeys (OTKn)
+    - since the BK is shared and known by each side, only the OTK must be send to the peer
+        a. OTKreq is encrypted with the public key of the app (PKapp)
+        b. OTKres is encrypted with the public key of the extension (PKext)
 
+### Linking phase
 
-Next steps:
- 1. Build a extension page that contains a generated UUID and a generated public key in a QR code. Store UUID and key pair in the browser.
- 2. Build a second page that asks for host details (ip or hostname) and port (defual prefilled) and store them in the browser
- 3. Implement a server in the app which can be turned on and off by the user.
- 4. Implement an activity to scan the QR code and store the needed information in the app (table WebExtensionEntity).
- 5. Implement the first endpoint/command to take the link handshake request
- 6. Integrate this endpoint in the extension after step 2.
+Before common communication can happen, a few information must be exchanged between extension and app
+1. Public keys (PKn) must be exchanged
+2. Base Key (BK) must be exchanged
+Both PKn and BK are securely stored on each side.
 
+Exchange happens through these steps:
+1. Extension generates:
+    a. a temporary AES-128bit Session Key (SK) designated to secure the linking phase
+    b. the extension-side RSA key pair (PKext and PrivKext, latter will never leave the extension)
+    c. the fingerprint of PKext (F)
+2. Extension sends those information through a secure offline channel (QR code scan) to the app
+3. App imports the PKext:
+    a. verifies PKext with F to mitigate MITM key exchanges (fails if not valid)
+    b. stores PKext for future communication
+5. App generates
+    a. the app-side RSA key pair (PKapp and PrivKapp, latter will never leave the extension)
+    b. the shared Base Key (BK) and stores it for future communication
+    c. a One-Time Key (OTKres)
+    d. a Transport Key derived from the previous scanned Session Key, since BK is not yet known by the extension 
+    --> TKres = SHA256(SK + OTKres)
+6. Now the app responds to the extension as described in "Common communication":
+    a. by using PKext to encrypt TKres 
+    b. using TKres to encrypt the payload
+    c. Payload contains:
+        - PKapp
+        - BK
+
+### Security considerations
+
+#### Man-i-the-Middle attacks
+
+#### Offline observers
+
+Meant is an attacker who is able to capture the QR code.

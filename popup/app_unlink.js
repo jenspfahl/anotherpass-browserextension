@@ -11,7 +11,7 @@ if (linked) {
     localStorage.removeItem("server_address");
     localStorage.removeItem("server_port");
 
-    deleteKey("client_keypair");
+    destroyAllKeys();
 
 
     alert("Extension unlinked");
