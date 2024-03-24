@@ -17,6 +17,8 @@ if (webClientId) {
       if (e.target.id === "accept") {
         localStorage.setItem("linked", true);
 
+        destroySessionKey();
+
         alert("Extension successfully linked.");
         window.close();
       }

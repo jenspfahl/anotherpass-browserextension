@@ -89,8 +89,13 @@ async function destroyAllKeys() {
   clientKeyPair = null;
   await deleteKey("client_keypair");
   await deleteKey("app_public_key");
-  await deleteKey("session_key");
   await deleteKey("base_key");
+  await destroySessionKey();
+}
+
+
+async function destroySessionKey() {
+  await deleteKey("session_key");
 }
 
 async function jwkToPublicKey(jwk) {

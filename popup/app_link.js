@@ -20,8 +20,6 @@ if (!linked) {
     console.log("Fingerprint: " + publicKeyFingerprint);
 
     const sessionKey = await generateOrGetSessionKey();
-    console.log("SK = " + sessionKey);
-
     const sessionKeyAsArray = await aesKeyToArray(sessionKey);
     console.log("Linking Session Key = " + bytesToBase64(sessionKeyAsArray));
 

@@ -11,7 +11,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredentials(sendResponse);
+    fetchCredentials(message.requestIdentifier, sendResponse);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -53,12 +53,13 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
   }
 });
 
-function fetchCredentials(sendResponse) {
+function fetchCredentials(requestIdentifier, sendResponse) {
 
   const server = localStorage.getItem("server_address");
   const request = {
     action: "request_credential",
     website: currentRequesterUrl,
+    requestIdentifier: requestIdentifier,
     configuredServer: server 
   };
   

@@ -18,6 +18,7 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "close") {
     //TODO turn this button to retry after end
+    destroySessionKey();
     window.close();
   }
   else if (e.target.id === "update") {
@@ -56,14 +57,29 @@ else {
 
 
   getKey("app_public_key").then(async value => {
-    //const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value.publicKey);
     document.getElementById("web_client_id").innerText = webClientId;
-    //document.getElementById("fingerprint").innerText = publicKeyFingerprint; //TODO fingerprint by transportkey
+
+    // destroy previous if still exists
+    destroySessionKey();
+    const sessionKey = await generateOrGetSessionKey();
+    const sessionKeyAsArray = await aesKeyToArray(sessionKey);
+    const sessionKeyBase64 = bytesToBase64(sessionKeyAsArray);
+    console.log("Request Session Key = " + sessionKeyBase64);
+    
+    const baseKey = await getKey("base_key");
+    const baseKeyAsArray = await aesKeyToArray(baseKey);
+    const fingerprintAsArray = await hashKeys(baseKeyAsArray, sessionKeyAsArray);
+    const fingerprint = bytesToBase64(fingerprintAsArray).replace(/[^a-z]/gi, '').substring(0, 6).toLowerCase();
+    const formattedFingerprint = fingerprint.substring(0, 2) + "-" + fingerprint.substring(2, 4) + "-" + fingerprint.substring(4, 6);
+
+
+    document.getElementById("fingerprint").innerText = formattedFingerprint;
 
 
     poll(async function () {
       let response = await chrome.runtime.sendMessage({
         action: "request_credential",
+        requestIdentifier: sessionKeyBase64
       });
       console.log("response = " + JSON.stringify(response));
       return response.response;
@@ -72,7 +88,7 @@ else {
       console.log(`Message from the password poll: ${JSON.stringify(response)}`);
       document.getElementById("waiting_time").value = 100;
 
-      //TODO store nextKeyPair
+      destroySessionKey();
       
       sendPasteCredentialMessage(response.passwd);
     }).catch(function (e) {
