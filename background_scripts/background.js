@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     openPasswordRequestDialog();
     return true; 
   }
-  else if (message.action === "request_password") {
+  else if (message.action === "request_credential") {
     fetchCredentials(sendResponse);
     return true;
   }
@@ -55,18 +55,14 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
 function fetchCredentials(sendResponse) {
 
-  generateOrGetClientKeyPair().then(clientKeyPair => {
-    const clientPublicKey = publicKeyToJWK(clientKeyPair.publicKey);
-    const server = localStorage.getItem("server_address");
-    const request = {
-      action: "request_password",
-      website: currentRequesterUrl,
-      clientPublicKey: clientPublicKey,
-      configuredServer: server 
-    };
-    
-    remoteCall(request, sendResponse);
-  });
+  const server = localStorage.getItem("server_address");
+  const request = {
+    action: "request_credential",
+    website: currentRequesterUrl,
+    configuredServer: server 
+  };
+  
+  remoteCall(request, sendResponse);
 
 }
 

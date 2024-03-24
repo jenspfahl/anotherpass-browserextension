@@ -11,7 +11,7 @@ if (linked) {
     localStorage.removeItem("server_address");
     localStorage.removeItem("server_port");
 
-    destroyAllKeys();
+    destroyAllKeys(); //TODO doesnt work, too fast?
 
 
     alert("Extension unlinked");

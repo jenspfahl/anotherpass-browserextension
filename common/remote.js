@@ -50,21 +50,26 @@ async function remoteCall(message, sendResponse) {
     const appPublicKey = await getKey("app_public_key");
     const oneTimeKey = await generateAesKey();
     const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
+    console.log("reqOneTimeKeyBase64=" + bytesToBase64(oneTimeKeyAsArray));
+
     const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
  
     const baseKey = await getKey("base_key");
     const baseKeyAsArray = await aesKeyToArray(baseKey);
     console.log("baseKey=" + bytesToBase64(baseKeyAsArray));
   
-    const transportKeyAsArray = await hashKeys(baseKey, oneTimeKey); 
+    const transportKeyAsArray = await hashKeys(baseKeyAsArray, oneTimeKeyAsArray); 
     const transportKey = await arrayToAesKey(transportKeyAsArray);
-    console.log("transportKey=" + transportKeyAsArray);
+    console.log("reqTransportKey=" + transportKeyAsArray);
+    console.log("reqTransportKeyBase64=" + bytesToBase64(transportKeyAsArray));
+
 
     const envelope = await encryptMessage(transportKey, JSON.stringify(message));
 
     request = {
       encOneTimeKey: bytesToBase64(encOneTimeKey), 
       envelope: envelope,
+      signature: null //TODO for common requests
     };
   }
   else {
@@ -76,7 +81,7 @@ async function remoteCall(message, sendResponse) {
 
     const envelope = await encryptMessage(sessionKey, JSON.stringify(message));
     request = {
-      envelope: envelope,
+      envelope: envelope
     };
   }
 
@@ -131,6 +136,8 @@ async function remoteCall(message, sendResponse) {
       let transportKeyAsArray;
       if (linked) {
         // derive transport key (local base key + sent encrypted one-time key)
+        const baseKey = await getKey("base_key");
+        const baseKeyAsArray = await aesKeyToArray(baseKey);
         transportKeyAsArray = await hashKeys(baseKeyAsArray, decOneTimeKeyAsArray);
       }
       else {

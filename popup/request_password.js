@@ -56,14 +56,14 @@ else {
 
 
   getKey("app_public_key").then(async value => {
-    const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value.publicKey);
+    //const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(value.publicKey);
     document.getElementById("web_client_id").innerText = webClientId;
-    document.getElementById("fingerprint").innerText = publicKeyFingerprint;
+    //document.getElementById("fingerprint").innerText = publicKeyFingerprint; //TODO fingerprint by transportkey
 
 
     poll(async function () {
       let response = await chrome.runtime.sendMessage({
-        action: "request_password",
+        action: "request_credential",
       });
       console.log("response = " + JSON.stringify(response));
       return response.response;

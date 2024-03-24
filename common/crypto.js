@@ -104,7 +104,7 @@ async function jwkToPublicKey(jwk) {
     jwk,
     {
       name: "RSA-OAEP",
-      hash: "SHA-256",
+      hash: "SHA-1",
     },
     true,
     ["encrypt"],

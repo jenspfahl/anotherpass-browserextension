@@ -71,7 +71,7 @@ if (!linked) {
                 kty:"RSA",
                 n: response.response.serverPubKey.n,
                 e: response.response.serverPubKey.e,
-                alg: "RSA-OAEP-256"
+                alg: "RSA-OAEP"
               };
 
         
