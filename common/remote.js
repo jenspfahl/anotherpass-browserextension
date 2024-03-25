@@ -100,36 +100,19 @@ async function remoteCall(message, sendResponse) {
         "Accept": "application/json",
       },
       body: JSON.stringify(request)
-    }).then(res => {
+    }).then(async res => {
       console.log("received HTTP Status: " + res.status);
 
+      const body = await res.json();
       if (res.status != 200) {
-        console.warn("Unsuccessful! Reason: " + JSON.stringify(res.text));
-        sendResponse({ response: null });
+        console.error("Unsuccessful! Reason: " + JSON.stringify(body));
+        sendResponse({ response: null, status: res.status, error: body.error });
         return null;
       }
 
-      return res.text();
-    }).then(async res => {
-
-      console.log("received body: " + res);
-      if (res == null) {
-        return null;
-      }
-
-      var response;
-      try {
-        response = JSON.parse(res);
-      }
-      catch (e) {
-        console.warn("cannot parse response", e)
-        response = {
-          "raw": res
-        };
-      }
 
       const keyPair = await getKey("client_keypair");
-      const encOneTimeKey = base64ToBytes(response.encOneTimeKey);
+      const encOneTimeKey = base64ToBytes(body.encOneTimeKey);
       console.log("encOneTimeKey=" + encOneTimeKey);
       const decOneTimeKeyAsArray = await decryptWithPrivateKey(keyPair.privateKey, encOneTimeKey);
       console.log("decOneTimeKeyAsArray=" + decOneTimeKeyAsArray);
@@ -152,7 +135,7 @@ async function remoteCall(message, sendResponse) {
 
       const transportKey = await arrayToAesKey(transportKeyAsArray);
       // decrypt response
-      return decryptMessage(transportKey, response.envelope);
+      return decryptMessage(transportKey, body.envelope);
 
     }).then(decryptedPayload => {
       console.debug("decrypted response", decryptedPayload);

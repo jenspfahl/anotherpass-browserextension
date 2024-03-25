@@ -17,7 +17,6 @@ document.addEventListener("click", (e) => {
     return;
   }
   else if (e.target.id === "close") {
-    //TODO turn this button to retry after end
     destroySessionKey();
     window.close();
   }
@@ -69,9 +68,7 @@ else {
     const baseKey = await getKey("base_key");
     const baseKeyAsArray = await aesKeyToArray(baseKey);
     const fingerprintAsArray = await hashKeys(baseKeyAsArray, sessionKeyAsArray);
-    const fingerprint = bytesToBase64(fingerprintAsArray).replace(/[^a-z]/gi, '').substring(0, 6).toLowerCase();
-    const formattedFingerprint = fingerprint.substring(0, 2) + "-" + fingerprint.substring(2, 4) + "-" + fingerprint.substring(4, 6);
-
+    const formattedFingerprint = toShortenedFingerprint(fingerprintAsArray);
 
     document.getElementById("fingerprint").innerText = formattedFingerprint;
 
@@ -82,6 +79,18 @@ else {
         requestIdentifier: sessionKeyBase64
       });
       console.log("response = " + JSON.stringify(response));
+      if (response.status == 401 || response.status == 403) {
+        console.warn("Request rejected");
+        document.getElementById("waiting_time").value = 0;
+        document.getElementById("instruction").innerText = "Request was rejected!";
+        document.getElementById("close").innerText = "Close";
+
+        alert("The request has been rejected in the app or the vault was locked.");
+        // cancel polling
+        destroySessionKey();
+        window.close();
+        return null;
+      }
       return response.response;
     }, 30000, 1000).then(function (response) { // TODO make timeout configurable (default 30 sec)
       // polling done
@@ -97,14 +106,14 @@ else {
       document.getElementById("close").innerText = "Close";
 
       alert("You haven't opened the app in reasonable time or the host or port is wrong.");
+      destroySessionKey();
+      window.close();
     });
 
 
     function sendPasteCredentialMessage(p) {
 
       browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-        console.log("send msg " + p);
-
         chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", p: p }, function () {
           window.close();
         });
