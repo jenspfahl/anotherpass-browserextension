@@ -51,12 +51,6 @@ async function hashKeys(key1, key2) {
   key.set(new Uint8Array(key2), key1.byteLength);
 
   const digest = await crypto.subtle.digest("SHA-256", key);
-  console.log("hashed key=" + bytesToBase64(key));
-
-  console.log("hashed key1=" + bytesToBase64(new Uint8Array(key1)));
-  console.log("hashed key2=" + bytesToBase64(new Uint8Array(key2)));
-
-  console.log("hashed keys=" + bytesToBase64(new Uint8Array(digest)));
 
   return new Uint8Array(digest);
 }
@@ -93,16 +87,11 @@ async function destroyAllKeys() {
   await destroySessionKey();
 }
 
-
 async function destroySessionKey() {
   await deleteKey("session_key");
 }
 
 async function jwkToPublicKey(jwk) {
-  console.debug("JWK to import:", JSON.stringify(jwk));
-  console.log("in: jwk.n=" + jwk.n);
-  console.log("in: jwk.e=" + jwk.e);
-
 
   return window.crypto.subtle.importKey(
     "jwk",
@@ -131,7 +120,6 @@ async function getPublicKeyFingerprint(key) {
 async function getPublicKeyShortenedFingerprint(key) {
   const jwk = await publicKeyToJWK(key);
   const buffer = new TextEncoder().encode(jwk.n);
-  console.log("out: jwk.n=" + jwk.n);
 
   const digest = await crypto.subtle.digest("SHA-256", buffer);
   return toShortenedFingerprint(new Uint8Array(digest));
@@ -165,9 +153,6 @@ async function encryptMessage(key, message) {
     encoded,
   );
 
-  console.log(iv);
-  console.log(new Uint8Array(ciphertext));
-
   return "EWM:" + bytesToBase64(iv) + ":" + bytesToBase64(new Uint8Array(ciphertext));
 }
 
@@ -179,8 +164,6 @@ async function decryptMessage(key, encrypted) {
   }
   const iv = base64ToBytes(splitted[1]);
   const ciphertext = base64ToBytes(splitted[2]);
-  console.log(iv);
-  console.log(ciphertext);
   const decrypted = await window.crypto.subtle.decrypt(
     { name: "AES-GCM", iv }, 
     key, 

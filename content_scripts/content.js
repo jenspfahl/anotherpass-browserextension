@@ -31,18 +31,13 @@
 
 /*chrome.extension*/browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
 
-  console.log("receive msg from " + JSON.stringify(sender));
-
   if (msg.action === "paste_credential") {
-
-    pasteCredential(msg.p, sendResponse);
-
+    pasteCredential(msg.password, sendResponse);
   }
 });
 
 function pasteCredential(p, sendResponse) {
-  console.log("received password to paste: '" + p + "'");
-
+  console.debug("received password to paste: '" + p + "'");
   let elem = document.activeElement;
 
   console.log("elem=" + JSON.stringify(elem));

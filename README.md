@@ -135,7 +135,7 @@ Each communication is secured by two layers of encryption:
             *  request (extension to app): **Request Transport Key** --> `TKrq = SHA256(BK + OTKrq)`
             *  response (app to extension): **Response Transport Key** --> `TKrs = SHA256(BK + OTKrs)`
 
-1. RSA encryption of the **OneTimeKeys** (`OTKn`)
+1. RSA encryption of the **One-Time Keys** (`OTKn`)
     * since the `BK` is shared and known by each side, only the `OTK` must be send to the peer
         * `OTKrq` is encrypted with the **Public Key of the app** (`PKapp`)
         * `OTKrs` is encrypted with the **Public Key of the extension** (`PKext`)
@@ -154,8 +154,10 @@ Exchange happens through these steps:
     * a temporary AES-128bit **Session Key** (`SK`) designated to secure the linking phase
     * the **extension-side RSA key pair** (4096bit, `PKext` and `PrivKext`, latter will never leave the extension)
     * the fingerprint of `PKext` (`F`)
-1. The extension sends those information through a secure offline channel (QR code scan) to the app
-1. The app imports the `PKext`:
+1. The extension sends `SK` and `F` through a secure offline channel (QR code scan) to the app
+1. The user initiates a HTTP request to the app by providing the app's IP or domain name. The extension submits:
+    * the **Extensions Public Key** `PKext` 
+1. The app imports `PKext` and
     * verifies `PKext` with `F` to mitigate MITM key substitution (fails if not valid)
     * stores `PKext` for future communication
 1. The app generates:
@@ -163,7 +165,7 @@ Exchange happens through these steps:
     * the shared **Base Key** (`BK`) and stores it for future communication
     * a **One-Time Key** (`OTKrs`)
     * a **Transport Key** derived from the previous scanned **Session Key**, since `BK` is not yet known by the extension --> `TKrs = SHA256(SK + OTKrs)`
-1. Now the app responds to the extension as described in "Common communication" but with a fifferently derived **Transport Key**:
+1. Now the app responds to the extension as described in "Common communication" but with a differently derived **Transport Key**:
     * by using `PrivKext` to decrypt `TKrs` (common behaviour)
     * using `TKrs` to decrypt the payload (common behaviour)
     * Payload contains:

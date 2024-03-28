@@ -48,7 +48,6 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "anotherpass-request") {
-    console.log("context click");
     openPasswordRequestDialog();
   }
 });
@@ -82,8 +81,6 @@ function linkToApp(sendResponse) {
       clientPublicKey: clientPublicKeyAsJWK,
       configuredServer: server
     };
-
-    console.log("linkToApp send: " + JSON.stringify(request));
     
     remoteCall(request, sendResponse);
   });
@@ -114,9 +111,7 @@ function openLinkWithQrCodeDialog() {
       width: 700,
       height: 200,
     };
-  
-    console.log("open link the app dialog");
-  
+    
     browser.windows.create(createData);
   }
   else {
@@ -126,9 +121,7 @@ function openLinkWithQrCodeDialog() {
       width: 800,
       height: 600,
     };
-  
-    console.log("open link the app dialog");
-  
+    
     browser.windows.create(createData);
   }
 }

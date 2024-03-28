@@ -78,8 +78,8 @@ else {
         action: "request_credential",
         requestIdentifier: sessionKeyBase64
       });
-      console.log("response = " + JSON.stringify(response));
-      if (response.status == 401 || response.status == 403) {
+      console.debug("response = " + JSON.stringify(response));
+      if (response.status == 403) {
         console.warn("Request rejected");
         document.getElementById("waiting_time").value = 0;
         document.getElementById("instruction").innerText = "Request was rejected!";
@@ -94,12 +94,11 @@ else {
       return response.response;
     }, 30000, 1000).then(function (response) { // TODO make timeout configurable (default 30 sec)
       // polling done
-      console.log(`Message from the password poll: ${JSON.stringify(response)}`);
       document.getElementById("waiting_time").value = 100;
 
       destroySessionKey();
       
-      sendPasteCredentialMessage(response.passwd);
+      sendPasteCredentialMessage(response.password);
     }).catch(function (e) {
       document.getElementById("waiting_time").value = 0;
       document.getElementById("instruction").innerText = "Unable to receive credentials!";
@@ -114,7 +113,7 @@ else {
     function sendPasteCredentialMessage(p) {
 
       browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", p: p }, function () {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: p }, function () {
           window.close();
         });
       });
