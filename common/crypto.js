@@ -134,7 +134,7 @@ async function getPublicKeyShortenedFingerprint(key) {
   console.log("out: jwk.n=" + jwk.n);
 
   const digest = await crypto.subtle.digest("SHA-256", buffer);
-  return fingerprintAsArray(new Uint8Array(digest));
+  return toShortenedFingerprint(new Uint8Array(digest));
 }
 
 function toShortenedFingerprint(keyAsArray) {

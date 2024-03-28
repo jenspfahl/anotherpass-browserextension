@@ -12,6 +12,8 @@ if (!linked) {
   document.getElementById("ip").value = ip;
   document.getElementById("port").value = port || 8001;
 
+  document.getElementById("next").disabled = true;
+
   // ensure regeneration
   destroyAllKeys().then(async _ => {
 
@@ -33,6 +35,8 @@ if (!linked) {
     const qrCodeInput = `${webClientId}:${bytesToBase64(sessionKeyAsArray)}:${publicKeyFingerprint}`;
     generateQrCode(qrCodeInput);
 
+    document.getElementById("next").disabled = false;
+
 
     document.addEventListener("click", (e) => {
 
@@ -50,6 +54,12 @@ if (!linked) {
         }
         else {
 
+          document.getElementById("next").disabled = true;
+          
+          document.querySelector(".loading-indicator").style.display = '';
+          document.querySelector(".qr-code").style.display = 'none';
+
+
           localStorage.setItem("server_address", ip);
           localStorage.setItem("server_port", port);
           
@@ -59,6 +69,9 @@ if (!linked) {
             if (response == null || response.response == null) {
               console.log("linking error from server, see previous logs");
               alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
+              document.getElementById("next").disabled = false;
+              document.querySelector(".loading-indicator").style.display = 'none';
+              document.querySelector(".qr-code").style.display = '';
             }
             else {
 
@@ -75,10 +88,7 @@ if (!linked) {
         
               console.log("jwk.n64 in:", base64ToBytes(jwk.n))
               const appPublicKey = await jwkToPublicKey(jwk);
-              const jwk2 = await publicKeyToJWK(appPublicKey);
-                console.log("jwk.n2 out:", jwk2.n)
-                console.log("jwk.n64 out:", base64ToBytes(jwk2.n))
-
+              
               await setKey("app_public_key", appPublicKey);
 
 
@@ -111,9 +121,10 @@ if (!linked) {
 
 
   function generateQrCode(input) {
-    document.getElementById("loading_icon").remove();
+    document.querySelector(".loading-indicator").style.display = 'none';
+
     const qrCodeDiv = document.querySelector(".qr-code");
-    var qrcode = new QRCode(qrCodeDiv, {
+    const qrcode = new QRCode(qrCodeDiv, {
       text: input,
       width: 300,
       height: 300,

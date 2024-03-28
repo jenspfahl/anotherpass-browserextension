@@ -9,3 +9,11 @@
 }
 
 
+.loading-indicator{
+  margin: auto;
+  width: 300px;
+  border: 1rem solid #ffffff;
+  border-radius: 0.5rem;
+  padding: 0px;
+}
+
