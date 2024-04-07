@@ -68,7 +68,7 @@ if (!linked) {
           }).then(async response => {
             if (response == null || response.response == null) {
               console.log("linking error from server, see previous logs");
-              alert("Cannot link with the app. Check whether the IP is correct and you have scanned the QR code with ANOTHERpass app.");
+              alert("Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
               document.getElementById("next").disabled = false;
               document.querySelector(".loading-indicator").style.display = 'none';
               document.querySelector(".qr-code").style.display = '';
@@ -93,6 +93,10 @@ if (!linked) {
 
 
               // read app generated base key
+
+              const linkedVaultId = response.response.linkedVaultId;
+              localStorage.setItem("linked_vault_id", linkedVaultId);
+
 
               const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
               const baseKey = await arrayToAesKey(baseKeyAsArray);

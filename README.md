@@ -18,36 +18,17 @@ To achieve a maximum of security the extension and the app must be linked before
 Using HTTPS is not constructive because the server (the app) cannot provide a TLS certificate signed by a common CA. A solution could be to include the certificate in the extension (if accepted by the browsers). In any way, we don't want to rely on TLS only and want to be able to use plain HTTP as well with our own encryption layer. This will be achieved by exchanging public keys beforehand through a secure offline-channel in a so called "linking"- step. This is feasible because a user should have physical access to the app (the server) and the extension in a browser (the client) at the same time and place.
 
 1. The user installs the extension in the brower
-2. The user clicks on the extension's action button and select "Link with ANOTHERpass app"
-3. A page opens with a generated QR code displayed which contains
-   - a unique identifier called "Client Identifier" to identify the extension (this UUID is generated once and stored in the browser storage)
-   - a secure random 128 bit long one-time key used to encrypt the "link" hand-shake, see below (created every time a new "Link with.." is initiated and deleted after successful linking)
-4. The user opens the app, clicks on "Link with a web browser" and scans the QR code
-   - the app asks for a name of the linked browser and stores the Client ID and the name in a table
-   - the app starts a http/https-server and shows the ip address and/or hostname and port to the user and prompts them to input these in the extension
-5. The user switches to the extension and clicks on "Next"-button and inputs the ip address or preferrely the hostname and clicks on "Link now"-button
-6. The extension
-   - generats a new RSA key pair and stores both parts (private key and public key) securelly in a browser keystore
-   - performs a http request to the provided host address that contains:
-     - the Client Identifier from above as HTTP Header "X-Web-Client-ID"
-     - the command "link" as HTTP Header "X-Web-Command"
-     - A payload (as HTTP body) which is encrypted with the one-time key which contains:
-       - the public key of the extension
-7. The app (the server) receives the request and
-   - looks up the Client Identifier
-     - if unknown return 404 Not found
-   - checks the command
-     - if not "link" return 401 Bad Request
-   - applies the previously shared one-time key to encrypt the payload
-   - stores the extension's public key securelly in the AndroidKeyStore
-   - replies to the extension with a payload encrypted with the previously shared one-time key which contains:
-     - a new generated public key of the app (the private key is stored in the Android KeyStore and assigned to the identifier)
-   - destroys the one-time key locally
-8. The extension
-   - decrypts the payload with the one-time key
-   - stores the app's public key securely in the browser's keystore
-   - destroys the one-time key
-   - displays a "Success"-dialog to the user
+2. The user clicks on the extension's action button and select "Link with app"
+3. A page opens with displaying a unique identifier and a generated QR code 
+4. The user opens the app and starts the server
+5. The user clicks on "Link new device" and a new screen is shown
+6. The app asks 
+    1. for a human name of the new link (e.g. "My laptop")
+    2. to scan the QR code presented from the browser extension
+3. Once scanned, the app displays the same unique identifier  as the extension
+4. The user has to enter the IP or host name displayed in the app into the related field in the extension and click on "Next" button
+5. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
+6. If the user confirms equality on both ends, the link process is completed  
 
 Now both parties have securelly and proven exchanged the public keys from each other to be used for the next communication.
 
