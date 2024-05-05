@@ -77,7 +77,8 @@ else {
     const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
 
-    poll(async function () {
+    poll(async function (progress) {
+      document.getElementById("waiting_time").value = progress;
       let response = await chrome.runtime.sendMessage({
         action: "request_credential",
         requestIdentifier: sessionKeyBase64

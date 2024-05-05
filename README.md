@@ -1,17 +1,19 @@
+# Intro
+
 ## Web Extension to communicate with ANOTHERpass app from a browser
 
-The web extension (called the extension) can connect to an ANOTHERpass app (called the app) running on a device which is reachable from the browser. To achieve this:
+The web extension (called the extension) can connect to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
 
 - the device where the extension in a browser runs and the device where the app runs is either in the same local network (recommended) or IP forwarding / DynDNS is implemented (to connect from outside of the local network)
 - the device where the app runs is connected to the same network as the device where the browser runs (recommended) or to the internet
 - the app acts as server, the extension as client
 - used protocol is HTTP/HTTPS to enable the extension to access the app (HTTPS requires a valid server certificate)
 - to easily find the app, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
-- a port can be configured on both ends (default 8000)
+- a port can be configured on both ends (default 8001)
 
-### Use Cases (initial idea)
+# Use Cases (outline)
 
-#### Link Extension with the App
+## Link Extension with the App
 
 To achieve a maximum of security the extension and the app must be linked before usage. That basically means both parties exchange public keys to ensure a secure communication over a secure offline-channel which cannot be observed (to avoid MITM-attacks).
 
@@ -25,59 +27,39 @@ Using HTTPS is not constructive because the server (the app) cannot provide a TL
 6. The app asks 
     1. for a human name of the new link (e.g. "My laptop")
     2. to scan the QR code presented from the browser extension
-3. Once scanned, the app displays the same unique identifier  as the extension
-4. The user has to enter the IP or host name displayed in the app into the related field in the extension and click on "Next" button
-5. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
-6. If the user confirms equality on both ends, the link process is completed  
+7. Once scanned, the app displays the same unique identifier  as the extension
+8. The user has to enter the IP or host name displayed in the app into the related field in the extension and click on "Next" button
+9. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
+10. If the user confirms equality on both ends, the link process is completed  
 
 Now both parties have securelly and proven exchanged the public keys from each other to be used for the next communication.
 
-#### Request a password for a website
+## Request a password for a website
 
-0. The user browses a website which contains a password field and the extension marks this field with a "Request password"-button
-1. The user clicks on this button
-2. The extension shows a dialog which:
+1. The user browses a website which contains a password field and the extension marks this field with a "Request password"-button
+2. The user clicks on this button
+3. The extension shows a dialog which:
    - says "Open the app and accept this request"
    - contains the configured IP address / hostname (see "link" flow above)
-   - also contains a shortened fingerprint of the extension's public key (as short as possible)
+   - also contains a shortened fingerprint
    - shows a timer which runs from 60s to 0s (the request will be aborted once the timer expires)
-3. The extension creates a one-time session key (128bit) and stores it in memory
-4. The extension polls every 2 seconds to the configured host and port with
-   - the Client Identifier from above as HTTP Header "X-Web-Client-ID"
-   - the command "requestPassword" as HTTP Header "X-Web-Command"
-   - the session key which is encrypted with the public key of the app (server) as HTTP Header "X-Web-Session-Key"
-   - an encrypted payload which is AES encrypted with the session key:
-     - contains the current website, e.g. "https://github.com/signin"
-     - .. could later contain more data useful to create a new credential entry in the app (e.g. username)
-   - a signature of the payload (headers + payload) performed with the private key of the extension
+4. The extension polls every x seconds to the configured host and port 
 5. The user opens the app and unlocks the vault
 6. The user turns on the server (if not automatically when unlock the vault) by clicking on a new UI switch on top of the credential list
    - if turned on the IP address / hostname is displayed and the new UI component is red to indicate a listening server!
-7. The app takes the next polling request from the extension and looks it up by the provided Client Identifier
-   - if not found return 404 Not found
-   - if not linked return 403 not authenticated
-   - else
-     - verifies the signature with the public key of the extension
-     - decrypt the session key with the apps's private key of the associated extension keypair stored in the AndroidKeyStore
-     - decrypt the payload with the session key and return 200 and ACC_WAIT
+7. The app takes the next polling request from the extension
 8. A message is shown in the app to confirm an incoming request by the user
    - the message contains the linked client name and the sent website, like e.g. "'Home-PC' wants to know credentials for github.com. Accept / Deny"
-   - the message also contains a short fingerprint of the extension's public key (as short as possible)
-9. If extension keeps polling since they received ACC_WAIT from the server
-10. The user compares the short fingerprint for equality and accepts the incoming request
+   - the message also contains a short fingerprint
+9. If extension keeps polling since they accepts od denies the request
+10. The user compares the short fingerprint for equality and accepts or denies the incoming request
 11. The app performs a UI search with the website as search string (how it does today when Autofilling a browser)
 12. The user either clicks on a credential or creates a new one (similar to Autofill flow)
-13. As a result the app replies to the next incoming poll with the selected credential:
-    - encrypts the username and password with the former decrypted session key
-    - sends both back to the extension with a 200 and ACC_REPLY
-14. The extension stops polling when they receive ACC_REPLY and decrypts the username and password with the session key and use them for the Autfilling
-
-#### Implement Forward Secrecy
-
-The idea is that for each single request and response a different secret key is used. This is to mitigate decrypting recorded communications.
+13. As a result the app replies to the next incoming poll with the selected credential
+14. The extension stops polling and decrypts the username and password and use them for the Autfilling
 
 
-#### Unlink an app
+## Unlink an app
 
 To delete a linked app in the extension:
 
@@ -89,7 +71,7 @@ To delete a linked app in the extension:
    - the app's public key from the browser keystore
    - the extensions RSA key pair from the browser keystore
 
-#### Unlink in the app
+## Unlink in the app
 
 To delete a linked extension in the app
 

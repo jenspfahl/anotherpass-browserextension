@@ -1,16 +1,21 @@
 
 
 function poll(fn, timeout, interval) {
-  var endTime = Number(new Date()) + (timeout || 2000);
+  const startTime = Number(new Date());
+  const endTime = startTime + (timeout || 2000);
+  const totalTime = endTime - startTime;
   interval = interval || 100;
   console.log(`endTime: ${new Date(endTime)}`);
-  var checkCondition = async function (resolve, reject) {
-    var result = await fn();
+  const checkCondition = async function (resolve, reject) {
+    const nowTime = Number(new Date());
+    const pastTime = nowTime - startTime;
+    const progress = pastTime / totalTime;
+    const result = await fn(progress);
     console.log(`result: ${JSON.stringify(result)}`);
     if (result) {
       resolve(result);
     }
-    else if (Number(new Date()) < endTime) {
+    else if (nowTime < endTime) {
       console.log(`new timeout: ${new Date(endTime)}`);
       setTimeout(checkCondition, interval, resolve, reject);
     }
