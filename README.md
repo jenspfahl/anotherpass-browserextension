@@ -1,8 +1,12 @@
 # Intro
 
-**Disclaimer**: This extension is still work in progress. Although the security and communication layer should be stable, the UI needs to be polished. 
+## Disclaimer
 
-## Web Extension to communicate with ANOTHERpass app from a browser
+This extension is still work in progress. Although the security and communication layer should be stable, the UI needs to be polished. 
+
+## Purpose
+
+This is a Web Extension to communicate with ANOTHERpass app from a browser as single source of truth.
 
 The web extension (called the extension) can connect to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
 
@@ -12,6 +16,12 @@ The web extension (called the extension) can connect to an [ANOTHERpass V2 app](
 - used protocol is HTTP/HTTPS to enable the extension to access the app (HTTPS requires a valid server certificate)
 - to easily find the app, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
 - a port can be configured on both ends (default 8001)
+
+# Installing
+
+This extension is under development and not yet published on any browsers extension stores. The plan is to support at least Firefox and Chrome.
+
+To install this extension you have to clone this repository and use `about:debugging#/runtime/this-firefox` to temporary load this extension to Firefox by selecting the `manifest.json`.
 
 # Use Cases (outline)
 
