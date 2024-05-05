@@ -38,7 +38,7 @@ Using HTTPS is not constructive because the server (the app) cannot provide a TL
 5. The user clicks on "Link new device" and a new screen is shown
 6. The app asks 
     1. for a human name of the new link (e.g. "My laptop")
-    2. to scan the QR code presented from the browser extension
+    2. to scan the QR code presented by the browser extension
 7. Once scanned, the app displays the same unique identifier  as the extension
 8. The user has to enter the IP or host name displayed in the app into the related field in the extension and click on "Next" button
 9. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
@@ -63,7 +63,7 @@ Now both parties have securelly and proven exchanged the public keys from each o
 8. A message is shown in the app to confirm an incoming request by the user
    - the message contains the linked client name and the sent website, like e.g. "'Home-PC' wants to know credentials for github.com. Accept / Deny"
    - the message also contains a short fingerprint
-9. If extension keeps polling since they accepts od denies the request
+9. The extension keeps polling until the user accepts or denies or cancels the request
 10. The user compares the short fingerprint for equality and accepts or denies the incoming request
 11. The app performs a UI search with the website as search string (how it does today when Autofilling a browser)
 12. The user either clicks on a credential or creates a new one (similar to Autofill flow)
@@ -76,12 +76,10 @@ Now both parties have securelly and proven exchanged the public keys from each o
 To delete a linked app in the extension:
 
 1. The user clicks on the extension's action button and select "Unlink with ANOTHERpass app"
-2. A confirmation dialog is shown to get user confirmation. It displays:
-   - the ip or hostname with port
+2. A confirmation dialog is shown to get user confirmation.
 3. Once confirmed, the extension deletes
    - the ip/host details
-   - the app's public key from the browser keystore
-   - the extensions RSA key pair from the browser keystore
+   - all exchanged secret keys
 
 ## Unlink in the app
 
@@ -91,8 +89,7 @@ To delete a linked extension in the app
 2. Select the link by the given name and click on the Trash-icon
    - The app deletes the stored
      - Web Identifier
-     - apps RSA key pair
-     - extensions public key
+     - all exchanged secret keys
 
 # Key mechanisms
 
@@ -141,24 +138,25 @@ Exchange happens through these steps:
     * a **One-Time Key** (`OTKrs`)
     * a **Transport Key** derived from the previous scanned **Session Key**, since `BK` is not yet known by the extension --> `TKrs = SHA256(SK + OTKrs)`
 1. Now the app responds to the extension as described in "Common communication" but with a differently derived **Transport Key**:
-    * by using `PrivKext` to decrypt `TKrs` (common behaviour)
-    * using `TKrs` to decrypt the payload (common behaviour)
+    * by using `PrivKext` to encrypt `OTKrs` (common behaviour)
+    * using derived `TKrs` to encrypt the payload (common behaviour)
     * Payload contains:
         * `PKapp`
         * `BK`
-1. The extension stores `PKapp` and `BK` in the browser for later usage.
+1. The extension decrypts `OTKrs` with its `PKext` and derives the `TKrs` by using the `SK` (instead of `BK` in the common flow)
+1. The extension stores the received `PKapp` and `BK` in the browser for later usage
 
 ## Security considerations
 
 ### Man-in-the-Middle attacks
 
-The communication between app and extension should usually happen in a local network, but still there is a risk of malicious actors in the same network. For instance an attack could have gained access to the local network and is able to sniff any network communication.
+The communication between app and extension should usually happen in a local network, but still there is a risk of malicious actors in the same network. For instance an attacker could have gained access to the local network and is able to sniff any network communication.
 
 Mitigations:
 
   * Each communication is encrypted as described above
   * The `PKext` used to encrypt the `TKrs` is confirmed by using a QR-code and a fingerprint `F`. Therefor all data encrypted with `PKext` is only decryptable  by the extension.
-  * For each link request and for each credential request a shortened fingerprint is promped to the users on both ends to confirm uniquenes. This ensure that `PKapp` is indeed the public key of the app.
+  * For each link request and for each credential request a shortened fingerprint is promped to the user on both ends to confirm uniquenes. This ensure that `PKapp` is indeed the public key of the app.
 
 ### Offline observers
 
@@ -166,7 +164,7 @@ Meant is an attacker who is able to capture the QR code during the linking phase
 
 Mitigations:
 
-  * If an attacker is able to capture `SK` they wont be able to read the `BK`, since it is encrypted with a `TKrs` encrypted by `PKext`. 
+  * If an attacker is able to capture `SK` they wont be able to read the `BK`, since it is encrypted with a `TKrs` derived and encrypted by `PKext`. 
 
 ### Post-Quantum consideration
 
@@ -174,5 +172,5 @@ Consider RSA will be broken through Quantum Computing. If so, all encrypted data
 
 Mitigations:
 
-  * The `BK` is shared during the linking phase through a confirmed and secure channel (encrypted by `SK`). As long as `SK` is not leaked the `BK` should be safe to decrypt the `TKn`.
-  *
+  * The `BK` is shared during the linking phase through a confirmed and secure channel (encrypted by `SK`). As long as `SK` is not leaked, the `BK` should be safe to decrypt the `TKn`.
+  
