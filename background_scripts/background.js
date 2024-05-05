@@ -26,6 +26,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     linkToApp(sendResponse);
     return true; 
   }
+  else if (message.action === "open_settings") {
+    openSettings();
+    return true; 
+  }
   return false; 
 });
 
@@ -54,12 +58,10 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
 function fetchCredentials(requestIdentifier, sendResponse) {
 
-  const server = localStorage.getItem("server_address");
   const request = {
     action: "request_credential",
     website: currentRequesterUrl,
-    requestIdentifier: requestIdentifier,
-    configuredServer: server 
+    requestIdentifier: requestIdentifier
   };
   
   remoteCall(request, sendResponse);
@@ -75,11 +77,9 @@ function linkToApp(sendResponse) {
   getKey("client_keypair").then(async value => {
     const clientPublicKey = value.publicKey;
     const clientPublicKeyAsJWK = await publicKeyToJWK(clientPublicKey);
-    const server = localStorage.getItem("server_address");
     const request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsJWK,
-      configuredServer: server
+      clientPublicKey: clientPublicKeyAsJWK
     };
     
     remoteCall(request, sendResponse);
@@ -136,6 +136,17 @@ function openLinkWithPollDialog() {
   };
 
   console.log("open link the app dialog");
+
+  browser.windows.create(createData);
+}
+
+function openSettings(url) {
+  let createData = {
+    type: "detached_panel",
+    url: "popup/settings.html",
+    width: 520,
+    height: 400,
+  };
 
   browser.windows.create(createData);
 }

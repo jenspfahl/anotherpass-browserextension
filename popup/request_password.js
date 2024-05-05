@@ -73,6 +73,10 @@ else {
     document.getElementById("fingerprint").innerText = formattedFingerprint;
 
 
+    const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
+    const pollingInterval = localStorage.getItem("polling_interval") || 2;
+
+
     poll(async function () {
       let response = await chrome.runtime.sendMessage({
         action: "request_credential",
@@ -92,7 +96,7 @@ else {
         return null;
       }
       return response.response;
-    }, 30000, 1000).then(function (response) { // TODO make timeout configurable (default 30 sec)
+    }, pollingTimeout * 1000, pollingInterval * 1000).then(function (response) { 
       // polling done
       document.getElementById("waiting_time").value = 100;
 

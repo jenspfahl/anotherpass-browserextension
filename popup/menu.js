@@ -7,7 +7,12 @@ document.addEventListener("click", (e) => {
       action: "start_link_flow",
     });
 
-    // TODO add Settings action
+  }
+  else if (e.target.id === "settings") {
+
+    chrome.runtime.sendMessage({
+      action: "open_settings",
+    });
 
   }
 });
