@@ -91,7 +91,8 @@ To delete a linked extension in the app
      - Web Identifier
      - all exchanged secret keys
 
-# Key mechanisms
+
+# Security mechanisms
 
 ## Common communication between extension and app
 
@@ -174,3 +175,31 @@ Mitigations:
 
   * The `BK` is shared during the linking phase through a confirmed and secure channel (encrypted by `SK`). As long as `SK` is not leaked, the `BK` should be safe to decrypt the `TKn`.
   
+
+# Future ideas
+
+## Add action to fetch a certain credential from the app
+
+A new action in the extension to just pick up one credential username/password of the users choise and display it in a new browser dialoge (with a copy to clickboard option).
+
+## Add option to remember the selected credential
+
+Once a credential is selected in the app and sent back the the extension, its UID is stored together with the current webpage url in the extension storage. During the next fill-request the credential will be pushed immediatelly after user approval for the current webpage (by UID).
+This would reduce the needed app interaction (selecting the right credential).
+
+ 
+## Add option to remember the selected credential at all
+
+Once a credential is selected in the app and sent back the the extension, it is stored encryptetly together with the current webpage url in the extension storage. During the next fill-request the app is only needed to unlock the extension storage (for x minutes or current session).
+This would reduce the app interaction even more.
+
+## Add action to sync a set of credentials in the extension
+
+A new action in the extension to fetch all or a subset of credentials from the app and store them encrypted in the extension storage.
+Unlocking of these extensions would done by an app request te user has to approve.
+This action could be split in two, one to fetch only the UID, name and webpage of the credentials and another to also fetch username and passwords.
+This would even more reduce the app interaction. 
+
+## Add action to push credentials to the app
+
+A new action to push certain credentials stored in the extension back to the app. If they exist in the app, they might be overwritten or created as copy. This feature would only make sense to migrate existing credentials to the app. 
