@@ -128,7 +128,7 @@ Exchange happens through these steps:
     * the **extension-side RSA key pair** (4096bit, `PKext` and `PrivKext`, latter will never leave the extension)
     * the fingerprint of `PKext` (`F`)
 1. The extension sends `SK` and `F` through a secure offline channel (QR code scan) to the app
-1. The user initiates a HTTP request to the app by providing the app's IP or domain name. The extension submits:
+1. The user initiates a HTTP request to the app by providing the app's IP or domain name. The extension submits following content encrypted with `SK`:
     * the **Extensions Public Key** `PKext` 
 1. The app imports `PKext` and
     * verifies `PKext` with `F` to mitigate MITM key substitution (fails if not valid)
@@ -144,7 +144,7 @@ Exchange happens through these steps:
     * Payload contains:
         * `PKapp`
         * `BK`
-1. The extension decrypts `OTKrs` with its `PKext` and derives the `TKrs` by using the `SK` (instead of `BK` in the common flow)
+1. The extension decrypts `OTKrs` with its `PrivKext` and derives the `TKrs` by using the `SK` (instead of `BK` in the common flow)
 1. The extension stores the received `PKapp` and `BK` in the browser for later usage
 
 ## Security considerations
