@@ -36,5 +36,18 @@ body{
   flex-direction: column;
   align-items: center;
   background-color: #f6f3f2;
+  font-family: system-ui;
 }
 
+.fingerprint{
+  font-family: 'Roboto Mono Bold',monospace;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+
+.fingerprint_small{
+  font-family: 'Roboto Mono Bold',monospace;
+  font-size: 14px;
+  font-weight: 900;
+}
