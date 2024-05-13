@@ -22,6 +22,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     openLinkWithPollDialog();
     return true; 
   }
+  else if (message.action === "start_unlink_flow") {
+    openUnlinkDialog();
+    return true; 
+  }
   else if (message.action === "link_to_app") {
     linkToApp(sendResponse);
     return true; 
@@ -102,28 +106,27 @@ function openPasswordRequestDialog(url) {
 
 
 function openLinkWithQrCodeDialog() {
-  const linked = localStorage.getItem("linked");
+  
+  let createData = {
+    type: "detached_panel",
+    url: "popup/app_link.html",
+    width: 800,
+    height: 600,
+  };
+  
+  browser.windows.create(createData);
+}
 
-  if (linked) {
-    let createData = {
-      type: "detached_panel",
-      url: "popup/app_unlink.html",
-      width: 700,
-      height: 200,
-    };
-    
-    browser.windows.create(createData);
-  }
-  else {
-    let createData = {
-      type: "detached_panel",
-      url: "popup/app_link.html",
-      width: 800,
-      height: 600,
-    };
-    
-    browser.windows.create(createData);
-  }
+function openUnlinkDialog() {
+  
+  let createData = {
+    type: "detached_panel",
+    url: "popup/app_unlink.html",
+    width: 700,
+    height: 200,
+  };
+  
+  browser.windows.create(createData);
 }
 
 function openLinkWithPollDialog() {

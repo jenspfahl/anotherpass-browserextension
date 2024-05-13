@@ -8,8 +8,14 @@
   <body>
     <div id="popup-content">
       <h3 id="state"></h3>
-      <button type="button" id="link">Link with app</button>
-      <button type="button" id="settings">Settings</button>
+     <!-- <button type="button" id="link">Link with app</button>-->
+      <button type="button" title="Link with app" class="icon-button" id="link"><div class="icon-link" id="link"></div></button>
+      <button type="button" title="Unlink from app" class="icon-button" id="unlink"><div class="icon-link-off" id="unlink"></div></button>
+      <button type="button" title="Unlock locally stored credentials" class="icon-button" id="lock"><div class="icon-lock-open" id="lock"></div></button>
+      <button type="button" title="Fetch single credential" class="icon-button" id="fetch_credential"><div class="icon-password" id="fetch_credential"></div></button>
+      <button type="button" title="Extension settings" class="icon-button" id="settings"><div class="icon-settings" id="settings"></div></button>
+      <button type="button" title="Online help" class="icon-button" id="help"><div class="icon-help" id="help"></div></button>
+      <button type="button" title="About this extenion" class="icon-button" id="info"><div class="icon-info" id="info"></div></button>
     </div>
     <script src="menu.js"></script>
   </body>

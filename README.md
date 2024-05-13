@@ -10,11 +10,10 @@ This is a Web Extension to communicate with ANOTHERpass app from a browser as si
 
 The web extension (called the extension) can connect to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
 
-- the device where the extension in a browser runs and the device where the app runs is either in the same local network (recommended) or IP forwarding / DynDNS is implemented (to connect from outside of the local network)
-- the device where the app runs is connected to the same network as the device where the browser runs (recommended) or to the internet
+- the device where the app runs is connected to the same local network as the device where the browser runs
 - the app acts as server, the extension as client
-- used protocol is HTTP/HTTPS to enable the extension to access the app (HTTPS requires a valid server certificate)
-- to easily find the app, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
+- used protocol is HTTP to enable the extension to access the app (HTTPS requires a valid server certificate signed by a CA, which is not available atm)
+- to easily find the app in the network, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
 - a port can be configured on both ends (default 8001)
 
 # Installing
@@ -27,24 +26,23 @@ To install this extension you have to clone this repository and use `about:debug
 
 ## Link Extension with the App
 
-To achieve a maximum of security the extension and the app must be linked before usage. That basically means both parties exchange public keys to ensure a secure communication over a secure offline-channel which cannot be observed (to avoid MITM-attacks).
+To achieve a maximum of security the extension and the app must be linked before usage. That basically means both parties exchange certain keys to ensure a secure communication.
 
-Using HTTPS is not constructive because the server (the app) cannot provide a TLS certificate signed by a common CA. A solution could be to include the certificate in the extension (if accepted by the browsers). In any way, we don't want to rely on TLS only and want to be able to use plain HTTP as well with our own encryption layer. This will be achieved by exchanging public keys beforehand through a secure offline-channel in a so called "linking"- step. This is feasible because a user should have physical access to the app (the server) and the extension in a browser (the client) at the same time and place.
+Using HTTPS is not constructive because the server (the app) cannot provide a TLS certificate signed by a common CA. A solution could be to include the certificate in the extension (if accepted by the browsers). In any way, we don't want to rely on TLS only and want to be able to use plain HTTP as well with our own encryption layer. This will be achieved by exchanging certain keys beforehand through a secure offline-channel in a so called "linking"- step. This is feasible because a user should have physical access to the app (the server) and the extension in a browser (the client) at the same time and place.
 
 1. The user installs the extension in the brower
 2. The user clicks on the extension's action button and select "Link with app"
-3. A page opens with displaying a unique identifier and a generated QR code 
+3. A page opens which displays a unique identifier and a generated QR code 
 4. The user opens the app and starts the server
 5. The user clicks on "Link new device" and a new screen is shown
 6. The app asks 
     1. for a human name of the new link (e.g. "My laptop")
     2. to scan the QR code presented by the browser extension
-7. Once scanned, the app displays the same unique identifier  as the extension
-8. The user has to enter the IP or host name displayed in the app into the related field in the extension and click on "Next" button
+7. Once scanned, the app displays the same unique identifier as the extension
+8. The user has to enter the IP or host name displayed in the app in the related field in the extension and click on "Next" button
 9. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
 10. If the user confirms equality on both ends, the link process is completed  
 
-Now both parties have securelly and proven exchanged the public keys from each other to be used for the next communication.
 
 ## Request a password for a website
 
@@ -54,18 +52,18 @@ Now both parties have securelly and proven exchanged the public keys from each o
    - says "Open the app and accept this request"
    - contains the configured IP address / hostname (see "link" flow above)
    - also contains a shortened fingerprint
-   - shows a timer which runs from 60s to 0s (the request will be aborted once the timer expires)
+   - shows a timer which runs down beginning with 60s (the request will be aborted once the timer expires)
 4. The extension polls every x seconds to the configured host and port 
 5. The user opens the app and unlocks the vault
 6. The user turns on the server (if not automatically when unlock the vault) by clicking on a new UI switch on top of the credential list
-   - if turned on the IP address / hostname is displayed and the new UI component is red to indicate a listening server!
+   - if turned on, the IP address / hostname is displayed and the new UI component is red to indicate a listening server!
 7. The app takes the next polling request from the extension
 8. A message is shown in the app to confirm an incoming request by the user
    - the message contains the linked client name and the sent website, like e.g. "'Home-PC' wants to know credentials for github.com. Accept / Deny"
-   - the message also contains a short fingerprint
+   - the message also contains a short fingerprint for verification
 9. The extension keeps polling until the user accepts or denies or cancels the request
 10. The user compares the short fingerprint for equality and accepts or denies the incoming request
-11. The app performs a UI search with the website as search string (how it does today when Autofilling a browser)
+11. The app performs a UI search with the website as search string (like how it does today when Autofilling a browser password field)
 12. The user either clicks on a credential or creates a new one (similar to Autofill flow)
 13. As a result the app replies to the next incoming poll with the selected credential
 14. The extension stops polling and decrypts the username and password and use them for the Autfilling
@@ -180,24 +178,28 @@ Mitigations:
 
 ## Add action to fetch a certain credential from the app
 
-A new action in the extension to just pick up one credential username/password of the users choise and display it in a new browser dialoge (with a copy to clickboard option).
+A new action in the extension to just pick up one credential of the users choise from the app and displays it in a new browser dialog (with a "copy to clipboard" option).
 
 ## Add option to remember the selected credential
 
-Once a credential is selected in the app and sent back the the extension, its UID is stored together with the current webpage url in the extension storage. During the next fill-request the credential will be pushed immediatelly after user approval for the current webpage (by UID).
+Once a credential is selected in the app and sent back the the extension, its UID is stored together with the current webpage url in the extension storage. When it comes to the next credential request for the same webpage / UID, the corresponding credential will be pushed immediatelly after user approval.
 This would reduce the needed app interaction (selecting the right credential).
 
  
 ## Add option to remember the selected credential at all
 
-Once a credential is selected in the app and sent back the the extension, it is stored encryptetly together with the current webpage url in the extension storage. During the next fill-request the app is only needed to unlock the extension storage (for x minutes or current session).
+Once a credential is selected in the app and sent back the the extension, it is stored encryptedly together with the current webpage url in the extension storage. When it comes to the next credential request for the same webpage / UID, the app is only needed to unlock the extension storage (for x minutes or the current session).
 This would reduce the app interaction even more.
 
-## Add action to sync a set of credentials in the extension
+## Add action to sync a set of credential UIDs to the extension
+
+A new action in the extension to fetch all or a subset of credential UIDs and its related webpage urls from the app and store them in the extension storage.
+When it comes to any next credential request for any known webpage / UID, the corresponding credential will be pushed immediatelly after user approval.This would even more reduce the app interaction. 
+
+## Add action to sync a set of credentials to the extension
 
 A new action in the extension to fetch all or a subset of credentials from the app and store them encrypted in the extension storage.
-Unlocking of these extensions would done by an app request te user has to approve.
-This action could be split in two, one to fetch only the UID, name and webpage of the credentials and another to also fetch username and passwords.
+Unlocking of these extensions would done by an unlock request to the app the user has to approve.
 This would even more reduce the app interaction. 
 
 ## Add action to push credentials to the app

@@ -21,6 +21,23 @@ button:hover {
   cursor: pointer;
 }
 
+.icon-button {
+  border: none;
+  margin: 5px;
+  width: 38px;
+  padding: 3px;
+  text-align: center;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #9f0052;
+}
+
+.icon-button:hover {
+  background-color: #ff0084;
+  cursor: pointer;
+}
+
 div {
   padding: 4px;
 }
@@ -50,4 +67,37 @@ body{
   font-family: 'Roboto Mono Bold',monospace;
   font-size: 14px;
   font-weight: 900;
+}
+
+
+.icon-password {
+  content: url("../icons/password_24.png");
+}
+
+.icon-lock-open {
+  content: url("../icons/lock_open_24.png");
+}
+
+.icon-lock-closed {
+  content: url("../icons/lock_closed_24.png");
+}
+
+.icon-link {
+  content: url("../icons/link_24.png");
+}
+
+.icon-link-off {
+  content: url("../icons/link_off_24.png");
+}
+
+.icon-settings {
+  content: url("../icons/settings_24.png");
+}
+
+.icon-help {
+  content: url("../icons/help_24.png");
+}
+
+.icon-info {
+  content: url("../icons/info_24.png");
 }
