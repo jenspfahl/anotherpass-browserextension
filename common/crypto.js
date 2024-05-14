@@ -126,8 +126,8 @@ async function getPublicKeyShortenedFingerprint(key) {
 }
 
 function toShortenedFingerprint(keyAsArray) {
-  const fingerprint = bytesToBase64(keyAsArray).replace(/[^a-z]/gi, '').substring(0, 6).toLowerCase();
-  return fingerprint.substring(0, 3) + "-" + fingerprint.substring(3, 6);
+  const fingerprint = bytesToBase64(keyAsArray).replace(/[^a-z]/gi, '').substring(0, 7).toUpperCase();
+  return fingerprint.substring(0, 2) + "-" + fingerprint.substring(2, 5) + "-" + fingerprint.substring(5, 7);
 }
 
 async function aesKeyToArray(aesKey) {

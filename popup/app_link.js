@@ -140,5 +140,9 @@ if (!linked) {
 
 }
 else {
-  alert("Something went wrong :(")
-}
+  window.close();
+  chrome.runtime.sendMessage({
+    action: "open_message_dialog",
+    title: "Error",
+    text: "Extension not linked with an app! Please first link it."
+  });}

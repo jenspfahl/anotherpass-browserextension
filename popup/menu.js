@@ -1,4 +1,7 @@
 
+const webClientId = localStorage.getItem("web_client_id");
+const linked = localStorage.getItem("linked");
+
 document.addEventListener("click", (e) => {
 
   if (e.target.id === "link") {
@@ -10,7 +13,10 @@ document.addEventListener("click", (e) => {
   } else if (e.target.id === "unlink") {
 
     chrome.runtime.sendMessage({
-      action: "start_unlink_flow",
+      action: "open_confirmation_dialog",
+      title: "Unlink from app",
+      text: "Are you sure to unlink '" + webClientId + "' from the app?",
+      confirmAction: "start_unlink_flow",
     });
 
   }
@@ -22,22 +28,34 @@ document.addEventListener("click", (e) => {
 
   }
   else if (e.target.id === "lock") {
-    alert("Not yet implemented");
+    chrome.runtime.sendMessage({
+      action: "open_message_dialog",
+      title: "Unlock local vault",
+      text: "Not yet implemented"
+    });
+
   }
   else if (e.target.id === "fetch_credential") {
-    alert("Not yet implemented");
+    const sending = chrome.runtime.sendMessage({
+      action: "start_single_password_request_flow"
+    });
   }
   else if (e.target.id === "help") {
-    alert("For help please visit https://github.com/jenspfahl/anotherpass-webext");
+    chrome.runtime.sendMessage({
+      action: "open_message_dialog",
+      title: "Help",
+      text: "For help please visit https://github.com/jenspfahl/anotherpass-webext"
+    });
   }
   else if (e.target.id === "info") {
-    alert("ANOTHERpass Web Extension (c) Jens Pfahl 2024 (v0.1)");
+    chrome.runtime.sendMessage({
+      action: "open_message_dialog",
+      title: "About the extension",
+      text: "ANOTHERpass Web Extension (c) Jens Pfahl 2024 (v0.1)"
+    });
   }
 });
 
-
-const webClientId = localStorage.getItem("web_client_id");
-const linked = localStorage.getItem("linked");
 
 if (webClientId && linked) {
   document.getElementById("state").innerText = "Linked (as " + webClientId + ")";

@@ -37,8 +37,12 @@ document.addEventListener("click", (e) => {
 var webClientId = localStorage.getItem("web_client_id");
 
 if (!webClientId) {
-  alert("Extension not linked with an app! Please first link it.");
   window.close();
+  chrome.runtime.sendMessage({
+    action: "open_message_dialog",
+    title: "Error",
+    text: "Extension not linked with an app! Please first link it."
+  });
 } 
 else {
 

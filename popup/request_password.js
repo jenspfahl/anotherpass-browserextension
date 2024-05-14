@@ -1,3 +1,4 @@
+const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
 document.addEventListener("click", (e) => {
 
@@ -44,8 +45,12 @@ document.addEventListener("click", (e) => {
 var webClientId = localStorage.getItem("web_client_id");
 
 if (!webClientId) {
-  alert("Extension not linked with an app! Please first link it.");
   window.close();
+  chrome.runtime.sendMessage({
+    action: "open_message_dialog",
+    title: "Error",
+    text: "Extension not linked with an app! Please first link it."
+  });
 } 
 else {
 
@@ -103,7 +108,14 @@ else {
 
       destroySessionKey();
       
-      sendPasteCredentialMessage(response.password);
+      console.log("autofill " + requestData.autofill);
+
+      if (requestData.autofill) {
+        sendPasteCredentialMessage(response.password);
+      }
+      else {
+        presentCredential(response);
+      }
     }).catch(function (e) {
       document.getElementById("waiting_time").value = 0;
       document.getElementById("instruction").innerText = "Unable to receive credentials!";
@@ -122,6 +134,15 @@ else {
           window.close();
         });
       });
+    }
+
+    function presentCredential(credential) {
+      console.log("present " + JSON.stringify(credential));
+      chrome.runtime.sendMessage({
+        action: "open_credential_dialog",
+        credential: credential
+      });
+      window.close();
     }
   });
 

@@ -19,8 +19,12 @@ if (webClientId) {
 
         destroySessionKey();
 
-        alert("Extension successfully linked.");
         window.close();
+        chrome.runtime.sendMessage({
+          action: "open_message_dialog",
+          title: "Success",
+          text: "Extension successfully linked as '" + webClientId + "'"
+        });
       }
 
       if (e.target.id === "deny") {
@@ -33,9 +37,12 @@ if (webClientId) {
         destroyAllKeys();
 
 
-        alert("Extension unlinked for security reasons");
         window.close();
-
+        chrome.runtime.sendMessage({
+          action: "open_message_dialog",
+          title: "Failure",
+          text: "Linking the extension has been denied in the app."
+        });
       }
     });
 
@@ -44,5 +51,10 @@ if (webClientId) {
 
 }
 else {
-  alert("Something went wrong :(")
+  window.close();
+  chrome.runtime.sendMessage({
+    action: "open_message_dialog",
+    title: "Error",
+    text: "Something went wrong :("
+  });
 }
