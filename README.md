@@ -2,11 +2,11 @@
 
 ## Disclaimer
 
-This extension is still work in progress. Although the security and communication layer should be stable, the UI needs to be polished. 
+This extension is still work in progress. Although the security and communication layer should be stable, the extension is not yet finished. 
 
 ## Purpose
 
-This is a Web Extension to communicate with ANOTHERpass app from a browser as single source of truth.
+This is a Web Extension to communicate with ANOTHERpass app as single source of truth and a browser on a different device.
 
 The web extension (called the extension) can connect to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
 
