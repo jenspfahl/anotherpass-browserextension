@@ -13,31 +13,17 @@ async function generateOrGetSessionKey() {
   }
   else {
     console.log("No session key, generate new");
-    const sessionKey = await generateAesKey();
+    const sessionKey = await generateAesKey(128);
     await setKey("session_key", sessionKey);
     return sessionKey;
   }
 }
 
-async function getBaseKey() {
-  const baseKey = await getKey("base_key");
-  if (baseKey) {
-    console.log("Current base key found");
-    return baseKey;
-  }
-  else {
-    console.log("No base key, generate new");
-    const baseKey = await generateAesKey();
-    await setKey("request_base_key", baseKey);
-    return baseKey;
-  }
-}
-
-async function generateAesKey() {
+async function generateAesKey(length) {
   return window.crypto.subtle.generateKey(
     {
       name: "AES-GCM",
-      length: 128,
+      length: length,
     },
     true,
     ["encrypt", "decrypt"]
@@ -85,6 +71,10 @@ async function destroyAllKeys() {
   await deleteKey("app_public_key");
   await deleteKey("base_key");
   await destroySessionKey();
+}
+
+function getSupportedKeyLength() {
+  return localStorage.getItem("symmetric_key_length") || 128;
 }
 
 async function destroySessionKey() {

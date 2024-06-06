@@ -99,6 +99,8 @@ if (!linked) {
 
 
               const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
+              localStorage.setItem("symmetric_key_length", baseKeyAsArray.length * 8);
+
               const baseKey = await arrayToAesKey(baseKeyAsArray);
               await setKey("base_key", baseKey);
 

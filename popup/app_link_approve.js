@@ -33,6 +33,7 @@ if (webClientId) {
         localStorage.removeItem("server_address");
         localStorage.removeItem("server_port");
         localStorage.removeItem("linked_vault_id");
+        localStorage.removeItem("symmetric_key_length");
 
         destroyAllKeys();
 

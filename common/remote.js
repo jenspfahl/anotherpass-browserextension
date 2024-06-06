@@ -53,7 +53,7 @@ async function remoteCall(message, sendResponse) {
   let request;
   if (linked) {
     const appPublicKey = await getKey("app_public_key");
-    const oneTimeKey = await generateAesKey();
+    const oneTimeKey = await generateAesKey(getSupportedKeyLength());
     const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
 
     const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
