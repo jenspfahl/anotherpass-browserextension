@@ -27,7 +27,6 @@
     "scripts": [
       "common/crypto.js",
       "common/remote.js",
-      "libs/qrcodejs/1.0.0/qrcode.min.js",
       "background_scripts/background.js"
     ]
   },
@@ -38,10 +37,11 @@
         "https://*/*"
       ],
       "js": [
-        "libs/qrcodejs/1.0.0/qrcode.min.js",
+        "libs/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js",
         "content_scripts/content.js"
       ],
       "css": [
+        "libs/bootstrap-5.3.3-dist/css/bootstrap.min.css",
         "content_scripts/content.css"
       ]
     }

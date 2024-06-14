@@ -97,10 +97,10 @@ To delete a linked extension in the app
 Each communication is secured by two layers of encryption:
 
 
-1. AES encryption of the payload (request and response body) with a changing 128bit **Transport Key** (`TK`)
+1. AES encryption of the payload (request and response body) with a changing 128/256 bit **Transport Key** (`TK`)
 	* `TK` is derived from:
-        *  a shared and on each side persisted 128bit **Base Key** (`BK`)
-        *  a randomnly generated 128bit **One-Time Key** (`OTK`) 
+        *  a shared and on each side persisted 128/256 bit **Base Key** (`BK`)
+        *  a randomnly generated 128/256 bit **One-Time Key** (`OTK`) 
         *  --> `TKn = SHA256(BK + OTKn)`
         *  `TK` is derived/regenerated for each communication direction:
             *  request (extension to app): **Request Transport Key** --> `TKrq = SHA256(BK + OTKrq)`

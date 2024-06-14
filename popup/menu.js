@@ -17,6 +17,8 @@ document.addEventListener("click", (e) => {
       title: "Unlink from app",
       text: "Are you sure to unlink '" + webClientId + "' from the app?",
       confirmAction: "start_unlink_flow",
+      width: 300,
+      height: 200
     });
 
   }
@@ -42,26 +44,31 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "help") {
     chrome.runtime.sendMessage({
-      action: "open_message_dialog",
-      title: "Help",
-      text: "For help please visit https://github.com/jenspfahl/anotherpass-webext"
+      action: "open_url",
+      url: "https://github.com/jenspfahl/anotherpass-webext"
     });
+    window.close();
   }
   else if (e.target.id === "info") {
     chrome.runtime.sendMessage({
       action: "open_message_dialog",
       title: "About the extension",
-      text: "ANOTHERpass Web Extension (c) Jens Pfahl 2024 (v0.1)"
+      text: "ANOTHERpass Browser Extension (c) Jens Pfahl 2024 (v0.1)",
+      width: 300,
+      height: 200
     });
   }
 });
 
 
 if (webClientId && linked) {
+  console.log("menu linked mode");
   document.getElementById("state").innerText = "Linked (as " + webClientId + ")";
   document.getElementById("link").style.display = 'none';
 }
 else {
+  console.log("menu unlinked mode");
+
   document.getElementById("state").innerText = "Not linked";
   document.getElementById("settings").style.display = 'none';
   document.getElementById("lock").style.display = 'none';

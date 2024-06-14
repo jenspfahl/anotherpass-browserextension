@@ -13,11 +13,7 @@ document.addEventListener("click", (e) => {
     console.log(`Error: ${error}`);
   }
 
-  if (e.target.tagName !== "BUTTON") {
-    // Ignore when click is not on a button within <div id="popup-content">.
-    return;
-  }
-  else if (e.target.id === "close") {
+  if (e.target.id === "close") {
     destroySessionKey();
     window.close();
   }
@@ -25,17 +21,12 @@ document.addEventListener("click", (e) => {
 
     // TODO check and save data --> function
     const ip = document.getElementById("ip").value;
-    const port = document.getElementById("port").value;
 
     if (!ip) {
       alert("A host is required");
     }
-    else if (!port) {
-      alert("A port is required");
-    }
     else {
       localStorage.setItem("server_address", ip);
-      localStorage.setItem("server_port", port);
     }
 
   }
@@ -55,9 +46,7 @@ if (!webClientId) {
 else {
 
   const ip = localStorage.getItem("server_address");
-  const port = localStorage.getItem("server_port");
   document.getElementById("ip").value = ip;
-  document.getElementById("port").value = port;
 
 
   getKey("app_public_key").then(async value => {

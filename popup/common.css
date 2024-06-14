@@ -1,11 +1,8 @@
 
-
-
 :root{
   font-size: 62.5%;
   --button-color: #9f0052;
-  --button-hover-color: #ff0084;;
-
+  --button-hover-color: #ff0084;
 }
 
 button {
@@ -46,6 +43,10 @@ div {
   padding: 4px;
 }
 
+div.popup-content {
+  text-align: center;
+}
+
 
 
 
@@ -70,6 +71,15 @@ body{
   font-weight: 900;
 }
 
+
+.table {
+  width: auto;
+  align-items: center;
+  display: table;
+}
+.cell {
+  display: table-cell;
+}
 
 .icon-password {
   content: url("../icons/password_24.png");

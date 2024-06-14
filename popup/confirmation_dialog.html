@@ -3,33 +3,28 @@
 
 <head>
   <meta charset="utf-8" />
-  <link rel="stylesheet" href="common.css" />
+  <link rel="stylesheet" href="../libs/bootstrap-5.3.3-dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="../css/custom.css" />
 </head>
 
 <body>
 
 
-  <div id="popup-content">
-    <h1 id="title"></h1>
-    <h3 id="text"></h3>
-
-    <table>
-      <tr>
-        <th>
-          <button type="button" id="cancel">Cancel</button>
-        </th>
-        <th>
-          <button type="button" id="ok">Ok</button>     
-        </th>
-      </tr>
-      <tr>
-      </tr>
-    </table>
+  <div class="container">
+    <h2 id="title"></h2>
+    <hr>
+    <h6 id="text"></h6>
+    <hr>
+    <div class="container justify-content-center">
+      <button id="ok" class="btn btn-primary rounded-0" type="button">Ok</button>
+      <button id="cancel" class="btn btn-outline-primary rounded-0" type="button">Cancel</button>
+    </div>
+  
 
   </div>
 
-  </div>
   <script src="confirmation_dialog.js"></script>
+
 </body>
 
 </html>

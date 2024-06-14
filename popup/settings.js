@@ -2,11 +2,7 @@
 document.addEventListener("click", (e) => {
 
 
-  if (e.target.tagName !== "BUTTON") {
-    // Ignore when click is not on a button within <div id="popup-content">.
-    return;
-  }
-  else if (e.target.id === "update") {
+  if (e.target.id === "update") {
 
     // TODO check and save data --> function
     const ip = document.getElementById("ip").value;

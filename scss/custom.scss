@@ -1,0 +1,14 @@
+@import "../libs/bootstrap-5.3.3-src/scss/functions"; 
+@import "../libs/bootstrap-5.3.3-src/scss/variables";
+
+$primary: #ff0084;
+$secondary: #9f0052;
+
+// merge with existing $theme-colors map
+$theme-colors: map-merge($theme-colors, (
+  "primary": $primary,
+  "secondary": $secondary
+));
+
+// set changes
+@import "../libs/bootstrap-5.3.3-src/scss/bootstrap";
