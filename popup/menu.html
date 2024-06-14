@@ -28,13 +28,23 @@
     <div class="container">
       <div>
         <b id="state"></b>
-        <button class="btn" title="Unlink from app">
+      
+        <button id="unlink" class="btn" title="Unlink from app">
           <span id="unlink" class="material-symbols-outlined size-48">
-          link_off
+            link_off
+          </span>
+        </button>
+
+        <button id="link" class="btn" title="Link with ANOTHERpass app">
+          <span id="link" class="material-symbols-outlined size-48">
+            link
           </span>
         </button>
         
       </div>
+
+ 
+      
 
       <!-- Here the known credentials-->
       <!--ul class="nav flex-column">
@@ -52,18 +62,69 @@
         </li>
       </ul-->
 
+
+
+
+      <!-- this is the future!
+      <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab" tabindex="0">
+          <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
+            <span id="lock" class="material-symbols-outlined size-24">
+              lock
+            </span>
+          </button>
+          credentials here ..
+        </div>
+        <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
+         settings here ..
+         
+        </div>
+        <div class="tab-pane fade" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
+          Visit jepfa.de to get help
+        </div>
+        <div class="tab-pane fade" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab" tabindex="0">
+          (c) Jens Pfahl
+        </div>
+      </div>
+
+      <nav>
+        <div class="nav nav-tabs nav-underline nav-fill" id="nav-tab" role="tablist">
+          <button class="nav-link active" id="nav-credentials-tab" data-bs-toggle="tab" data-bs-target="#nav-credentials" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Managed credentials">
+            <span id="xlock" class="material-symbols-outlined size-24">
+              password
+            </span>
+          </button>
+
+          <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Extension settings">
+            <span id="xlock" class="material-symbols-outlined size-24">
+              settings
+            </span>
+          </button>
+          
+          <button class="nav-link" id="nav-help-tab" data-bs-toggle="tab" data-bs-target="#nav-help" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Online help">
+            <span id="xlock" class="material-symbols-outlined size-24">
+              help
+            </span>
+          </button>
+
+          <button class="nav-link" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="About this extenion">
+            <span id="xlock" class="material-symbols-outlined size-24">
+              info
+            </span>
+          </button>
+
+        </div>
+      </nav>
+      
+      
+
+
+    -->
+      
+
+    
       <div class="container justify-content-center">
-        <button id="link" class="btn btn-primary rounded-0" title="Link with app">
-          <span id="link" class="material-symbols-outlined size-24">
-            link
-          </span>
-          Link with app
-        </button>
-        <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
-          <span id="lock" class="material-symbols-outlined size-24">
-            lock
-          </span>
-        </button>
+        
         <button id="fetch_credential" class="btn btn-outline-primary rounded-0" title="Fetch single credential">
           <span id="fetch_credential" class="material-symbols-outlined size-48">
             password
@@ -87,15 +148,9 @@
         <p></p>
       </div>
 
-<!--
-      <button type="button" title="Link with app" class="icon-button" id="link"><div class="icon-link" id="link"></div></button>
-      <button type="button" title="Unlock locally stored credentials" class="icon-button" id="lock"><div class="icon-lock-open" id="lock"></div></button>
-      <button type="button" title="Fetch single credential" class="icon-button" id="fetch_credential"><div class="icon-password" id="fetch_credential"></div></button>
-      <button type="button" title="Extension settings" class="icon-button" id="settings"><div class="icon-settings" id="settings"></div></button>
-      <button type="button" title="Online help" class="icon-button" id="help"><div class="icon-help" id="help"></div></button>
-      <button type="button" title="About this extenion" class="icon-button" id="info"><div class="icon-info" id="info"></div></button>
-    -->
     </div>
     <script src="menu.js"></script>
+    <script src="../libs/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
+
   </body>
 </html>
