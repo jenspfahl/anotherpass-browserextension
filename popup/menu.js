@@ -74,13 +74,6 @@ document.addEventListener("click", (e) => {
      });
 
   }
-  else if (e.target.id === "settings") {
-
-    chrome.runtime.sendMessage({
-      action: "open_settings",
-    });
-
-  }
   else if (e.target.id === "lock") {
     bsAlert("Error", "This operation is not yet supported!");
     /*chrome.runtime.sendMessage({
@@ -93,22 +86,6 @@ document.addEventListener("click", (e) => {
   else if (e.target.id === "fetch_credential") {
     const sending = chrome.runtime.sendMessage({
       action: "start_single_password_request_flow"
-    });
-  }
-  else if (e.target.id === "help") {
-    chrome.runtime.sendMessage({
-      action: "open_url",
-      url: "https://github.com/jenspfahl/anotherpass-webext"
-    });
-    window.close();
-  }
-  else if (e.target.id === "info") {
-    chrome.runtime.sendMessage({
-      action: "open_message_dialog",
-      title: "About the extension",
-      text: "ANOTHERpass Browser Extension (c) Jens Pfahl 2024 (v0.1)",
-      width: 300,
-      height: 200
     });
   }
 });

@@ -1,4 +1,5 @@
-var webClientId = localStorage.getItem("web_client_id");
+const webClientId = localStorage.getItem("web_client_id");
+const linkedVaultId = localStorage.getItem("linked_vault_id");
 
 
 if (webClientId) {
@@ -23,7 +24,7 @@ if (webClientId) {
         chrome.runtime.sendMessage({
           action: "open_message_dialog",
           title: "Success",
-          text: "Extension successfully linked as '" + webClientId + "'"
+          text: "Extension successfully linked to vault with id '" + linkedVaultId + "' with the identifier '" + webClientId + "'"
         });
       }
 

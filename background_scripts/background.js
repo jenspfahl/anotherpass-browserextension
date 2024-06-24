@@ -38,20 +38,8 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     linkToApp(sendResponse);
     return true; 
   }
-  else if (message.action === "open_settings") {
-    openSettings();
-    return true; 
-  }
   else if (message.action === "open_message_dialog") {
     openMessageDialog(message.title, message.text, message.width, message.height);
-    return true; 
-  }
-  else if (message.action === "open_confirmation_dialog") {
-    openConfirmationDialog(message.title, message.text, message.confirmAction);
-    return true; 
-  }
-  else if (message.action === "open_url") {
-    openUrl(message.url);
     return true; 
   }
   else if (message.action === "open_credential_dialog") {
@@ -173,18 +161,6 @@ function openLinkWithPollDialog() {
   browser.windows.create(createData);
 }
 
-function openSettings() {
-  let createData = {
-    type: "detached_panel",
-    url: "popup/settings.html",
-    width: 520,
-    height: 400,
-  };
-
-  browser.windows.create(createData);
-}
-
-
 function openMessageDialog(title, text, width, height) {
   let createData = {
     type: "detached_panel",
@@ -196,21 +172,6 @@ function openMessageDialog(title, text, width, height) {
   browser.windows.create(createData);
 }
 
-
-function openConfirmationDialog(title, text, confirmAction) {
-  let createData = {
-    type: "detached_panel",
-    url: "popup/confirmation_dialog.html?data=" + encodeURIComponent(JSON.stringify({title: title, text: text, confirmAction: confirmAction})),
-    width: 400,
-    height: 200,
-  };
-
-  browser.windows.create(createData);
-}
-
-function openUrl(url) {
-  browser.tabs.create({ url: url });
-}
 
 function openCredentialDialog(credential) {
   console.log("openCredentialDialog with " + JSON.stringify(credential));
