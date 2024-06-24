@@ -28,7 +28,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "start_unlink_flow") {
-    openUnlinkDialog();
+    unlinkApp();
     return true; 
   }
   else if (message.action === "link_to_app") {
@@ -138,17 +138,22 @@ function openLinkWithQrCodeDialog() {
   browser.windows.create(createData);
 }
 
-function openUnlinkDialog() {
-  
-  let createData = {
-    type: "detached_panel",
-    url: "popup/app_unlink.html",
-    width: 700,
-    height: 200,
-  };
-  
-  browser.windows.create(createData);
+
+function unlinkApp() {
+
+  console.log("do unlink");
+  localStorage.removeItem("linked");
+  localStorage.removeItem("web_client_id");
+  localStorage.removeItem("server_address");
+  localStorage.removeItem("server_port");
+  localStorage.removeItem("linked_vault_id");
+  localStorage.removeItem("symmetric_key_length");
+
+
+  destroyAllKeys(); //TODO doesnt work, too fast?
+
 }
+
 
 function openLinkWithPollDialog() {
 

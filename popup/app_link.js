@@ -10,7 +10,7 @@ if (!linked) {
   const port = localStorage.getItem("server_port");
   document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app and enter the IP / hostname provided by the app.";
   document.getElementById("ip").value = ip;
-  document.getElementById("port").value = port || 8001;
+  document.getElementById("port").value = port || 8787;
 
   document.getElementById("next").disabled = true;
 

@@ -43,7 +43,7 @@
         
       </div>
 
- 
+       
       
 
       <!-- Here the known credentials-->
@@ -65,50 +65,99 @@
 
 
 
-      <!-- this is the future!
+      <!-- this is the future!-->
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade show active" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab" tabindex="0">
-          <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
-            <span id="lock" class="material-symbols-outlined size-24">
-              lock
-            </span>
-          </button>
-          credentials here ..
+          <p>
+            ANOTHERpass vault Id:
+            <strong id="linked_vault_id"></strong>
+            <br>
+            <div class="container justify-content-center">
+              <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
+                <span id="lock" class="material-symbols-outlined size-24">
+                  lock
+                </span>
+              </button>
+              <button id="fetch_credential" class="btn btn-outline-primary rounded-0" title="Fetch single credential">
+                <span id="fetch_credential" class="material-symbols-outlined size-24">
+                  password
+                </span>
+              </button>
+            </div>
+          </p>
         </div>
         <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
-         settings here ..
-         
+          <p>
+
+            <div class="mb-3">
+              <label for="server-settings-host" class="form-label">ANOTHERpass is reachable with this hostname:</label>            
+              <input id="server-settings-host" class="form-control" type="text" placeholder="Host or IP" aria-label="The hostname or IP address">
+            </div>
+
+
+
+            <div class="mb-3">
+              <label for="server-settings-port" class="form-label">and this port: </label>            
+              <input id="server-settings-port" class="form-control" type="number" min="1024" max="49151" placeholder="Port" aria-label="The TCP port">
+            </div>
+
+
+
+            <div class="mb-3">
+              <label for="server-settings-polling-timeout" class="form-label">This extension polls for credentials with this timeout in seconds:</label>            
+              <input id="server-settings-polling-timeout" class="form-control" type="number" min="1" max="3600" placeholder="Polling timeout" aria-label="Polling timeout in seconds">
+            </div>
+
+
+
+            <div class="mb-3">
+              <label for="server-settings-polling-interval" class="form-label">and polls every X seconds:</label>            
+              <input id="server-settings-polling-interval" class="form-control" type="number" min="1" max="60" placeholder="Polling interval" aria-label="Polling interval in seconds">
+            </div>
+
+
+            <button id="btn-save-settings" type="button" class="btn btn-secondary rounded-0">Save</button>
+
+          </p>
         </div>
         <div class="tab-pane fade" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
-          Visit jepfa.de to get help
+          <p>
+            This is an extension to communicate with an ANOTHERpass vault.
+            <br>
+            <a href="https://github.com/jenspfahl/anotherpass-webext">Click here for more information</a>
+          </p>
         </div>
         <div class="tab-pane fade" id="nav-about" role="tabpanel" aria-labelledby="nav-about-tab" tabindex="0">
-          (c) Jens Pfahl
+          <p>
+            ANOTHERpass Extension is licensed under GPLv3
+            <br>
+            (c) Jens Pfahl 2024
+          </p>
         </div>
       </div>
 
       <nav>
         <div class="nav nav-tabs nav-underline nav-fill" id="nav-tab" role="tablist">
           <button class="nav-link active" id="nav-credentials-tab" data-bs-toggle="tab" data-bs-target="#nav-credentials" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Managed credentials">
-            <span id="xlock" class="material-symbols-outlined size-24">
+            <span class="material-symbols-outlined size-24">
               password
             </span>
           </button>
 
           <button class="nav-link" id="nav-settings-tab" data-bs-toggle="tab" data-bs-target="#nav-settings" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Extension settings">
-            <span id="xlock" class="material-symbols-outlined size-24">
+            <span class="material-symbols-outlined size-24">
               settings
             </span>
           </button>
           
           <button class="nav-link" id="nav-help-tab" data-bs-toggle="tab" data-bs-target="#nav-help" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Online help">
-            <span id="xlock" class="material-symbols-outlined size-24">
+            <span class="material-symbols-outlined size-24">
               help
             </span>
           </button>
 
           <button class="nav-link" id="nav-about-tab" data-bs-toggle="tab" data-bs-target="#nav-about" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="About this extenion">
-            <span id="xlock" class="material-symbols-outlined size-24">
+            <span class="material-symbols-outlined size-24">
               info
             </span>
           </button>
@@ -119,11 +168,11 @@
       
 
 
-    -->
+    
       
 
     
-      <div class="container justify-content-center">
+      <!--div class="container justify-content-center">
         
         <button id="fetch_credential" class="btn btn-outline-primary rounded-0" title="Fetch single credential">
           <span id="fetch_credential" class="material-symbols-outlined size-48">
@@ -146,7 +195,7 @@
           </span>
         </button>
         <p></p>
-      </div>
+      </div-->
 
     </div>
     <script src="menu.js"></script>
