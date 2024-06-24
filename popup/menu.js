@@ -65,7 +65,9 @@ document.addEventListener("click", (e) => {
           console.log("unlink response:" + JSON.stringify(response));
           updateMenuUi(null, null);
 
-          bsAlert("Success", "App successfully un-linked!");
+          bsAlert("Success", "App successfully un-linked!").then(_ => {
+            window.close();
+          });
 
         });
       }
@@ -120,12 +122,25 @@ function updateMenuUi(webClientId, linked) {
     console.log("menu linked mode");
     document.getElementById("state").innerText = "Linked (as " + webClientId + ")";
     document.getElementById("link").classList.add("d-none");
+
+    document.getElementById("nav-credentials-tab").classList.add("active");
+    document.getElementById("nav-credentials").classList.add("show");
+    document.getElementById("nav-credentials").classList.add("active");
+
+
   }
   else {
     console.log("menu unlinked mode");
 
     document.getElementById("state").innerText = "Not linked";
     document.getElementById("unlink").classList.add("d-none");
+    document.getElementById("nav-credentials-tab").classList.add("d-none");
+    document.getElementById("nav-settings-tab").classList.add("d-none");
+
+    document.getElementById("nav-help-tab").classList.add("active");
+    document.getElementById("nav-help").classList.add("show");
+    document.getElementById("nav-help").classList.add("active");
+
   }
 }
 

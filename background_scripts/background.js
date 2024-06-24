@@ -28,7 +28,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "start_unlink_flow") {
-    unlinkApp();
+    unlinkApp().then(async _ => {
+      console.log("unlink then entered");
+      sendResponse();
+    });
     return true; 
   }
   else if (message.action === "link_to_app") {
@@ -139,7 +142,7 @@ function openLinkWithQrCodeDialog() {
 }
 
 
-function unlinkApp() {
+async function unlinkApp() {
 
   console.log("do unlink");
   localStorage.removeItem("linked");
@@ -150,7 +153,8 @@ function unlinkApp() {
   localStorage.removeItem("symmetric_key_length");
 
 
-  destroyAllKeys(); //TODO doesnt work, too fast?
+  await destroyAllKeys(); 
+  console.log("do unlink done");
 
 }
 
