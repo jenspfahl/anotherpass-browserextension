@@ -1,61 +1,12 @@
 
 :root{
-  font-size: 62.5%;
-  --button-color: #9f0052;
-  --button-hover-color: #ff0084;
-}
-
-button {
-  border: none;
-  width: 100%;
-  margin: 3% auto;
-  padding: 4px;
-  text-align: center;
-  font-size: 1.5em;
-  cursor: pointer;
-  color: #ffffff;
-  background-color: var(--button-color);
+  --bg-color: #f6f3f2;;
 }
 
 
-button:hover {
-  background-color: var(--button-hover-color);
-  cursor: pointer;
-}
-
-button.icon-button {
-  border: none;
-  margin: 5px;
-  width: 38px;
-  padding: 3px;
-  text-align: center;
-  font-size: 1.5em;
-  cursor: pointer;
-  color: #ffffff;
-  background-color: var(--button-color);
-}
-button.icon-button:hover {
-  background-color: var(--button-hover-color);
-  cursor: pointer;
-}
-
-div {
-  padding: 4px;
-}
-
-div.popup-content {
-  text-align: center;
-}
-
-
-
-
-body{
-  display: flex;
-  flex-direction: column;
+.centered{
   align-items: center;
-  background-color: #f6f3f2;
-  font-family: system-ui;
+  text-align: center;
 }
 
 .fingerprint{
@@ -71,44 +22,3 @@ body{
   font-weight: 900;
 }
 
-
-.table {
-  width: auto;
-  align-items: center;
-  display: table;
-}
-.cell {
-  display: table-cell;
-}
-
-.icon-password {
-  content: url("../icons/password_24.png");
-}
-
-.icon-lock-open {
-  content: url("../icons/lock_open_24.png");
-}
-
-.icon-lock-closed {
-  content: url("../icons/lock_closed_24.png");
-}
-
-.icon-link {
-  content: url("../icons/link_24.png");
-}
-
-.icon-link-off {
-  content: url("../icons/link_off_24.png");
-}
-
-.icon-settings {
-  content: url("../icons/settings_24.png");
-}
-
-.icon-help {
-  content: url("../icons/help_24.png");
-}
-
-.icon-info {
-  content: url("../icons/info_24.png");
-}

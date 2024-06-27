@@ -1,7 +1,7 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
 document.addEventListener("click", (e) => {
-
+/*
 
   function handleResponse(message) {
     console.log(`Message from the password fetch: ${message.response}`);
@@ -12,18 +12,17 @@ document.addEventListener("click", (e) => {
   function handleError(error) {
     console.log(`Error: ${error}`);
   }
-
+*/
   if (e.target.id === "close") {
     destroySessionKey();
     window.close();
   }
   else if (e.target.id === "update") {
 
-    // TODO check and save data --> function
-    const ip = document.getElementById("ip").value;
+    const ip = document.getElementById("host").value;
 
-    if (!ip) {
-      alert("A host is required");
+    if (!ip || ip == "") {
+      bsAlert("Error", "A host is required");
     }
     else {
       localStorage.setItem("server_address", ip);
@@ -33,20 +32,18 @@ document.addEventListener("click", (e) => {
 });
 
 
-var webClientId = localStorage.getItem("web_client_id");
+const webClientId = localStorage.getItem("web_client_id");
+const linked = localStorage.getItem("linked");
 
-if (!webClientId) {
-  window.close();
-  chrome.runtime.sendMessage({
-    action: "open_message_dialog",
-    title: "Error",
-    text: "Extension not linked with an app! Please first link it."
+if (!linked) {
+  bsAlert("Error", "Extension not linked with an app! Please link it first.").then(_ => {
+    window.close();
   });
 } 
 else {
 
   const ip = localStorage.getItem("server_address");
-  document.getElementById("ip").value = ip;
+  document.getElementById("host").value = ip;
 
 
   getKey("app_public_key").then(async value => {
@@ -110,9 +107,11 @@ else {
       document.getElementById("instruction").innerText = "Unable to receive credentials!";
       document.getElementById("close").innerText = "Close";
 
-      alert("You haven't opened the app in reasonable time or the host or port is wrong.");
       destroySessionKey();
-      window.close();
+
+      bsAlert("Error", "You haven't opened the app in reasonable time or the host or port is wrong.").then(_ => {
+        window.close();
+      });
     });
 
 

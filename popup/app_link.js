@@ -8,8 +8,8 @@ if (!linked) {
 
   const ip = localStorage.getItem("server_address");
   const port = localStorage.getItem("server_port");
-  document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app and enter the IP / hostname provided by the app.";
-  document.getElementById("ip").value = ip;
+  document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app and enter the provided IP / hostname.";
+  document.getElementById("host").value = ip;
   document.getElementById("port").value = port || 8787;
 
   document.getElementById("next").disabled = true;
@@ -40,24 +40,28 @@ if (!linked) {
 
     document.addEventListener("click", (e) => {
 
+      if (e.target.id === "cancel") {
+        window.close();
+      }
+
       if (e.target.id === "next") {
 
         // TODO check and save data
-        const ip = document.getElementById("ip").value;
-        const port = document.getElementById("port").value;
+        const ip = document.getElementById("host").value;
+        const port = parseInt(document.getElementById("port").value);
 
-        if (!ip) {
-          alert("A host is required");
+        if (!ip || ip == "") {
+          bsAlert("Error", "A host is required");
         }
-        else if (!port) {
-          alert("A port is required");
+        else if (isNaN(port) || port < 1024 || port > 49151) {
+          bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
         }
         else {
 
           document.getElementById("next").disabled = true;
           
-          document.querySelector(".loading-indicator").style.display = '';
-          document.querySelector(".qr-code").style.display = 'none';
+          document.querySelector("#loading_pad").style.display = '';
+          document.querySelector("#qr_code_pad").style.display = 'none';
 
 
           localStorage.setItem("server_address", ip);
@@ -68,10 +72,10 @@ if (!linked) {
           }).then(async response => {
             if (response == null || response.response == null) {
               console.log("linking error from server, see previous logs");
-              alert("Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
+              bsAlert("Error", "Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
               document.getElementById("next").disabled = false;
-              document.querySelector(".loading-indicator").style.display = 'none';
-              document.querySelector(".qr-code").style.display = '';
+              document.querySelector("#loading_pad").style.display = 'none';
+              document.querySelector("#qr_code_pad").style.display = '';
             }
             else {
 
@@ -106,17 +110,48 @@ if (!linked) {
 
               console.log("save shared base key:", baseKeyAsArray);
 
-              window.close();
+              const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(appPublicKey);
 
-              chrome.runtime.sendMessage({
-                action: "continue_link_flow",
-              });
+              bsConfirm(
+                "Confirm app link", 
+                "Ensure that the fingerprint <h1 class=\"fingerprint\">" + publicKeyFingerprint + "</h1> is the same as shown in the app and don't forget to accept there too.",
+                "Yes, same",
+                "No, different"
+              )
+              .then((decision) => {
+                if (decision === true) {
+                  localStorage.setItem("linked", true);
+
+                  destroySessionKey();
+
+                  bsAlert("Success", "Extension successfully linked to vault <b>" + linkedVaultId + "</b> with the link identifier <b class=\"fingerprint\">" + webClientId + "</b>.").then(_ => {
+                    window.close();
+                  });
+                }
+                else if (decision === false) {
+                  localStorage.removeItem("linked");
+                  localStorage.removeItem("web_client_id");
+                  localStorage.removeItem("server_address");
+                  localStorage.removeItem("server_port");
+                  localStorage.removeItem("linked_vault_id");
+                  localStorage.removeItem("symmetric_key_length");
+
+                  destroyAllKeys();
+
+                  bsAlert("Failure", "Linking the extension has been denied in the app.").then(_ => {
+                    window.close();
+                  });
+                }
+               });
+
             }
 
           },
           error => {
             console.log("unknown linking error from server: ", error);
-            alert("Cannot link with the app due to an unknown problem");
+            bsAlert("Error", "Cannot link with the app due to an unknown problem").then(_ => {
+              window.close();
+            });
           });
 
         }
@@ -127,9 +162,9 @@ if (!linked) {
 
 
   function generateQrCode(input) {
-    document.querySelector(".loading-indicator").style.display = 'none';
+    document.querySelector("#loading_pad").style.display = 'none';
 
-    const qrCodeDiv = document.querySelector(".qr-code");
+    const qrCodeDiv = document.querySelector("#qr_code_pad");
     const qrcode = new QRCode(qrCodeDiv, {
       text: input,
       width: 300,
@@ -142,9 +177,7 @@ if (!linked) {
 
 }
 else {
-  window.close();
-  chrome.runtime.sendMessage({
-    action: "open_message_dialog",
-    title: "Error",
-    text: "Extension not linked with an app! Please first link it."
-  });}
+  bsAlert("Error", "Extension already linked with the app!").then(_ => {
+    window.close();
+  });
+}

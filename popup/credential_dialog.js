@@ -9,7 +9,7 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(credential.password);
-    alert("Password copied to clipboard");
+    bsAlert("Success", "Password copied to clipboard");
   }
 });
 

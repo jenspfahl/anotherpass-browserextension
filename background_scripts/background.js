@@ -23,10 +23,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     openLinkWithQrCodeDialog();
     return true; 
   }
-  else if (message.action === "continue_link_flow") {
-    openLinkWithPollDialog();
-    return true; 
-  }
   else if (message.action === "start_unlink_flow") {
     unlinkApp().then(async _ => {
       console.log("unlink then entered");
@@ -36,10 +32,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
   else if (message.action === "link_to_app") {
     linkToApp(sendResponse);
-    return true; 
-  }
-  else if (message.action === "open_message_dialog") {
-    openMessageDialog(message.title, message.text, message.width, message.height);
     return true; 
   }
   else if (message.action === "open_credential_dialog") {
@@ -107,8 +99,8 @@ function openPasswordRequestDialog(autofill) {
   let createData = {
     type: "detached_panel",
     url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill})),
-    width: 500,
-    height: 390,
+    width: 650,
+    height: 520,
   };
 
   console.log("open request password dialog");
@@ -123,7 +115,7 @@ function openLinkWithQrCodeDialog() {
     type: "detached_panel",
     url: "popup/app_link.html",
     width: 800,
-    height: 600,
+    height: 765,
   };
   
   browser.windows.create(createData);
@@ -147,39 +139,13 @@ async function unlinkApp() {
 }
 
 
-function openLinkWithPollDialog() {
-
-  let createData = {
-    type: "detached_panel",
-    url: "popup/app_link_approve.html",
-    width: 800,
-    height: 600,
-  };
-
-  console.log("open link the app dialog");
-
-  browser.windows.create(createData);
-}
-
-function openMessageDialog(title, text, width, height) {
-  let createData = {
-    type: "detached_panel",
-    url: "popup/message_dialog.html?data=" + encodeURIComponent(JSON.stringify({title: title, text: text})),
-    width: width || 600,
-    height: height || 300,
-  };
-
-  browser.windows.create(createData);
-}
-
-
 function openCredentialDialog(credential) {
   console.log("openCredentialDialog with " + JSON.stringify(credential));
   let createData = {
     type: "detached_panel",
     url: "popup/credential_dialog.html?data=" + encodeURIComponent(JSON.stringify(credential)),
-    width: 600,
-    height: 400,
+    width: 700,
+    height: 500,
   };
 
   browser.windows.create(createData);
