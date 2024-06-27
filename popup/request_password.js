@@ -1,18 +1,9 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
+let _credential;
+
 document.addEventListener("click", (e) => {
-/*
 
-  function handleResponse(message) {
-    console.log(`Message from the password fetch: ${message.response}`);
-    sendPasteCredentialMessage(message.response.passwd);
-
-  }
-
-  function handleError(error) {
-    console.log(`Error: ${error}`);
-  }
-*/
   if (e.target.id === "close") {
     destroySessionKey();
     window.close();
@@ -28,6 +19,10 @@ document.addEventListener("click", (e) => {
       localStorage.setItem("server_address", ip);
     }
 
+  }
+  else if (e.target.id === "copy") {
+    navigator.clipboard.writeText(_credential.password);
+    const copyButton = document.getElementById("copy").innerText = "Copied!";
   }
 });
 
@@ -81,10 +76,11 @@ else {
         document.getElementById("instruction").innerText = "Request was rejected!";
         document.getElementById("close").innerText = "Close";
 
-        alert("The request has been rejected in the app or the vault was locked.");
-        // cancel polling
         destroySessionKey();
-        window.close();
+
+        bsAlert("Error", "The request has been rejected in the app or the vault was locked.").then(_ => {
+          window.close();
+        });
         return null;
       }
       return response.response;
@@ -103,6 +99,7 @@ else {
         presentCredential(response);
       }
     }).catch(function (e) {
+      console.error(e);
       document.getElementById("waiting_time").value = 0;
       document.getElementById("instruction").innerText = "Unable to receive credentials!";
       document.getElementById("close").innerText = "Close";
@@ -126,11 +123,81 @@ else {
 
     function presentCredential(credential) {
       console.log("present " + JSON.stringify(credential));
-      chrome.runtime.sendMessage({
-        action: "open_credential_dialog",
-        credential: credential
+
+      _credential = credential;
+
+
+      bsConfirm(
+        "Credential '" + credential.name + "'", 
+        `
+        <div class="container text-left">
+          <div class="row">
+            <div class="col">
+              <div class="mb-3">
+                Website:
+              </div>
+            </div>
+            <div class="col col-sm-auto">
+              <div class="mb-1">
+                <a target="_blank" href="${credential.website}">${credential.website}</a>
+              </div>
+            </div>
+            <div class="col">  
+            </div>
+          </div>
+        </div>
+
+        <div class="container text-left">
+          <div class="row">
+            <div class="col">
+              <div class="mb-3">
+                User:
+              </div>
+            </div>
+            <div class="col col-sm-auto">
+              <div class="mb-1">
+                <b>${credential.user}</b>
+              </div>
+            </div>
+            <div class="col">  
+            </div>
+          </div>
+        </div>
+
+        <div class="container text-left">
+          <div class="row">
+            <div class="col">
+              <div class="mb-3">
+                Password:
+              </div>
+            </div>
+            <div class="col col-sm-auto">
+              <div class="mb-1">
+                <b class="fingerprint_small">${credential.password}</b>
+              </div>
+            </div>
+            <div class="col">
+              <div class="mb-3">
+                <button type="button" id="copy" title="Copy to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        `,
+        "Import and Close",
+        "Close"
+      )
+      .then((decision) => {
+        console.log("decision:" + decision);
+        if (decision === true) {
+          window.close() // import the credential
+        }
+        else if (decision === false) {
+          window.close()
+        }
       });
-      window.close();
+
     }
   });
 

@@ -34,10 +34,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     linkToApp(sendResponse);
     return true; 
   }
-  else if (message.action === "open_credential_dialog") {
-    openCredentialDialog(message.credential);
-    return true; 
-  }
+
   return false; 
 });
 
@@ -136,17 +133,4 @@ async function unlinkApp() {
   await destroyAllKeys(); 
   console.log("do unlink done");
 
-}
-
-
-function openCredentialDialog(credential) {
-  console.log("openCredentialDialog with " + JSON.stringify(credential));
-  let createData = {
-    type: "detached_panel",
-    url: "popup/credential_dialog.html?data=" + encodeURIComponent(JSON.stringify(credential)),
-    width: 700,
-    height: 500,
-  };
-
-  browser.windows.create(createData);
 }
