@@ -34,8 +34,8 @@ document.addEventListener("click", (e) => {
     else if (isNaN(port) || port < 1024 || port > 49151) {
       bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
     }
-    else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 3600) {
-      bsAlert("Error", "Invalid polling timeout, should be a number between 1 and 3600.");
+    else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
+      bsAlert("Error", "Invalid polling timeout, should be a number between 1 and 300.");
     }
     else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
       bsAlert("Error", "Invalid polling interval, should be a number between 1 and 60.");
