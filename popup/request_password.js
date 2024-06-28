@@ -40,6 +40,16 @@ else {
   const ip = localStorage.getItem("server_address");
   document.getElementById("host").value = ip;
 
+  const targetUrl = requestData.messageUrl;
+
+  if (!targetUrl) {
+    document.getElementById("websiteDetails").classList.add("d-none");
+    document.getElementById("credentialOptions").classList.add("d-none");
+  }
+  else {
+    document.getElementById("websiteTargetUrl").innerText = targetUrl;
+  }
+  
 
   getKey("app_public_key").then(async value => {
     document.getElementById("web_client_id").innerText = webClientId;
@@ -65,10 +75,21 @@ else {
 
     poll(async function (progress) {
       document.getElementById("waiting_time").value = progress;
-      let response = await chrome.runtime.sendMessage({
-        action: "request_credential",
-        requestIdentifier: sessionKeyBase64
-      });
+      let request;
+      if (targetUrl) {
+        request = {
+          action: "request_credential",
+          requestIdentifier: sessionKeyBase64,
+          website: targetUrl
+        };
+      }
+      else {
+        request = {
+          action: "request_credential",
+          requestIdentifier: sessionKeyBase64,
+        };
+      }
+      let response = await chrome.runtime.sendMessage(request);
       console.debug("response = " + JSON.stringify(response));
       if (response.status == 403) {
         console.warn("Request rejected");
@@ -81,22 +102,24 @@ else {
         bsAlert("Error", "The request has been rejected in the app or the vault was locked.").then(_ => {
           window.close();
         });
-        return null;
+        return STOP_POLLING;
       }
       return response.response;
     }, pollingTimeout * 1000, pollingInterval * 1000).then(function (response) { 
-      // polling done
-      document.getElementById("waiting_time").value = 100;
+      if (response !== STOP_POLLING) {
+        // polling done
+        document.getElementById("waiting_time").value = 100;
 
-      destroySessionKey();
-      
-      console.log("autofill " + requestData.autofill);
+        destroySessionKey();
+        
+        console.log("autofill " + requestData.autofill);
 
-      if (requestData.autofill) {
-        sendPasteCredentialMessage(response.password);
-      }
-      else {
-        presentCredential(response);
+        if (requestData.autofill === true) {
+          sendPasteCredentialMessage(response.password);
+        }
+        else {
+          presentCredential(response);
+        }
       }
     }).catch(function (e) {
       console.error(e);
@@ -191,7 +214,10 @@ else {
       .then((decision) => {
         console.log("decision:" + decision);
         if (decision === true) {
-          window.close() // import the credential
+          bsAlert("Error", "Saving the credential in a local vault is not yet supported!").then(_ => {
+            window.close();
+          });
+          //window.close() // TODO import the credential to the local vault
         }
         else if (decision === false) {
           window.close()

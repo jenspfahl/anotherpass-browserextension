@@ -1,4 +1,3 @@
-let currentRequesterUrl;
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action);
@@ -6,17 +5,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
   if (message.action === "start_password_request_flow") {
-    currentRequesterUrl = message.url;
-    openPasswordRequestDialog(true);
+    openPasswordRequestDialog(true, message.url);
     return true; 
   }
   if (message.action === "start_single_password_request_flow") {
-    currentRequesterUrl = message.url;
-    openPasswordRequestDialog(false);
+    openPasswordRequestDialog(false, null);
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredentials(message.requestIdentifier, sendResponse);
+    fetchCredential(message.requestIdentifier, sendResponse, message.website);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -57,15 +54,15 @@ browser.contextMenus.create({
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "anotherpass-request") {
-    openPasswordRequestDialog();
+    openPasswordRequestDialog(true, tab.url);
   }
 });
 
-function fetchCredentials(requestIdentifier, sendResponse) {
+function fetchCredential(requestIdentifier, sendResponse, website) {
 
   const request = {
     action: "request_credential",
-    website: currentRequesterUrl,
+    website: website,
     requestIdentifier: requestIdentifier
   };
   
@@ -92,12 +89,18 @@ function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog(autofill) {
+function openPasswordRequestDialog(autofill, messageUrl) {
+  var width = 660;
+  var height = 540;
+  if (messageUrl) {
+    width = 680;
+    height = 630;
+  }
   let createData = {
     type: "detached_panel",
-    url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill})),
-    width: 650,
-    height: 520,
+    url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl})),
+    width: width,
+    height: height,
   };
 
   console.log("open request password dialog");

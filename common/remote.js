@@ -1,4 +1,4 @@
-
+const STOP_POLLING = "STOP_POLLING";
 
 function poll(fn, timeout, interval) {
   const startTime = Number(new Date());
@@ -15,13 +15,17 @@ function poll(fn, timeout, interval) {
     if (result) {
       resolve(result);
     }
+    else if (result === STOP_POLLING) {
+      console.log(`Polling stopped by caller`);
+      reject(new Error('stopped by caller'));
+    }
     else if (nowTime < endTime) {
       console.log(`new timeout: ${new Date(endTime)}`);
       setTimeout(checkCondition, interval, resolve, reject);
     }
     else {
       console.log(`Error: ${arguments}`);
-      reject(new Error('timed out for ' + fn + ': ' + arguments));
+      reject(new Error('timed out'));
     }
   };
 
