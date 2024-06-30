@@ -31,10 +31,19 @@ async function generateAesKey(length) {
 }
 
 
-async function hashKeys(key1, key2) {
-  var key = new Uint8Array(key1.byteLength + key2.byteLength);
-  key.set(new Uint8Array(key1), 0);
-  key.set(new Uint8Array(key2), key1.byteLength);
+async function hashKeys(key1, key2, key3) {
+  console.log("hashKey key3:" + key3);
+  if (key3) {
+    var key = new Uint8Array(key1.byteLength + key2.byteLength + key3.byteLength);
+    key.set(new Uint8Array(key1), 0);
+    key.set(new Uint8Array(key2), key1.byteLength);
+    key.set(new Uint8Array(key3), key1.byteLength + key2.byteLength);
+  }
+  else {
+    var key = new Uint8Array(key1.byteLength + key2.byteLength);
+    key.set(new Uint8Array(key1), 0);
+    key.set(new Uint8Array(key2), key1.byteLength);
+  }
 
   const digest = await crypto.subtle.digest("SHA-256", key);
 

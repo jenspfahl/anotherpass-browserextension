@@ -52,109 +52,113 @@ function getAddress() {
  */
 async function remoteCall(message, sendResponse) {
   const webClientId = localStorage.getItem("web_client_id");
-
   const linked = localStorage.getItem("linked");
-  let request;
-  if (linked) {
-    const appPublicKey = await getKey("app_public_key");
-    const oneTimeKey = await generateAesKey(getSupportedKeyLength());
-    const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
+  try {
+    let request;
+    let requestTransportKeyAsArray;
+    if (linked) {
+      const appPublicKey = await getKey("app_public_key");
+      const oneTimeKey = await generateAesKey(getSupportedKeyLength());
+      const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
 
-    const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
- 
-    const baseKey = await getKey("base_key");
-    const baseKeyAsArray = await aesKeyToArray(baseKey);
+      const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
   
-    const transportKeyAsArray = await hashKeys(baseKeyAsArray, oneTimeKeyAsArray); 
-    const transportKey = await arrayToAesKey(transportKeyAsArray);
- 
-    const envelope = await encryptMessage(transportKey, JSON.stringify(message));
+      const baseKey = await getKey("base_key");
+      const baseKeyAsArray = await aesKeyToArray(baseKey);
+    
+      requestTransportKeyAsArray = await hashKeys(baseKeyAsArray, oneTimeKeyAsArray); 
+      const requestTransportKey = await arrayToAesKey(requestTransportKeyAsArray);
+  
+      const envelope = await encryptMessage(requestTransportKey, JSON.stringify(message));
 
-    request = {
-      encOneTimeKey: bytesToBase64(encOneTimeKey), 
-      envelope: envelope
-    };
-  }
-  else {
-    const sessionKey = await generateOrGetSessionKey(); 
-    const sessionKeyAsArray = await aesKeyToArray(sessionKey);
+      request = {
+        encOneTimeKey: bytesToBase64(encOneTimeKey), 
+        envelope: envelope
+      };
+    }
+    else {
+      const sessionKey = await generateOrGetSessionKey(); 
+
+      const envelope = await encryptMessage(sessionKey, JSON.stringify(message));
+      request = {
+        envelope: envelope
+      };
+    }
+
+    console.debug("sending plain request:", JSON.stringify(message));  
+    console.debug("sending request:", JSON.stringify(request));
+
+    const address = getAddress();
+    console.debug("fetch from", address);
+
+    const res = await fetch('http://' + address + '/', {
+        method: 'POST',
+        headers: { 
+          "X-WebClientId": webClientId, 
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(request)
+      });
+
+    console.log("received HTTP Status: " + res.status);
+
+    const body = await res.json();
+    if (res.status != 200) {
+      console.error("Unsuccessful! Reason: " + JSON.stringify(body));
+      sendResponse({ response: null, status: res.status, error: body.error });
+      return null;
+    }
 
 
-    const envelope = await encryptMessage(sessionKey, JSON.stringify(message));
-    request = {
-      envelope: envelope
-    };
-  }
+    const keyPair = await getKey("client_keypair");
+    const encOneTimeKey = base64ToBytes(body.encOneTimeKey);
+    const decOneTimeKeyAsArray = await decryptWithPrivateKey(keyPair.privateKey, encOneTimeKey);
+    let responseTransportKeyAsArray;
+    if (linked) {
+      // derive reponse transport key (local base key + sent encrypted one-time key + used request transport key)
+      const baseKey = await getKey("base_key");
+      const baseKeyAsArray = await aesKeyToArray(baseKey);
+      responseTransportKeyAsArray = await hashKeys(baseKeyAsArray, decOneTimeKeyAsArray, requestTransportKeyAsArray);
+    }
+    else {
+      // in linking phase the client doesn't have a basekey and uses the previously shared session key as second key
+      const sessionKey = await generateOrGetSessionKey(); 
+      const sessionKeyAsArray = await aesKeyToArray(sessionKey);        
+      // derive transport key (session key + sent encrypted one-time key)
+      responseTransportKeyAsArray = await hashKeys(sessionKeyAsArray, decOneTimeKeyAsArray);
+    }
 
-  console.debug("sending plain request:", JSON.stringify(message));  
-  console.debug("sending request:", JSON.stringify(request));
+    const transportKey = await arrayToAesKey(responseTransportKeyAsArray);
+    // decrypt response
+    const decryptedPayload = await decryptMessage(transportKey, body.envelope);
 
-  const address = getAddress();
-  console.debug("fetch from", address);
+    console.debug("decrypted response", decryptedPayload);
 
-
-  fetch('http://' + address + '/', {
-      method: 'POST',
-      headers: { 
-        "X-WebClientId": webClientId, 
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      },
-      body: JSON.stringify(request)
-    }).then(async res => {
-      console.log("received HTTP Status: " + res.status);
-
-      const body = await res.json();
-      if (res.status != 200) {
-        console.error("Unsuccessful! Reason: " + JSON.stringify(body));
-        sendResponse({ response: null, status: res.status, error: body.error });
-        return null;
-      }
-
-
-      const keyPair = await getKey("client_keypair");
-      const encOneTimeKey = base64ToBytes(body.encOneTimeKey);
-      const decOneTimeKeyAsArray = await decryptWithPrivateKey(keyPair.privateKey, encOneTimeKey);
-      let transportKeyAsArray;
-      if (linked) {
-        // derive transport key (local base key + sent encrypted one-time key)
-        const baseKey = await getKey("base_key");
-        const baseKeyAsArray = await aesKeyToArray(baseKey);
-        transportKeyAsArray = await hashKeys(baseKeyAsArray, decOneTimeKeyAsArray);
-      }
-      else {
-        // in linking phase the client doesn't have a basekey and uses the previously shared session key as second key
-        const sessionKey = await generateOrGetSessionKey(); 
-        const sessionKeyAsArray = await aesKeyToArray(sessionKey);        
-        // derive transport key (session key + sent encrypted one-time key)
-        transportKeyAsArray = await hashKeys(sessionKeyAsArray, decOneTimeKeyAsArray);
-      }
-
-      const transportKey = await arrayToAesKey(transportKeyAsArray);
-      // decrypt response
-      return decryptMessage(transportKey, body.envelope);
-
-    }).then(decryptedPayload => {
-      console.debug("decrypted response", decryptedPayload);
-
-      if (decryptedPayload == null) {
-        return null;
-      }
-
-      var response;
-      try {
-        response = JSON.parse(decryptedPayload);
-      }
-      catch (e) {
-        console.warn("cannot parse decryptedPayload", e)
-        response = {
-          "raw": res
-        };
-      }
-
-      sendResponse({ response: response });
-    }).catch(e => {
-      console.error("HTTP failed:", e);
+    if (decryptedPayload == null) {
+      console.error("HTTP decrypted payload is null");
       sendResponse({ response: null });
-    });
+      return null;
+    }
+
+    var response;
+    try {
+      response = JSON.parse(decryptedPayload);
+    }
+    catch (e) {
+      console.warn("cannot parse decryptedPayload", e)
+      response = {
+        "raw": res
+      };
+    }
+
+    sendResponse({ response: response });
+
+  }
+  catch (e) {
+    console.warn("HTTP fetch failed:", e)
+    sendResponse({ response: null });
+  }  
+    
+   
 }
