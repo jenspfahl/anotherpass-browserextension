@@ -8,11 +8,11 @@ function generateWebClientId() {
 async function generateOrGetSessionKey() {
   const sessionKey = await getKey("session_key");
   if (sessionKey != null) {
-    console.log("Current session key found");
+    console.debug("Current session key found");
     return sessionKey;
   }
   else {
-    console.log("No session key, generate new");
+    console.debug("No session key, generate new");
     const sessionKey = await generateAesKey(128);
     await setKey("session_key", sessionKey);
     return sessionKey;
@@ -32,7 +32,6 @@ async function generateAesKey(length) {
 
 
 async function hashKeys(key1, key2, key3) {
-  console.log("hashKey key3:" + key3);
   if (key3) {
     var key = new Uint8Array(key1.byteLength + key2.byteLength + key3.byteLength);
     key.set(new Uint8Array(key1), 0);
@@ -53,11 +52,11 @@ async function hashKeys(key1, key2, key3) {
 async function generateOrGetClientKeyPair() {
   const currentClientKeyPair = await getKey("client_keypair");
   if (currentClientKeyPair != null) {
-    console.log("Current client keypair found");
+    console.debug("Current client keypair found");
     return currentClientKeyPair;
   }
   else {
-    console.log("No client keypair, generate new");
+    console.debug("No client keypair, generate new");
     clientKeyPair = await window.crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
@@ -273,7 +272,7 @@ function getKey(key) {
     const store = tx.objectStore("keyStore");
     const data = store.get(key);
     data.onsuccess = () => {
-      console.log("Got back: " + JSON.stringify(data.result));
+      //console.debug("Got back: " + JSON.stringify(data.result));
       if (data.result) {
         result = data.result.value;
       }

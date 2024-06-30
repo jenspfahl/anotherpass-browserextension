@@ -59,7 +59,7 @@ else {
     const sessionKey = await generateOrGetSessionKey();
     const sessionKeyAsArray = await aesKeyToArray(sessionKey);
     const sessionKeyBase64 = bytesToBase64(sessionKeyAsArray);
-    console.log("Request Session Key = " + sessionKeyBase64);
+    //console.debug("Request Session Key = " + sessionKeyBase64);
     
     const baseKey = await getKey("base_key");
     const baseKeyAsArray = await aesKeyToArray(baseKey);
@@ -112,7 +112,7 @@ else {
 
         destroySessionKey();
         
-        console.log("autofill " + requestData.autofill);
+        console.debug("autofill " + requestData.autofill);
 
         if (requestData.autofill === true) {
           sendPasteCredentialMessage(response.password);
@@ -145,8 +145,6 @@ else {
     }
 
     function presentCredential(credential) {
-      console.log("present " + JSON.stringify(credential));
-
       _credential = credential;
 
 

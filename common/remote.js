@@ -5,13 +5,13 @@ function poll(fn, timeout, interval) {
   const endTime = startTime + (timeout || 2000);
   const totalTime = endTime - startTime;
   interval = interval || 100;
-  console.log(`endTime: ${new Date(endTime)}`);
+  console.debug(`poll endTime: ${new Date(endTime)}`);
   const checkCondition = async function (resolve, reject) {
     const nowTime = Number(new Date());
     const pastTime = nowTime - startTime;
     const progress = pastTime / totalTime;
     const result = await fn(progress);
-    console.log(`result: ${JSON.stringify(result)}`);
+    //console.debug(`result: ${JSON.stringify(result)}`);
     if (result) {
       resolve(result);
     }
@@ -24,7 +24,7 @@ function poll(fn, timeout, interval) {
       setTimeout(checkCondition, interval, resolve, reject);
     }
     else {
-      console.log(`Error: ${arguments}`);
+      console.error(`Error: ${arguments}`);
       reject(new Error('timed out'));
     }
   };
@@ -85,8 +85,8 @@ async function remoteCall(message, sendResponse) {
       };
     }
 
-    console.debug("sending plain request:", JSON.stringify(message));  
-    console.debug("sending request:", JSON.stringify(request));
+    //console.debug("sending plain request:", JSON.stringify(message));  
+    //console.debug("sending request:", JSON.stringify(request));
 
     const address = getAddress();
     console.debug("fetch from", address);
@@ -133,7 +133,7 @@ async function remoteCall(message, sendResponse) {
     // decrypt response
     const decryptedPayload = await decryptMessage(transportKey, body.envelope);
 
-    console.debug("decrypted response", decryptedPayload);
+    //console.debug("decrypted response", decryptedPayload);
 
     if (decryptedPayload == null) {
       console.error("HTTP decrypted payload is null");

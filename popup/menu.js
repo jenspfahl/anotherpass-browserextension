@@ -77,7 +77,6 @@ document.addEventListener("click", (e) => {
         chrome.runtime.sendMessage({
           action: "start_unlink_flow",
         }).then((response) => {
-          console.log("unlink response:" + JSON.stringify(response));
           updateMenuUi(null, null);
 
           bsAlert("Success", "App successfully un-linked! You can remove the linked device <b class=\"fingerprint_small\">" + webClientId + "</b> from your app.").then(_ => {
@@ -105,7 +104,7 @@ updateMenuUi(webClientId, linked);
 
 function updateMenuUi(webClientId, linked) {
   if (webClientId && linked) {
-    console.log("menu linked mode");
+    console.debug("menu linked mode");
     document.getElementById("state").innerText = "Linked (as " + webClientId + ")";
     document.getElementById("link").classList.add("d-none");
 
@@ -116,7 +115,7 @@ function updateMenuUi(webClientId, linked) {
 
   }
   else {
-    console.log("menu unlinked mode");
+    console.debug("menu unlinked mode");
 
     document.getElementById("state").innerText = "Not linked";
     document.getElementById("unlink").classList.add("d-none");

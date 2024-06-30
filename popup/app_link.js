@@ -7,9 +7,7 @@ if (!linked) {
   chrome.runtime.sendMessage({
     action: "get",
     key: "is_linking"
-  }).then((getResponse) => {
-    console.log("is_linking getResponse:" + JSON.stringify(getResponse));
-    
+  }).then((getResponse) => {    
 
     const isLinking = getResponse.result;
     if (isLinking) {
@@ -24,8 +22,6 @@ if (!linked) {
         chrome.runtime.sendMessage({
           action: "delete",
           key: "is_linking"
-        }).then((response) => {
-          console.log("delete is_linking response:" + JSON.stringify(response));
         });
       }
   
@@ -33,14 +29,12 @@ if (!linked) {
         action: "set",
         key: "is_linking",
         value: true,
-      }).then((response) => {
-        console.log("set is_linking to true" );
       });
       
-  
+
       const webClientId = generateWebClientId();
   
-      console.log("webClientId = " + webClientId);
+      console.debug("webClientId = " + webClientId);
   
       const ip = localStorage.getItem("server_address");
       const port = localStorage.getItem("server_port");
@@ -55,11 +49,11 @@ if (!linked) {
   
         const keyPair = await generateOrGetClientKeyPair();
         const publicKeyFingerprint = await getPublicKeyFingerprint(keyPair.publicKey);
-        console.log("Fingerprint: " + publicKeyFingerprint);
+        //console.debug("Fingerprint: " + publicKeyFingerprint);
   
         const sessionKey = await generateOrGetSessionKey();
         const sessionKeyAsArray = await aesKeyToArray(sessionKey);
-        console.log("Linking Session Key = " + bytesToBase64(sessionKeyAsArray));
+        //console.debug("Linking Session Key = " + bytesToBase64(sessionKeyAsArray));
   
         document.getElementById("web_client_id").innerText = webClientId;
   
@@ -107,16 +101,14 @@ if (!linked) {
                 action: "link_to_app"
               }).then(async response => {
                 if (response == null || response.response == null) {
-                  console.log("linking error from server, see previous logs");
+                  console.error("linking error from server, see previous logs");
                   bsAlert("Error", "Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
                   document.getElementById("next").disabled = false;
                   document.querySelector("#loading_pad").style.display = 'none';
                   document.querySelector("#qr_code_pad").style.display = '';
                 }
                 else {
-  
-                  console.log("linking response: " + response.response.serverPubKey.n)
-  
+    
                   // read app public key
                   const jwk = {
                     kty:"RSA",
@@ -126,7 +118,6 @@ if (!linked) {
                   };
   
             
-                  console.log("jwk.n64 in:", base64ToBytes(jwk.n))
                   const appPublicKey = await jwkToPublicKey(jwk);
                   
                   await setKey("app_public_key", appPublicKey);
@@ -144,7 +135,7 @@ if (!linked) {
                   const baseKey = await arrayToAesKey(baseKeyAsArray);
                   await setKey("base_key", baseKey);
   
-                  console.log("save shared base key:", baseKeyAsArray);
+                  //console.debug("save shared base key:", baseKeyAsArray);
   
                   const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(appPublicKey);
   
@@ -184,7 +175,7 @@ if (!linked) {
   
               },
               error => {
-                console.log("unknown linking error from server: ", error);
+                console.error("unknown linking error from server: ", error);
                 bsAlert("Error", "Cannot link with the app due to an unknown problem").then(_ => {
                   window.close();
                 });

@@ -2,8 +2,7 @@ const variables = new Map();
 
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  console.log("background action: " + message.action);
-  console.log("sender: " + JSON.stringify(sender));
+  console.log("background action: " + message.action + ", sender: " + sender.url);
 
   if (message.action == "get") {
     sendResponse({result: variables.get(message.key)});
@@ -36,7 +35,6 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
   else if (message.action === "start_unlink_flow") {
     unlinkApp().then(async _ => {
-      console.log("unlink then entered");
       sendResponse();
     });
     return true; 
@@ -95,9 +93,6 @@ function fetchCredential(requestIdentifier, sendResponse, website) {
 
 
 function linkToApp(sendResponse) {
-
-
-  console.log("linkToApp");
 
   getKey("client_keypair").then(async value => {
     const clientPublicKey = value.publicKey;

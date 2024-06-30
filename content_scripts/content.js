@@ -14,7 +14,7 @@ chrome.runtime.sendMessage({
       for (var j = 0; j < inputs.length; j++) {
         var input = inputs[j];
         // TODO only add if not present
-        console.log("found password field " + input.style.width);
+        //console.debug("found password field");
         var button = document.createElement('button');
         button.type="button";
         button.className = "inputFieldButton";
@@ -24,9 +24,7 @@ chrome.runtime.sendMessage({
           input.focus();
           
           const parsedUrl = new URL(window.location.href);
-          console.log("current url=" + parsedUrl);
-
-          const sending = chrome.runtime.sendMessage({
+          chrome.runtime.sendMessage({
             action: "start_password_request_flow",
             url: parsedUrl.toString()
           });
@@ -44,10 +42,8 @@ chrome.runtime.sendMessage({
     });
 
     function pasteCredential(p, sendResponse) {
-      console.debug("received password to paste: '" + p + "'");
+      //console.debug("received password to paste: '" + p + "'");
       let elem = document.activeElement;
-
-      console.log("elem=" + JSON.stringify(elem));
 
       elem.value = p;
 
