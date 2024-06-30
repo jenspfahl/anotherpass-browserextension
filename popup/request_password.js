@@ -137,7 +137,7 @@ else {
 
     function sendPasteCredentialMessage(p) {
 
-      browser.tabs.query({ active: true, currentWindow: false /* true for actino popup, false for request password popup */ }, function (tabs) {
+      browser.tabs.query({ active: true, currentWindow: false /* true for active popup, false for request password popup */ }, function (tabs) {
         chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: p }, function () {
           window.close();
         });

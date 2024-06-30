@@ -53,6 +53,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 const linked = localStorage.getItem("linked");
 if (linked) {
+
+  // init internal cache to avoid accessing localStorage from content script
+  variables.set("linked", linked);
+
+
   // Callback reads runtime.lastError to prevent an unchecked error from being 
   // logged when the extension attempt to register the already-registered menu 
   // again. Menu registrations in event pages persist across extension restarts.
@@ -143,6 +148,9 @@ function openLinkWithQrCodeDialog() {
 async function unlinkApp() {
 
   console.log("do unlink");
+
+  variables.delete("linked");
+
   localStorage.removeItem("linked");
   localStorage.removeItem("web_client_id");
   localStorage.removeItem("server_address");
