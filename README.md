@@ -101,10 +101,9 @@ Each communication is secured by two layers of encryption:
 	* `TK` is derived from:
         *  a shared and on each side persisted 128/256 bit **Base Key** (`BK`)
         *  a randomnly generated 128/256 bit **One-Time Key** (`OTK`) 
-        *  --> `TKn = SHA256(BK + OTKn)`
-        *  `TK` is derived/regenerated for each communication direction:
+        *  `TK` is derived/generated for each communication direction:
             *  request (extension to app): **Request Transport Key** --> `TKrq = SHA256(BK + OTKrq)`
-            *  response (app to extension): **Response Transport Key** --> `TKrs = SHA256(BK + OTKrs)`
+            *  response (app to extension): **Response Transport Key** --> `TKrs = SHA256(BK + OTKrs + TKrq)`
 
 1. RSA encryption of the **One-Time Keys** (`OTKn`)
     * since the `BK` is shared and known by each side, only the `OTK` must be send to the peer
@@ -149,13 +148,13 @@ Exchange happens through these steps:
 
 ### Man-in-the-Middle attacks
 
-The communication between app and extension should usually happen in a local network, but still there is a risk of malicious actors in the same network. For instance an attacker could have gained access to the local network and is able to sniff any network communication.
+The communication between app and extension usually happens in a local network, but still there is a risk of malicious actors in the same network. For instance an attacker could have gained access to the local network and is able to sniff any network communication.
 
 Mitigations:
 
   * Each communication is encrypted as described above
-  * The `PKext` used to encrypt the `TKrs` is confirmed by using a QR-code and a fingerprint `F`. Therefor all data encrypted with `PKext` is only decryptable  by the extension.
-  * For each link request and for each credential request a shortened fingerprint is promped to the user on both ends to confirm uniquenes. This ensure that `PKapp` is indeed the public key of the app.
+  * The `PKext` used to encrypt the `OTKrs` is confirmed by using a QR-code and a fingerprint `F`. Therefor all data encrypted with `PKext` is only decryptable  by the extension.
+  * For each link request and for each credential request a shortened fingerprint is promped to the user on both ends to confirm uniquenes. This ensures that `PKapp` is indeed the public key of the app.
 
 ### Offline observers
 
@@ -164,6 +163,16 @@ Meant is an attacker who is able to capture the QR code during the linking phase
 Mitigations:
 
   * If an attacker is able to capture `SK` they wont be able to read the `BK`, since it is encrypted with a `TKrs` derived and encrypted by `PKext`. 
+
+
+### Leak of stored extension secret keys
+
+In case an attacker is able to obtain all stored secret keys from the extensions (`BK`, `PrivKExt`), e.g. through a malware on the computer or by an malicious admin decoding the local browser storage, all previous and future communication between the extension and the app could be revealed.
+
+Mitigations:
+
+   * To at least protect the reply-communication from the app back to the extension (which might contain fetched credentials), the app response is additionally encrypted with `TKrq`, which only lives in memory on the extension side.
+   * Proposal: The extension stores all secret keys encrypted. This could be achieved by the user itself (encrypting their storage) or introducing another user password required to basically use the extension, or a way to use the users keychain somehow.
 
 ### Post-Quantum consideration
 
