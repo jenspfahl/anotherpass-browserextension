@@ -1,10 +1,24 @@
+const variables = new Map();
+
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action);
   console.log("sender: " + JSON.stringify(sender));
 
-
-  if (message.action === "start_password_request_flow") {
+  if (message.action == "get") {
+    sendResponse({result: variables.get(message.key)});
+    return true; 
+  } 
+  else if (message.action == "set") {
+    variables.set(message.key, message.value);
+    sendResponse({result: message.value});
+    return true; 
+  }
+  else if (message.action == "delete") {
+    sendResponse({result: variables.delete(message.key)});
+    return true; 
+  }
+  else if (message.action === "start_password_request_flow") {
     openPasswordRequestDialog(true, message.url);
     return true; 
   }
