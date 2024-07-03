@@ -10,10 +10,10 @@ async function bsAlert(title, message, closeLabel) {
             <h1 class="modal-title fs-5">${title}</h1>
             <button id="modal-btn-cancel" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
           </div>             
-          <div class="modal-body fs-6">
+          <div class="modal-body fs-6 overflow-auto">
             ${message}
         </div>    
-        <div class="modal-footer" style="border-top:0px">             
+        <div class="modal-footer"">             
         <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${closeLabel||"Close"}</button>
         </div>
       </div>
@@ -60,7 +60,7 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
         <div class="modal-body fs-7">
           ${message}
       </div>    
-      <div class="modal-footer" style="border-top:0px">             
+      <div class="modal-footer">             
       <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${cancelLabel||"Cancel"}</button>
       <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${okLabel||"Ok"}</button>
       </div>

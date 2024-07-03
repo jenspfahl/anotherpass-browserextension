@@ -1,8 +1,5 @@
 
-chrome.runtime.sendMessage({
-  action: "get",
-  key: "linked"
-}).then((getResponse) => {
+getLocalKey("linked").then((getResponse) => {
   const linked = getResponse.result;
   if (linked) {
 

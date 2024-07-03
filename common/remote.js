@@ -33,9 +33,9 @@ function poll(fn, timeout, interval) {
 }
 
 
-function getAddress() {
-  const server = localStorage.getItem("server_address");
-  const port = localStorage.getItem("server_port");
+async function getAddress(variables) {
+  const server = await getTempOrLocalKey("server_address", variables);
+  const port = await getTempOrLocalKey("server_port", variables);
   return server + ":" + port;
 }
 
@@ -50,15 +50,17 @@ function getAddress() {
  * @param {*} message 
  * @param {*} sendResponse 
  */
-async function remoteCall(message, sendResponse) {
-  const webClientId = localStorage.getItem("web_client_id");
-  const linked = localStorage.getItem("linked");
+async function remoteCall(message, sendResponse, variables) {
+  const isLinking = await getTemporaryKey("is_linking", variables);
+  const webClientId = await getTempOrLocalKey("web_client_id", variables);
+  const linked = await getLocalKey("linked");
+  console.debug("remote call asks isLinking? " + isLinking);
   try {
     let request;
     let requestTransportKeyAsArray;
-    if (linked) {
+    if (!isLinking && linked) {
       const appPublicKey = await getKey("app_public_key");
-      const oneTimeKey = await generateAesKey(getSupportedKeyLength());
+      const oneTimeKey = await generateAesKey(await getSupportedKeyLength(variables));
       const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
 
       const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
@@ -88,7 +90,7 @@ async function remoteCall(message, sendResponse) {
     //console.debug("sending plain request:", JSON.stringify(message));  
     //console.debug("sending request:", JSON.stringify(request));
 
-    const address = getAddress();
+    const address = await getAddress(variables);
     console.debug("fetch from", address);
 
     const res = await fetch('http://' + address + '/', {
@@ -111,11 +113,18 @@ async function remoteCall(message, sendResponse) {
     }
 
 
-    const keyPair = await getKey("client_keypair");
+    let keyPair;
+    console.debug("(2) use temporary client keys:" + isLinking);
+    if (isLinking) {
+      keyPair = await getKey("temp_client_keypair");
+    }
+    else {
+      keyPair = await getKey("client_keypair");
+    }
     const encOneTimeKey = base64ToBytes(body.encOneTimeKey);
     const decOneTimeKeyAsArray = await decryptWithPrivateKey(keyPair.privateKey, encOneTimeKey);
     let responseTransportKeyAsArray;
-    if (linked) {
+    if (!isLinking && linked) {
       // derive reponse transport key (local base key + sent encrypted one-time key + used request transport key)
       const baseKey = await getKey("base_key");
       const baseKeyAsArray = await aesKeyToArray(baseKey);
@@ -157,6 +166,7 @@ async function remoteCall(message, sendResponse) {
   }
   catch (e) {
     console.warn("HTTP fetch failed:", e)
+
     sendResponse({ response: null });
   }  
     

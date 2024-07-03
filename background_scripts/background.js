@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true;
   }
   else if (message.action === "start_link_flow") {
-    openLinkWithQrCodeDialog();
+    openLinkWithQrCodeDialog(message.relink);
     return true; 
   }
   else if (message.action === "start_unlink_flow") {
@@ -87,23 +87,45 @@ function fetchCredential(requestIdentifier, sendResponse, website) {
     requestIdentifier: requestIdentifier
   };
   
-  remoteCall(request, sendResponse);
+  remoteCall(request, sendResponse, variables);
 
 }
 
 
-function linkToApp(sendResponse) {
+async function linkToApp(sendResponse) {
 
-  getKey("client_keypair").then(async value => {
-    const clientPublicKey = value.publicKey;
-    const clientPublicKeyAsJWK = await publicKeyToJWK(clientPublicKey);
-    const request = {
+  let clientKeyPair;
+  const isLinking = await getTemporaryKey("is_linking", variables);
+  const linked = await getLocalKey("linked");
+  const currentVaultId = await getLocalKey("linked_vault_id");
+
+  console.debug("(1) use temporary client keys:" + isLinking + ", currentVaultId=" + currentVaultId);
+
+  if (isLinking) {
+    clientKeyPair = await getKey("temp_client_keypair");
+  }
+  else {
+    clientKeyPair = await getKey("client_keypair");
+  }
+
+  const clientPublicKey = clientKeyPair.publicKey;
+  const clientPublicKeyAsJWK = await publicKeyToJWK(clientPublicKey);
+  let request;
+  if (linked && currentVaultId) {
+    request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsJWK
-    };
-    
-    remoteCall(request, sendResponse);
-  });
+      clientPublicKey: clientPublicKeyAsJWK,
+      vaultId: currentVaultId,
+    };  
+  }
+  else {
+    request = {
+      action: "link_app",
+      clientPublicKey: clientPublicKeyAsJWK,
+    };  
+  }
+  
+  remoteCall(request, sendResponse, variables);
 }
 
 
@@ -127,11 +149,11 @@ function openPasswordRequestDialog(autofill, messageUrl) {
 }
 
 
-function openLinkWithQrCodeDialog() {
+function openLinkWithQrCodeDialog(relink) {
   
   let createData = {
     type: "detached_panel",
-    url: "popup/app_link.html",
+    url: "popup/app_link.html?data=" + encodeURIComponent(JSON.stringify({relink: relink})),
     width: 800,
     height: 765,
   };

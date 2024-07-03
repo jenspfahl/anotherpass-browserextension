@@ -48,8 +48,11 @@
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab" tabindex="0">
           <p>
-            ANOTHERpass vault Id:
-            <strong id="linked_vault_id"></strong>
+            ANOTHERpass vault Id: <strong id="linked_vault_id"></strong>
+            <button id="details" class="btn" title="Link details">
+              &#9432;  
+            </button>
+    
             <br>
             <div class="container justify-content-center">
               <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
@@ -116,6 +119,10 @@
             <button id="btn-save-settings" type="button" class="btn btn-primary rounded-0">Save</button>
             <button id="btn-reset-settings" type="button" class="btn btn-outline-primary rounded-0">Reset</button>
 
+            <div class="float-end">    
+              <button id="relink" type="button" class="btn btn-secondary rounded-0">Relink</button>
+            </div>
+
           </p>
         </div>
         <div class="tab-pane fade" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
@@ -167,6 +174,7 @@
     </div>
 
     <script src="../common/ui.js"></script>
+    <script src="../common/crypto.js"></script>
     <script src="menu.js"></script>
     <script src="../libs/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js"></script>
 

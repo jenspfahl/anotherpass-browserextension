@@ -17,7 +17,7 @@ document.getElementById("server-settings-port").value = port;
 document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
 document.getElementById("server-settings-polling-interval").value = pollingInterval;
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", async (e) => {
 
   if (e.target.id === "btn-save-settings") {
 
@@ -65,6 +65,13 @@ document.addEventListener("click", (e) => {
       action: "start_link_flow",
     });
 
+  } else if (e.target.id === "relink") {
+
+    chrome.runtime.sendMessage({
+      action: "start_link_flow",
+      relink: true
+    });
+
   } else if (e.target.id === "unlink") {
 
      bsConfirm(
@@ -95,6 +102,27 @@ document.addEventListener("click", (e) => {
     const sending = chrome.runtime.sendMessage({
       action: "start_single_password_request_flow"
     });
+  }
+  else if (e.target.id === "details") {
+
+    const clientKeyPair = await getKey("client_keypair");
+    const clientPublicKeyFingerprint = await getPublicKeyStandarizedFingerprint(clientKeyPair.publicKey, ":");
+    
+    const appPublicKey = await getKey("app_public_key");
+    const appKeyFingerprint = await getPublicKeyStandarizedFingerprint(appPublicKey, ":");
+
+
+    const baseKey = await getKey("base_key");
+    const baseKeyAsArray = await aesKeyToArray(baseKey);
+    const baseKeyFingerprint = await sha256(baseKeyAsArray);
+
+    bsAlert("Info for " + webClientId, `
+    <div class="container">
+      App Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${appKeyFingerprint}</b>&nbsp;&nbsp;<br>
+      Device Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${clientPublicKeyFingerprint}</b>&nbsp;&nbsp;<br>
+      Shared Secret Fingerprint: <b class=\"fingerprint_small font-monospace\">${bytesToHex(baseKeyFingerprint, ":")}</b>&nbsp;&nbsp;<br>
+    </div>
+    `);
   }
 });
 

@@ -49,15 +49,20 @@ async function hashKeys(key1, key2, key3) {
   return new Uint8Array(digest);
 }
 
-async function generateOrGetClientKeyPair() {
-  const currentClientKeyPair = await getKey("client_keypair");
-  if (currentClientKeyPair != null) {
-    console.debug("Current client keypair found");
-    return currentClientKeyPair;
-  }
-  else {
-    console.debug("No client keypair, generate new");
-    clientKeyPair = await window.crypto.subtle.generateKey(
+
+
+async function sha256(byteArray) {
+
+  var key = new Uint8Array(byteArray.byteLength);
+  key.set(new Uint8Array(byteArray), 0);
+
+  const digest = await crypto.subtle.digest("SHA-256", key);
+
+  return new Uint8Array(digest);
+}
+
+async function generateClientKeyPair() {
+  return await window.crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
         modulusLength: 4096,
@@ -67,22 +72,19 @@ async function generateOrGetClientKeyPair() {
       true,
       ["encrypt", "decrypt"],
     );
-    await setKey("client_keypair", clientKeyPair);
-    
-    return clientKeyPair;
-  }
 }
 
 async function destroyAllKeys() {
   clientKeyPair = null;
+  await deleteKey("temp_client_keypair");
   await deleteKey("client_keypair");
   await deleteKey("app_public_key");
   await deleteKey("base_key");
   await destroySessionKey();
 }
 
-function getSupportedKeyLength() {
-  return localStorage.getItem("symmetric_key_length") || 128;
+async function getSupportedKeyLength(variables) {
+  return await getTempOrLocalKey("symmetric_key_length", variables) || 128;
 }
 
 async function destroySessionKey() {
@@ -107,13 +109,19 @@ async function publicKeyToJWK(key) {
   return await window.crypto.subtle.exportKey("jwk", key);
 }
 
-async function getPublicKeyFingerprint(key) {
+async function getPublicKeyFingerprint(key, separator) {
   const jwk = await publicKeyToJWK(key);
   const buffer = new TextEncoder().encode(jwk.n);
   const digest = await crypto.subtle.digest("SHA-256", buffer);
-  return bytesToHex(new Uint8Array(digest));
+  return bytesToHex(new Uint8Array(digest), separator);
 }
 
+async function getPublicKeyStandarizedFingerprint(key, separator) {
+  const jwk = await publicKeyToJWK(key);
+  const buffer = base64ToBytes(jwk.n);
+  const digest = await crypto.subtle.digest("SHA-256", buffer);
+  return bytesToHex(new Uint8Array(digest), separator);
+}
 
 async function getPublicKeyShortenedFingerprint(key) {
   const jwk = await publicKeyToJWK(key);
@@ -209,10 +217,10 @@ function bytesToBase64(bytes) {
   return btoa(binString);
 }
 
-function bytesToHex(bytes) {
+function bytesToHex(bytes, separator) {
   return Array.from(bytes, function(byte) {
     return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-  }).join('');
+  }).join(separator || '');
 }
 
 
@@ -236,6 +244,110 @@ function openDb() {
       var db = open.result;
       resolve(db);
     };
+  });
+}
+
+/**
+ * Sets a key/value pair that only lives in memory and is therefore erased when the process ends.
+ * @param {*} key 
+ * @param {*} value any value, but no CryptoObjects! (they cannot be accessed through the getTemporaryKey function)
+ * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
+* @returns 
+ */
+function setTemporaryKey(key, value, variables) {
+  return new Promise(async (resolve, reject) => {
+
+    if (variables) {  
+      resolve(variables.set(key, value));
+    }
+    else {
+      chrome.runtime.sendMessage({
+        action: "set",
+        key: key,
+        value: value,
+      })
+      .then(response => resolve(response.result))
+      .catch(e => {
+        console.error(e);
+        reject();
+      });
+    }
+  
+  });
+}
+
+/**
+ * Gets the value of a key that only lives in memory and is bound to the background script / extension.  
+ * @param {*} key 
+ * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
+ * @returns 
+ */
+function getTemporaryKey(key, variables) {
+  return new Promise(async (resolve, reject) => {
+
+    if (variables) {  
+      resolve(variables.get(key));
+    }
+    else {
+      const response = await chrome.runtime.sendMessage({
+        action: "get",
+        key: key,
+      });
+      resolve(response.result);
+    }
+  });
+ 
+}
+
+/**
+ * Deletes the value of a key that only lived in memory and is bound to the background script / extension.  
+ * @param {*} key 
+ * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
+ * @returns 
+ */
+function deleteTemporaryKey(key, variables) {
+  return new Promise(async (resolve, reject) => {
+
+    if (variables) {  
+      resolve(variables.delete(key));
+    }
+    else {
+      const response = await chrome.runtime.sendMessage({
+        action: "delete",
+        key: key,
+      });
+      resolve(response.result);
+    }
+  });
+}
+
+/**
+ * Gets the value of a key that first lives in memory and is bound to the background script / extension, or, if nothing found, lives in the localStorage.
+ * @param {*} key 
+ * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
+ * @returns 
+ */
+function getTempOrLocalKey(key, variables) {
+  return new Promise(async (resolve, reject) => {
+    const value = await getTemporaryKey(key, variables);
+    
+    if (value) {
+      console.debug("found temp key value for local " + key);
+      resolve(value);
+      return;
+    }
+    resolve(localStorage.getItem(key));
+  });
+}
+
+/**
+ * Gets the value of a key stored in the local storage. Encapsulates different browser APIs.
+ * @param {*} key 
+ * @returns 
+ */
+function getLocalKey(key) {
+  return new Promise(async (resolve, reject) => {
+    resolve(localStorage.getItem(key));
   });
 }
 
@@ -263,6 +375,7 @@ function setKey(key, value) {
 
 function getKey(key) {
   return new Promise(async (resolve, reject) => {
+
     const db = await openDb();
     const tx = db.transaction("keyStore", 'readwrite');
    

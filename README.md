@@ -14,7 +14,7 @@ The web extension (called the extension) can connect to an [ANOTHERpass V2 app](
 - the app acts as server, the extension as client
 - used protocol is HTTP to enable the extension to access the app (HTTPS requires a valid server certificate signed by a CA, which is not available atm)
 - to easily find the app in the network, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
-- a port can be configured on both ends (default 8001)
+- a port can be configured on both ends (default 8787)
 
 # Installing
 
@@ -167,11 +167,11 @@ Mitigations:
 
 ### Leak of stored extension secret keys
 
-In case an attacker is able to obtain all stored secret keys from the extensions (`BK`, `PrivKExt`), e.g. through a malware on the computer or by an malicious admin decoding the local browser storage, all previous and future communication between the extension and the app could be revealed.
+In case an attacker is able to obtain all stored secret keys from the extensions (`BK`, `PrivKExt`), e.g. through a malware on the computer or by an malicious admin decoding the local browser storage, all previous and future communication from the app back to the extension could be revealed.
 
 Mitigations:
 
-   * To at least protect the reply-communication from the app back to the extension (which might contain fetched credentials), the app response is additionally encrypted with `TKrq`, which only lives in memory on the extension side.
+   * To protect the reply-communication from the app back to the extension (which might contain fetched credentials), the app response is additionally encrypted with `TKrq`, which only lives in memory on the extension side and is never stored on any device.
    * Proposal: The extension stores all secret keys encrypted. This could be achieved by the user itself (encrypting their storage) or introducing another user password required to basically use the extension, or a way to use the users keychain somehow.
 
 ### Post-Quantum consideration
