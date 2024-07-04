@@ -1,5 +1,8 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
+const PREFIX_UID = "remembered_uid_for_"
+const PREFIX_NAME = "remembered_name_for_"
+
 let _credential;
 
 document.addEventListener("click", (e) => {
@@ -74,37 +77,23 @@ else {
       const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
       const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
-      let targetUid;
+      let targetUid, targetName;
       if (requestData.autofill === true) {
-        targetUid = localStorage.getItem("index_" + hostname);
-        console.debug("found for " + hostname + ": " + targetUid);
+        targetUid = localStorage.getItem(PREFIX_UID + hostname);
+        targetName = localStorage.getItem(PREFIX_NAME + hostname);
+
+        console.debug("found for " + hostname + ": " + targetUid + " - " + targetName);
       }
 
       poll(async function (progress) {
         document.getElementById("waiting_time").value = progress;
-        let request;
-        if (targetUrl) {
-          if (targetUid) {
-            request = {
-              action: "request_credential",
-              requestIdentifier: sessionKeyBase64,
-              uid: targetUid
-            };
-          }
-          else {
-            request = {
-              action: "request_credential",
-              requestIdentifier: sessionKeyBase64,
-              website: targetUrl
-            };
-          }
-        }
-        else {
-          request = {
-            action: "request_credential",
-            requestIdentifier: sessionKeyBase64,
-          };
-        }
+        const request = {
+          action: "request_credential",
+          requestIdentifier: sessionKeyBase64,
+          website: targetUrl,
+          uid: targetUid,
+          credentialName: targetName,
+        };
         let response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
         if (response.status == 403) {
@@ -131,11 +120,18 @@ else {
           console.debug("autofill " + requestData.autofill);
 
           if (requestData.autofill === true) {
-            const rememberCredentialSelection = document.getElementById("rememberCredentialSelection")
+            const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
+            const uid = response.uid;
+            const name = response.name;
             if (rememberCredentialSelection.checked) {
-              const uid = response.uid;
-              console.debug("remember checked: " + hostname, uid);
-              localStorage.setItem("index_" + hostname, uid);
+              console.debug("remember credential for " + hostname + " with uuid " + uid + " and name " + name);
+              localStorage.setItem(PREFIX_UID + hostname, uid);
+              localStorage.setItem(PREFIX_NAME + hostname, name);
+            }
+            else {
+              console.debug("forget credential for " + hostname + " with uuid " + uid + " and name " + name);
+              localStorage.removeItem(PREFIX_UID + hostname);
+              localStorage.removeItem(PREFIX_NAME + hostname);
             }
             sendPasteCredentialMessage(response.password);
           }
