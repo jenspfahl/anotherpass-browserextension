@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredential(message.requestIdentifier, sendResponse, message.website);
+    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -79,11 +79,12 @@ if (linked) {
 
 
 
-function fetchCredential(requestIdentifier, sendResponse, website) {
+function fetchCredential(requestIdentifier, sendResponse, website, uid) {
 
   const request = {
     action: "request_credential",
     website: website,
+    uid: uid,
     requestIdentifier: requestIdentifier
   };
   

@@ -1,6 +1,7 @@
+console.debug("content inject");
+getTemporaryKey("linked").then((linked) => { //TODO doesn't work, use message
+  console.debug("app linked: " + linked);
 
-getLocalKey("linked").then((getResponse) => {
-  const linked = getResponse.result;
   if (linked) {
 
     // inspects all password fields and adds an Autofill icon

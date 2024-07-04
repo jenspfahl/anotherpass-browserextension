@@ -37,6 +37,7 @@
         "https://*/*"
       ],
       "js": [
+        "common/crypto.js",
         "content_scripts/content.js"
       ],
       "css": [

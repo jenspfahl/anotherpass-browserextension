@@ -41,6 +41,7 @@ else {
   document.getElementById("host").value = ip;
 
   const targetUrl = requestData.messageUrl;
+  const hostname = new URL(targetUrl).hostname;
 
   if (!targetUrl) {
     document.getElementById("websiteDetails").classList.add("d-none");
@@ -73,16 +74,30 @@ else {
       const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
       const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
+      let targetUid;
+      if (requestData.autofill === true) {
+        targetUid = localStorage.getItem("index_" + hostname);
+        console.debug("found for " + hostname + ": " + targetUid);
+      }
 
       poll(async function (progress) {
         document.getElementById("waiting_time").value = progress;
         let request;
         if (targetUrl) {
-          request = {
-            action: "request_credential",
-            requestIdentifier: sessionKeyBase64,
-            website: targetUrl
-          };
+          if (targetUid) {
+            request = {
+              action: "request_credential",
+              requestIdentifier: sessionKeyBase64,
+              uid: targetUid
+            };
+          }
+          else {
+            request = {
+              action: "request_credential",
+              requestIdentifier: sessionKeyBase64,
+              website: targetUrl
+            };
+          }
         }
         else {
           request = {
@@ -116,6 +131,12 @@ else {
           console.debug("autofill " + requestData.autofill);
 
           if (requestData.autofill === true) {
+            const rememberCredentialSelection = document.getElementById("rememberCredentialSelection")
+            if (rememberCredentialSelection.checked) {
+              const uid = response.uid;
+              console.debug("remember checked: " + hostname, uid);
+              localStorage.setItem("index_" + hostname, uid);
+            }
             sendPasteCredentialMessage(response.password);
           }
           else {
