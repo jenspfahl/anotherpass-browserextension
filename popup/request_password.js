@@ -1,7 +1,8 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
 const PREFIX_UID = "remembered_uid_for_"
-const PREFIX_NAME = "remembered_name_for_"
+const PREFIX_REMEMBER_DENIED = "remembered_denied_for_"
+
 
 let _credential;
 
@@ -44,7 +45,6 @@ else {
   document.getElementById("host").value = ip;
 
   const targetUrl = requestData.messageUrl;
-  const hostname = new URL(targetUrl).hostname;
 
   if (!targetUrl) {
     document.getElementById("websiteDetails").classList.add("d-none");
@@ -77,12 +77,23 @@ else {
       const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
       const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
-      let targetUid, targetName;
+      let targetUid;
       if (requestData.autofill === true) {
-        targetUid = localStorage.getItem(PREFIX_UID + hostname);
-        targetName = localStorage.getItem(PREFIX_NAME + hostname);
+        const index = await createIndex(targetUrl);
 
-        console.debug("found for " + hostname + ": " + targetUid + " - " + targetName);
+        targetUid = localStorage.getItem(PREFIX_UID + index);
+        console.debug("found for " + targetUrl + ": " + targetUid );
+
+        const rememberDenied = localStorage.getItem(PREFIX_REMEMBER_DENIED + index);
+        const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
+        if (rememberCredentialSelection) {
+          if (rememberDenied) {
+            rememberCredentialSelection.checked = false;
+          }
+          else {
+            rememberCredentialSelection.checked = true;
+          }
+        }
       }
 
       poll(async function (progress) {
@@ -91,8 +102,7 @@ else {
           action: "request_credential",
           requestIdentifier: sessionKeyBase64,
           website: targetUrl,
-          uid: targetUid,
-          credentialName: targetName,
+          uid: targetUid
         };
         let response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
@@ -110,7 +120,7 @@ else {
           return STOP_POLLING;
         }
         return response.response;
-      }, pollingTimeout * 1000, pollingInterval * 1000).then(function (response) { 
+      }, pollingTimeout * 1000, pollingInterval * 1000).then(async function (response) { 
         if (response !== STOP_POLLING) {
           // polling done
           document.getElementById("waiting_time").value = 100;
@@ -122,16 +132,18 @@ else {
           if (requestData.autofill === true) {
             const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
             const uid = response.uid;
-            const name = response.name;
+            const index = await createIndex(targetUrl);
+
             if (rememberCredentialSelection.checked) {
-              console.debug("remember credential for " + hostname + " with uuid " + uid + " and name " + name);
-              localStorage.setItem(PREFIX_UID + hostname, uid);
-              localStorage.setItem(PREFIX_NAME + hostname, name);
+              console.debug("remember credential for " + targetUrl + " with uuid " + uid);
+              localStorage.setItem(PREFIX_UID + index, uid);
+              localStorage.removeItem(PREFIX_REMEMBER_DENIED + index);
             }
             else {
-              console.debug("forget credential for " + hostname + " with uuid " + uid + " and name " + name);
-              localStorage.removeItem(PREFIX_UID + hostname);
-              localStorage.removeItem(PREFIX_NAME + hostname);
+              console.debug("forget credential for " + targetUrl + " with uuid " + uid);
+              localStorage.removeItem(PREFIX_UID + index);
+              localStorage.setItem(PREFIX_REMEMBER_DENIED + index, true);
+
             }
             sendPasteCredentialMessage(response.password);
           }
@@ -252,4 +264,7 @@ else {
 }
 
 
+async function createIndex(targetUrl) {
+  return bytesToBase64(await sha256(new URL(targetUrl).hostname));
+}
 

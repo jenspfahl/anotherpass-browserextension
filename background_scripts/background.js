@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.credentialName);
+    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -79,13 +79,12 @@ if (linked) {
 
 
 
-function fetchCredential(requestIdentifier, sendResponse, website, uid, credentialName) {
+function fetchCredential(requestIdentifier, sendResponse, website, uid) {
 
   const request = {
     action: "request_credential",
     website: website === null ? undefined : website,
     uid: uid === null ? undefined : uid,
-    name: credentialName === null ? undefined : credentialName,
     requestIdentifier: requestIdentifier,
   };
   
@@ -170,12 +169,7 @@ async function unlinkApp() {
 
   variables.delete("linked");
 
-  localStorage.removeItem("linked");
-  localStorage.removeItem("web_client_id");
-  localStorage.removeItem("server_address");
-  localStorage.removeItem("server_port");
-  localStorage.removeItem("linked_vault_id");
-  localStorage.removeItem("symmetric_key_length");
+  localStorage.clear();
 
 
   await destroyAllKeys(); 
