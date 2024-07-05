@@ -3,9 +3,53 @@
   --bg-color: #f6f3f2;;
 }
 
+.pre-scrollable-100 {
+  max-height: 100px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-150 {
+  max-height: 150px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-200 {
+  max-height: 200px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-300 {
+  max-height: 300px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-350 {
+  max-height: 350px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-400 {
+  max-height: 400px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-450 {
+  max-height: 450px;
+  overflow-x: scroll;
+}
+
+.pre-scrollable-500 {
+  max-height: 500px;
+  overflow-x: scroll;
+}
 
 .centered{
   align-items: center;
+  text-align: center;
+}
+
+.stretched{
+  align-items: stretch;
   text-align: center;
 }
 

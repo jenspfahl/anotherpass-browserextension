@@ -89,6 +89,40 @@
         <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
           <p>
 
+
+            <div class="mb-3">
+              <label for="settings-theme" class="form-label">Extension color theme:</label>            
+              <div id="settings-theme"  class="nav-item dropdown">
+                <button id="settings-theme" class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                        type="button"
+                        aria-expanded="false"
+                        data-bs-toggle="dropdown"
+                        data-bs-display="static"
+                        aria-label="Toggle theme (auto)">
+                  <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="bd-theme-text">
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light" aria-pressed="false">
+                      Light
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark" aria-pressed="false">
+                      Dark
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto" aria-pressed="true">
+                      Auto
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+
+
             <div class="mb-3">
               <label for="server-settings-host" class="form-label">ANOTHERpass is reachable with this hostname:</label>            
               <input id="server-settings-host" class="form-control" type="text" placeholder="Host or IP" aria-label="The hostname or IP address">

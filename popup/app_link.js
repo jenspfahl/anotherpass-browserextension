@@ -5,6 +5,9 @@ const linked = localStorage.getItem("linked");
 
 if (!linked || relink) {
 
+
+  document.querySelector("#qr_code_pad").style.display = 'none';
+
   getTemporaryKey("is_linking").then((result) => {    
 
     const isLinking = result;
@@ -58,6 +61,7 @@ else {
 
 function generateQrCode(input) {
   document.querySelector("#loading_pad").style.display = 'none';
+  document.querySelector("#qr_code_pad").style.display = '';
 
   const qrCodeDiv = document.querySelector("#qr_code_pad");
   new QRCode(qrCodeDiv, {
