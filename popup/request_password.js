@@ -145,10 +145,10 @@ else {
               localStorage.setItem(PREFIX_REMEMBER_DENIED + index, true);
 
             }
-            sendPasteCredentialMessage(response.password);
+            sendPasteCredentialMessage(response.credential.password);
           }
           else {
-            presentCredential(response);
+            presentCredential(response.credential, response.clientKey);
           }
         }
       }).catch(function (e) {
@@ -174,7 +174,7 @@ else {
         });
       }
 
-      function presentCredential(credential) {
+      function presentCredential(credential, clientKeyBase64) {
         _credential = credential;
 
 
@@ -239,16 +239,28 @@ else {
           "Import and Close",
           "Close"
         )
-        .then((decision) => {
+        .then(async (decision) => {
           console.log("decision:" + decision);
           if (decision === true) {
-            bsAlert("Error", "Saving the credential in a local vault is not yet supported!").then(_ => {
-              window.close();
+            const clientKeyArray = await base64ToBytes(clientKeyBase64);
+            const clientKey = await arrayToAesKey(clientKeyArray);
+            const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
+
+            setTemporaryKey("clientKey", {
+              clientKey: clientKeyBase64,
+              timestamp: Date.now(),
             });
-            //window.close() // TODO import the credential to the local vault
+            localStorage.setItem("credential_" + credential.uid, encCredential);
+
+      
+            
+            //bsAlert("Error", "Saving the credential in a local vault is not yet supported!").then(_ => {
+            //  window.close();
+            //});
+            window.close();
           }
           else if (decision === false) {
-            window.close()
+            window.close();
           }
         });
 

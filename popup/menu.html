@@ -3,12 +3,12 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../libs/bootstrap-5.3.3-dist/css/bootstrap.min.css" />
-    <!--link rel="stylesheet" href="common.css" /-->
+    <link rel="stylesheet" href="common.css" >
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
     <link rel="stylesheet" href="../css/custom.css" />
   </head>
 
-  <body>
+  <body class="menuSize">
     
       <div class="p-3 mb-2 bg-black text-white">
       <table>
@@ -42,9 +42,8 @@
       </div>
 
        
-  
 
-      <!-- this is the future!-->
+
       <div class="tab-content" id="nav-tabContent">
         <div class="tab-pane fade" id="nav-credentials" role="tabpanel" aria-labelledby="nav-credentials-tab" tabindex="0">
           <p>
@@ -55,8 +54,8 @@
     
             <br>
             <div class="container justify-content-center">
-              <button id="lock" class="btn btn-primary rounded-0" title="Unlock vault">
-                <span id="lock" class="material-symbols-outlined size-24">
+              <button id="lock" class="btn btn-primary rounded-0" title="Unlock local vault">
+                <span id="lock_icon" class="material-symbols-outlined size-24">
                   lock
                 </span>
               </button>
@@ -66,29 +65,22 @@
                 </span>
               </button>
 
-               <!-- Here the known credentials-->
-              <!--ul class="nav flex-column">
-                <li class="nav-item">
-                  <a class="nav-link" href="#">github.com</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">web.de</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">reddit.com</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="#">mailbox.org</a>
-                </li>
-              </ul-->
 
+              <br>
+              <h7 id="vaultStatus">- local vault locked -</h7>
+              <div class="container">
+                <!-- Here the saved credentials-->
+
+                <ul id="credential_list" class="justify-content-center list-group flex-column shadow mh-50 mv-4">
+                </ul>
+
+              </div>
 
             </div>
           </p>
         </div>
-        <div class="tab-pane fade" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
+        <div class="tab-pane fade pre-scrollable-400" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
           <p>
-
 
             <div class="mb-3">
               <label for="settings-theme" class="form-label">Extension color theme:</label>            
@@ -159,7 +151,7 @@
 
           </p>
         </div>
-        <div class="tab-pane fade" id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
+        <div class="tab-pane fade " id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
           <p>
             This is an extension to communicate with a linked ANOTHERpass vault.
             <br>
@@ -175,8 +167,8 @@
         </div>
       </div>
 
-      <nav>
-        <div class="nav nav-tabs nav-underline nav-fill" id="nav-tab" role="tablist">
+      <footer class="footer fixed-bottom">
+        <ul class="nav nav-tabs nav-underline nav-fill" id="nav-tab" role="tablist">
           <button class="nav-link" id="nav-credentials-tab" data-bs-toggle="tab" data-bs-target="#nav-credentials" type="button" role="tab" aria-controls="nav-home" aria-selected="true" title="Managed credentials">
             <span class="material-symbols-outlined size-24">
               password
@@ -201,11 +193,11 @@
             </span>
           </button>
 
-        </div>
-      </nav>
+        </ul>
+      </div>
       
   
-    </div>
+    </footer>
 
     <script src="../common/ui.js"></script>
     <script src="../common/crypto.js"></script>

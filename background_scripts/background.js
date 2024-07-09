@@ -25,6 +25,10 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     openPasswordRequestDialog(false, null);
     return true; 
   }
+  if (message.action === "start_client_key_request_flow") {
+    openPasswordRequestDialog(false, null); //TODO
+    return true; 
+  }
   else if (message.action === "request_credential") {
     fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid);
     return true;

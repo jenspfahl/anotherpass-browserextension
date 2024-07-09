@@ -53,6 +53,10 @@
   text-align: center;
 }
 
+.no-bullets {
+  list-style-type: none;
+}
+
 .fingerprint{
   font-family: 'Roboto Mono Bold',monospace;
   font-size: 24px;
@@ -64,5 +68,10 @@
   font-family: 'Roboto Mono Bold',monospace;
   font-size: 14px;
   font-weight: 900;
+}
+
+.menuSize {
+  width: 400px;
+  height: 600px;
 }
 

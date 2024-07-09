@@ -95,8 +95,20 @@ document.addEventListener("click", async (e) => {
      });
 
   }
-  else if (e.target.id === "lock") {
-    bsAlert("Error", "This operation is not yet supported!");
+  else if (e.target.id === "lock" || e.target.id === "lock_icon") {
+    const clientKeyData = await getTemporaryKey("clientKey");
+    if (clientKeyData) {
+      // lock local vault
+      deleteTemporaryKey("clientKey");
+      updateVaultUi();
+      document.getElementById("credential_list").remove();
+    }
+    else {
+      //request clientKey from app
+      const sending = chrome.runtime.sendMessage({
+        action: "start_client_key_request_flow"
+      });
+    }
   }
   else if (e.target.id === "fetch_credential") {
     const sending = chrome.runtime.sendMessage({
@@ -130,6 +142,16 @@ document.addEventListener("click", async (e) => {
 updateMenuUi(webClientId, linked);
 
 
+function updateVaultUi(clientKeyData) {
+  if (clientKeyData) {
+    document.getElementById("lock_icon").innerText = "lock_open";
+  }
+  else {
+    document.getElementById("lock_icon").innerText = "lock";
+    document.getElementById("vaultStatus").innerText = "- local vault locked -";
+  }
+}
+
 function updateMenuUi(webClientId, linked) {
   if (webClientId && linked) {
     console.debug("menu linked mode");
@@ -149,6 +171,7 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("unlink").classList.add("d-none");
     document.getElementById("nav-credentials-tab").classList.add("d-none");
     document.getElementById("nav-settings-tab").classList.add("d-none");
+    document.getElementById("vaultStatus").classList.add("d-none");
 
     document.getElementById("nav-help-tab").classList.add("active");
     document.getElementById("nav-help").classList.add("show");
@@ -156,5 +179,178 @@ function updateMenuUi(webClientId, linked) {
 
   }
 }
+
+
+(async () => {
+
+  const clientKeyData = await getTemporaryKey("clientKey");
+  updateVaultUi(clientKeyData);
+
+  if (!clientKeyData) {
+    return;
+  }
+  const timestamp = clientKeyData.timestamp;
+  const now = Date.now();
+  const age = now - timestamp;
+  console.debug("client key age", age);
+  if (age > 1000 * 60 * 600) { // accept age less than one minute, later less than 1 hour/configurable
+    console.log("ClientKey too old, logging out");
+    deleteTemporaryKey("clientKey");
+    return;
+  }
+
+  const clientKeyBase64 = clientKeyData.clientKey;
+  const clientKeyArray = await base64ToBytes(clientKeyBase64);
+  const clientKey = await arrayToAesKey(clientKeyArray);
+  if (clientKey) {
+
+    const list = document.getElementById("credential_list");
+    
+    const credentials = [];
+
+    for (var i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+
+      if (key.startsWith("credential_")) {
+        const credential = JSON.parse(await decryptMessage(clientKey, value));
+        //console.debug("credential", credential);
+        credentials.push(credential);
+      }
+    }
+
+    document.getElementById("vaultStatus").innerText = credentials.length + " credentials";
+
+    credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    
+    credentials.forEach(credential => {
+      let uuid = credential.uid;
+
+      const li = document.createElement("li");
+      li.classList.add("no-bullets");
+      li.innerHTML = `
+        <div class="nav-link my-1 mr-3">
+          <button id="credential_dropdown_${uuid}" class="btn">
+          ${credential.name}
+          </button>
+          <div class="btn-group float-end">
+            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            </button>
+            <ul class="dropdown-menu">
+              <button id="showDetails_${uuid}" class="btn dropdown-item">Show details</button>
+              <button id="syncWithApp_${uuid}" class="btn dropdown-item">Sync with app</button>
+   
+              <li><hr class="dropdown-divider"></li>
+              <button id="delete_${uuid}" class="btn dropdown-item">Delete</button>
+
+            </ul>
+          </div>
+        </div>
+      `;
+      list.appendChild(li);
+
+      document.addEventListener("click", async (e) => {
+        if (e.target.id === "copy_" + uuid) {
+          navigator.clipboard.writeText(credential.password);
+          const copyButton = document.getElementById("copy_" + uuid).innerText = "Copied!";
+        }
+        if (e.target.id === "credential_dropdown_" + uuid) {
+          bsAlert(
+            "Credential '" + credential.name + "'", 
+            `
+            <div class="container text-left">
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    Website:
+                  </div>
+                </div>
+                <div class="col col-sm-auto">
+                  <div class="mb-1">
+                    <a target="_blank" href="${credential.website}">${credential.website}</a>
+                  </div>
+                </div>
+                <div class="col">  
+                </div>
+              </div>
+            </div>
+  
+            <div class="container text-left">
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    User:
+                  </div>
+                </div>
+                <div class="col col-sm-auto">
+                  <div class="mb-1">
+                    <b>${credential.user}</b>
+                  </div>
+                </div>
+                <div class="col">  
+                </div>
+              </div>
+            </div>
+  
+            <div class="container text-left">
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    Password:
+                  </div>
+                </div>
+                <div class="col col-sm-auto">
+                  <div class="mb-1">
+                    <b class="fingerprint_small">${credential.password}</b>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="mb-3">
+                    <button type="button" id="copy_${uuid}" title="Copy to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            `
+          );
+        }
+        if (e.target.id === "showDetails_" + uuid) {
+          bsAlert(
+            "Details for '" + credential.name + "'",
+            ` 
+            <b> UUID:</b> ${credential.uid}
+            <br>
+            <b> UID:</b> ${credential.readableUid}
+            `
+          );
+        }
+        if (e.target.id === "syncWithApp_" + uuid) {
+          //TODO trigger new feth
+        }
+        if (e.target.id === "delete_" + uuid) {
+          bsConfirm(
+            "Delete '" + credential.name + "'",
+            "Are you sure to delete this credential from the local vault?"
+          )
+          .then(async (decision) => {
+            console.log("decision:" + decision);
+            if (decision === true) {
+              localStorage.removeItem("credential_" + uuid);
+              list.removeChild(li);
+            }
+          });
+        }
+
+      }); 
+    
+    });
+   
+
+  }
+
+
+ 
+})()
 
 
