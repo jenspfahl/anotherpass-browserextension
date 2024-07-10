@@ -26,11 +26,11 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   if (message.action === "start_client_key_request_flow") {
-    openPasswordRequestDialog(false, null); //TODO
+    openPasswordRequestDialog(); 
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid);
+    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.requestClientKey);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -83,13 +83,14 @@ if (linked) {
 
 
 
-function fetchCredential(requestIdentifier, sendResponse, website, uid) {
+function fetchCredential(requestIdentifier, sendResponse, website, uid, requestClientKey) {
 
   const request = {
     action: "request_credential",
     website: website === null ? undefined : website,
     uid: uid === null ? undefined : uid,
     requestIdentifier: requestIdentifier,
+    requestClientKey: requestClientKey,
   };
   
   remoteCall(request, sendResponse, variables);
@@ -141,12 +142,24 @@ function openPasswordRequestDialog(autofill, messageUrl) {
     width = 680;
     height = 630;
   }
-  let createData = {
-    type: "detached_panel",
-    url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl})),
-    width: width,
-    height: height,
-  };
+
+  let createData;
+  if (autofill === undefined && messageUrl === undefined) {
+    createData = {
+      type: "detached_panel",
+      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({requestClientKey: true})),
+      width: width,
+      height: height,
+    };
+  }
+  else {
+    createData = {
+      type: "detached_panel",
+      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl})),
+      width: width,
+      height: height,
+    };
+  }
 
   console.log("open request password dialog");
 

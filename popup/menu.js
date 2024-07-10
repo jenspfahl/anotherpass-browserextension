@@ -159,8 +159,8 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("link").classList.add("d-none");
 
     document.getElementById("nav-credentials-tab").classList.add("active");
-    document.getElementById("nav-credentials").classList.add("show");
-    document.getElementById("nav-credentials").classList.add("active");
+    document.getElementById("navCredentials").classList.add("show");
+    document.getElementById("navCredentials").classList.add("active");
 
 
   }
@@ -219,7 +219,8 @@ function updateMenuUi(webClientId, linked) {
       }
     }
 
-    document.getElementById("vaultStatus").innerText = credentials.length + " credentials";
+    let credentialCount = credentials.length;
+    updateCredentialCountUi(credentialCount);
 
     credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
     
@@ -338,6 +339,8 @@ function updateMenuUi(webClientId, linked) {
             if (decision === true) {
               localStorage.removeItem("credential_" + uuid);
               list.removeChild(li);
+              credentialCount--;
+              updateCredentialCountUi(credentialCount);
             }
           });
         }
@@ -353,4 +356,8 @@ function updateMenuUi(webClientId, linked) {
  
 })()
 
+
+function updateCredentialCountUi(credentialCount) {
+  document.getElementById("vaultStatus").innerText = credentialCount + " credentials";
+}
 

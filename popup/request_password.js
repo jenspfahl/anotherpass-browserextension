@@ -44,6 +44,12 @@ else {
   const ip = localStorage.getItem("server_address");
   document.getElementById("host").value = ip;
 
+
+  if (requestData.requestClientKey === true) {
+    document.getElementById("instruction").innerText = "Requesting to unlock local vault .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+  }
+
+  
   const targetUrl = requestData.messageUrl;
 
   if (!targetUrl) {
@@ -102,7 +108,8 @@ else {
           action: "request_credential",
           requestIdentifier: sessionKeyBase64,
           website: targetUrl,
-          uid: targetUid
+          uid: targetUid,
+          requestClientKey: requestData.requestClientKey,
         };
         let response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
@@ -129,9 +136,14 @@ else {
           
           console.debug("autofill " + requestData.autofill);
 
+          const credential = response.credential;
+          const clientKeyBase64 = response.clientKey;
+
+        
           if (requestData.autofill === true) {
             const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
-            const uid = response.uid;
+
+            const uid = credential.uid;
             const index = await createIndex(targetUrl);
 
             if (rememberCredentialSelection.checked) {
@@ -143,12 +155,26 @@ else {
               console.debug("forget credential for " + targetUrl + " with uuid " + uid);
               localStorage.removeItem(PREFIX_UID + index);
               localStorage.setItem(PREFIX_REMEMBER_DENIED + index, true);
-
             }
-            sendPasteCredentialMessage(response.credential.password);
+
+            const saveCredentialInLocalVault = document.getElementById("saveCredentialInLocalVault");
+
+            if (saveCredentialInLocalVault.checked) {
+              console.debug("save credential in local vault with uuid " + uid);
+              const clientKey = await unlockVault(clientKeyBase64);
+              await saveCredential(credential, clientKey);
+            }
+
+            sendPasteCredentialMessage(credential.password);
+          }
+          else if (requestData.requestClientKey === true) {
+            await unlockVault(clientKeyBase64);
+            bsAlert("Success!", "Local vault unlocked.").then(_ => {
+              window.close();
+            });
           }
           else {
-            presentCredential(response.credential, response.clientKey);
+            presentCredential(credential, clientKeyBase64);
           }
         }
       }).catch(function (e) {
@@ -172,6 +198,19 @@ else {
             window.close();
           });
         });
+      }
+
+      async function unlockVault(clientKeyBase64) {
+        console.log("Unlocking vault ...");
+        const clientKeyArray = await base64ToBytes(clientKeyBase64);
+        const clientKey = await arrayToAesKey(clientKeyArray);
+
+        await setTemporaryKey("clientKey", {
+          clientKey: clientKeyBase64,
+          timestamp: Date.now(),
+        });
+
+        return clientKey;
       }
 
       function presentCredential(credential, clientKeyBase64) {
@@ -242,28 +281,15 @@ else {
         .then(async (decision) => {
           console.log("decision:" + decision);
           if (decision === true) {
-            const clientKeyArray = await base64ToBytes(clientKeyBase64);
-            const clientKey = await arrayToAesKey(clientKeyArray);
-            const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
+            const clientKey = await unlockVault(clientKeyBase64);
+            await saveCredential(credential, clientKey);
 
-            setTemporaryKey("clientKey", {
-              clientKey: clientKeyBase64,
-              timestamp: Date.now(),
-            });
-            localStorage.setItem("credential_" + credential.uid, encCredential);
-
-      
-            
-            //bsAlert("Error", "Saving the credential in a local vault is not yet supported!").then(_ => {
-            //  window.close();
-            //});
             window.close();
           }
           else if (decision === false) {
             window.close();
           }
         });
-
       }
     } catch(e) {
       bsAlert("Error", "Something went wrong! Re-link the app to solve this problem.").then(_ => {
@@ -278,5 +304,10 @@ else {
 
 async function createIndex(targetUrl) {
   return bytesToBase64(await sha256(new URL(targetUrl).hostname));
+}
+
+async function saveCredential(credential, clientKey) {
+  const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
+  localStorage.setItem("credential_" + credential.uid, encCredential);
 }
 
