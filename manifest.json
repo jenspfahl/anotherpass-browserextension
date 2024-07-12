@@ -30,6 +30,19 @@
       "background_scripts/background.js"
     ]
   },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "*.css",
+        "*.html",
+        "*.js"
+      ],
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ]
+    }
+   ],
   "content_scripts": [
     {
       "all_frames": true,

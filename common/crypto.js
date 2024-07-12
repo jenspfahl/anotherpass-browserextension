@@ -1,4 +1,9 @@
 
+const PREFIX_UID = "remembered_uid_for_"
+const PREFIX_REMEMBER_DENIED = "remembered_denied_for_"
+const PREFIX_CREDENTIAL = "credential_"
+
+
 function generateWebClientId() {
   const rnd = window.crypto.getRandomValues(new Uint8Array(32));
   const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 6).toUpperCase();
@@ -418,4 +423,42 @@ function deleteKey(key) {
       db.close();
     };
   });
+}
+
+
+
+async function getClientKey(variables) {
+  const clientKeyData = await getTemporaryKey("clientKey", variables);
+
+  if (!clientKeyData) {
+    return;
+  }
+  const timestamp = clientKeyData.timestamp;
+  const now = Date.now();
+  const age = now - timestamp;
+  console.debug("client key age", age);
+  if (age > 1000 * 60 * 600) { // accept age less than one minute, TODO later less than 1 hour/configurable
+    console.log("ClientKey too old, logging out");
+    deleteTemporaryKey("clientKey"); 
+    return;
+  }
+
+  const clientKeyBase64 = clientKeyData.clientKey;
+  const clientKeyArray = await base64ToBytes(clientKeyBase64);
+  const clientKey = await arrayToAesKey(clientKeyArray);
+  return clientKey;
+}
+
+
+async function isLocalVaultUnlocked(variables) {
+  const clientKey = await getClientKey(variables);
+  if (clientKey) {
+    return true;
+  }
+  return false;
+}
+
+
+async function createIndex(targetUrl) {
+  return bytesToBase64(await sha256(new URL(targetUrl).hostname.toLowerCase()));
 }

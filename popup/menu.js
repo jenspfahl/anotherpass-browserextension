@@ -96,8 +96,8 @@ document.addEventListener("click", async (e) => {
 
   }
   else if (e.target.id === "lock" || e.target.id === "lock_icon") {
-    const clientKeyData = await getTemporaryKey("clientKey");
-    if (clientKeyData) {
+    const isUnlocked = await isLocalVaultUnlocked();
+    if (isUnlocked) {
       // lock local vault
       deleteTemporaryKey("clientKey");
       updateVaultUi();
@@ -142,12 +142,14 @@ document.addEventListener("click", async (e) => {
 updateMenuUi(webClientId, linked);
 
 
-function updateVaultUi(clientKeyData) {
-  if (clientKeyData) {
+function updateVaultUi(unlocked) {
+  if (unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
+    document.getElementById("lock").title = "Lock local vault";
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
+    document.getElementById("lock").title = "Unlock local vault";
     document.getElementById("vaultStatus").innerText = "- local vault locked -";
   }
 }
@@ -158,7 +160,7 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("state").innerText = "Linked (as " + webClientId + ")";
     document.getElementById("link").classList.add("d-none");
 
-    document.getElementById("nav-credentials-tab").classList.add("active");
+    document.getElementById("navCredentialsTab").classList.add("active");
     document.getElementById("navCredentials").classList.add("show");
     document.getElementById("navCredentials").classList.add("active");
 
@@ -169,7 +171,7 @@ function updateMenuUi(webClientId, linked) {
 
     document.getElementById("state").innerText = "Not linked";
     document.getElementById("unlink").classList.add("d-none");
-    document.getElementById("nav-credentials-tab").classList.add("d-none");
+    document.getElementById("navCredentialsTab").classList.add("d-none");
     document.getElementById("nav-settings-tab").classList.add("d-none");
     document.getElementById("vaultStatus").classList.add("d-none");
 
@@ -183,26 +185,14 @@ function updateMenuUi(webClientId, linked) {
 
 (async () => {
 
-  const clientKeyData = await getTemporaryKey("clientKey");
-  updateVaultUi(clientKeyData);
+  const clientKey = await getClientKey();
+  updateVaultUi(clientKey);
 
-  if (!clientKeyData) {
+  if (!clientKey) {
+    console.debug("Local vault locked, nothing to display");
     return;
   }
-  const timestamp = clientKeyData.timestamp;
-  const now = Date.now();
-  const age = now - timestamp;
-  console.debug("client key age", age);
-  if (age > 1000 * 60 * 600) { // accept age less than one minute, later less than 1 hour/configurable
-    console.log("ClientKey too old, logging out");
-    deleteTemporaryKey("clientKey");
-    return;
-  }
-
-  const clientKeyBase64 = clientKeyData.clientKey;
-  const clientKeyArray = await base64ToBytes(clientKeyBase64);
-  const clientKey = await arrayToAesKey(clientKeyArray);
-  if (clientKey) {
+  else {
 
     const list = document.getElementById("credential_list");
     
@@ -212,7 +202,7 @@ function updateMenuUi(webClientId, linked) {
       const key = localStorage.key(i);
       const value = localStorage.getItem(key);
 
-      if (key.startsWith("credential_")) {
+      if (key.startsWith(PREFIX_CREDENTIAL)) {
         const credential = JSON.parse(await decryptMessage(clientKey, value));
         //console.debug("credential", credential);
         credentials.push(credential);
@@ -337,7 +327,7 @@ function updateMenuUi(webClientId, linked) {
           .then(async (decision) => {
             console.log("decision:" + decision);
             if (decision === true) {
-              localStorage.removeItem("credential_" + uuid);
+              localStorage.removeItem(PREFIX_CREDENTIAL + uuid);
               list.removeChild(li);
               credentialCount--;
               updateCredentialCountUi(credentialCount);

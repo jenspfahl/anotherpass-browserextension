@@ -1,10 +1,14 @@
+console.log("Start extension");
 const variables = new Map();
 
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action + ", sender: " + sender.url);
 
-  if (message.action == "get") {
+  if (message.action == "get_tab_id") {
+    sendResponse({tabId: sender.tab.id});
+  }
+  else if (message.action == "get") {
     sendResponse({result: variables.get(message.key)});
     return true; 
   } 
@@ -31,6 +35,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
   else if (message.action === "request_credential") {
     fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.requestClientKey);
+    return true;
+  }
+  else if (message.action === "list_local_credentials") {
+    listLocalCredentials(message.url, sendResponse);
+    return true;
+  }
+  else if (message.action === "forward_credential") {
+    forwardCredential(message.tabId, message.uid);
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -83,6 +95,36 @@ if (linked) {
 
 
 
+async function forwardCredential(tabId, uid) {
+
+  const clientKey = await getClientKey(variables);
+
+  if (clientKey) {
+
+    const encCredential = findLocalByUid(PREFIX_CREDENTIAL, uid);
+
+    if (encCredential) {
+      const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
+      chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password });
+    }
+    
+  }
+}
+
+function findLocalByUid(prefix, uid) {
+  for (var i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+
+    if (key.startsWith(prefix)) {
+      const keyUid = key.substring(prefix.length);
+      if (keyUid === uid) {
+        return value;
+      }
+    }
+  }
+}
+
 function fetchCredential(requestIdentifier, sendResponse, website, uid, requestClientKey) {
 
   const request = {
@@ -95,6 +137,54 @@ function fetchCredential(requestIdentifier, sendResponse, website, uid, requestC
   
   remoteCall(request, sendResponse, variables);
 
+}
+
+async function listLocalCredentials(url, sendResponse) {
+  const clientKey = await getClientKey(variables);
+
+  if (clientKey) {
+    
+    const allCredentialNames = [];
+    const suggestedCredentialNames = [];
+
+    const index = await createIndex(url);
+    const preferedUid = localStorage.getItem(PREFIX_UID + index);
+    const preferedHostname = new URL(url).hostname.toLowerCase();
+    console.debug("found prefered for " + url + " (hostname=" + preferedHostname + "): " + preferedUid);
+
+
+    for (var i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+
+      if (key.startsWith(PREFIX_CREDENTIAL)) {
+        const credential = JSON.parse(await decryptMessage(clientKey, value));
+        //console.debug("credential", credential);
+        allCredentialNames.push({name: credential.name, uid: credential.uid});
+
+        if (credential.website && url && 
+          (credential.website.toLowerCase().includes(url) || url.includes(credential.website.toLowerCase()))) {
+            suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+        }
+        else if (credential.uid === preferedUid) {
+          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+        }
+        else if (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase())) {
+          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+
+        }
+      }
+    }
+
+    allCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    suggestedCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+
+    console.debug("credentials", allCredentialNames);
+    console.debug("matches", suggestedCredentialNames);
+  
+
+    sendResponse({matches: suggestedCredentialNames, credentials: allCredentialNames});
+  }
 }
 
 

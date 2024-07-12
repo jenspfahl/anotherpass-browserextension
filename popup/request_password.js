@@ -1,9 +1,5 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
-const PREFIX_UID = "remembered_uid_for_"
-const PREFIX_REMEMBER_DENIED = "remembered_denied_for_"
-
-
 let _credential;
 
 document.addEventListener("click", (e) => {
@@ -111,7 +107,7 @@ else {
           uid: targetUid,
           requestClientKey: requestData.requestClientKey,
         };
-        let response = await chrome.runtime.sendMessage(request);
+        const response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
         if (response.status == 403) {
           console.warn("Request rejected");
@@ -301,13 +297,8 @@ else {
 
 }
 
-
-async function createIndex(targetUrl) {
-  return bytesToBase64(await sha256(new URL(targetUrl).hostname));
-}
-
 async function saveCredential(credential, clientKey) {
   const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
-  localStorage.setItem("credential_" + credential.uid, encCredential);
+  localStorage.setItem(PREFIX_CREDENTIAL + credential.uid, encCredential);
 }
 
