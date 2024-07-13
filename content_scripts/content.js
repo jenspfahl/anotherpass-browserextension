@@ -68,7 +68,7 @@ getTemporaryKey("linked").then((linked) => {
       if (msg.action === "refresh_credential_dialog") {
         if (_dialog) {
           _dialog.close(); 
-          console.debug("Reopen dialog at" + _x + ", " + _y + " with " + _url);
+          console.debug("Reopen dialog at x:" + _x + ", y:" + _y + " with url:" + _url);
           showCredentialModal(_x, _y, _url);
         } 
       }
@@ -112,7 +112,24 @@ function addButton(input) {
     _activeInput = input;//document.activeElement;
 
     console.log("event", event);
-    showCredentialModal(event.clientX, event.clientY, window.location.href);  
+    const w = window.innerWidth;
+    const h = window.innerHeight; 
+    let x = event.pageX;
+    let y = event.pageY;
+
+
+    if (y > h - 450) {
+      console.log("adjust y:", y);
+
+      y = h - 450;
+      if (y < 0) y = 0;
+    }
+    console.log("x:", x);
+    console.log("y:", y);
+
+
+    console.log("window w:" + w + ", h:" + h);
+    showCredentialModal(x, y , window.location.href);  
 
   }, false);
 }
@@ -127,8 +144,14 @@ const showCredentialModal = (x, y, url) => {
   _url = url;
   const modal = document.createElement("dialog"); 
 
-  modal.setAttribute("style", `height:400px;width:300px,border: none;top:${y}px;left:${x}px;border-radius:10px;background-color:white;position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`); 
-  modal.innerHTML = `<iframe id="popup-content"; style="height:100%"></iframe><div style="position:absolute; top:0px; left:5px;"><button style="padding: 8px 12px; font-size: 16px; border: none; border-radius: 20px;">x</button></div>`; 
+  modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 400px; width: 300px; border: none; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`); 
+  modal.innerHTML = `
+  <iframe id="popup-content"; style="height:100%; width: 100%"></iframe>
+  <div style="position:absolute; top:5px; right:5px;">
+    <button style="padding: 8px 12px; font-size: 14px; border: none; border-radius: 15px;">
+     x
+    </button>
+  </div>`; 
   document.body.appendChild(modal); 
   const dialog = document.querySelector("dialog"); 
   _dialog = dialog;
