@@ -165,6 +165,14 @@ else {
           }
           else if (requestData.requestClientKey === true) {
             await unlockVault(clientKeyBase64);
+
+            //inform credential popup
+            console.debug("refresh popup for tabId " + requestData.tabId);
+            if (requestData.tabId) {
+              chrome.runtime.sendMessage({ action: "refresh_credential_dialog", tabId: requestData.tabId });
+            }
+
+            //TODO close automatically if autoclose is enabled
             bsAlert("Success!", "Local vault unlocked.").then(_ => {
               window.close();
             });

@@ -22,15 +22,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "start_password_request_flow") {
-    openPasswordRequestDialog(true, message.url);
+    openPasswordRequestDialog(undefined, true, message.url);
     return true; 
   }
   if (message.action === "start_single_password_request_flow") {
-    openPasswordRequestDialog(false, null);
+    openPasswordRequestDialog(undefined, false, null);
     return true; 
   }
   if (message.action === "start_client_key_request_flow") {
-    openPasswordRequestDialog(); 
+    openPasswordRequestDialog(message.tabId); 
     return true; 
   }
   else if (message.action === "request_credential") {
@@ -43,6 +43,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   }
   else if (message.action === "forward_credential") {
     forwardCredential(message.tabId, message.uid);
+    return true;
+  }
+  else if (message.action === "close_credential_dialog") {
+    chrome.tabs.sendMessage(message.tabId, { action: "close_credential_dialog" });
+    return true;
+  }
+  else if (message.action === "refresh_credential_dialog") {
+    chrome.tabs.sendMessage(message.tabId, { action: "refresh_credential_dialog" });
     return true;
   }
   else if (message.action === "start_link_flow") {
@@ -88,7 +96,7 @@ if (linked) {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "anotherpass-request") {
-      openPasswordRequestDialog(true, tab.url);
+      openPasswordRequestDialog(tab.id, true, tab.url);
     }
   });
 }
@@ -225,7 +233,7 @@ async function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog(autofill, messageUrl) {
+function openPasswordRequestDialog(tabId, autofill, messageUrl) {
   var width = 660;
   var height = 540;
   if (messageUrl) {
@@ -237,7 +245,7 @@ function openPasswordRequestDialog(autofill, messageUrl) {
   if (autofill === undefined && messageUrl === undefined) {
     createData = {
       type: "detached_panel",
-      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({requestClientKey: true})),
+      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({requestClientKey: true, tabId: tabId})),
       width: width,
       height: height,
     };
@@ -245,7 +253,7 @@ function openPasswordRequestDialog(autofill, messageUrl) {
   else {
     createData = {
       type: "detached_panel",
-      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl})),
+      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl, tabId: tabId})),
       width: width,
       height: height,
     };

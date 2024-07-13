@@ -2,7 +2,7 @@
 
 console.debug("app content inject");
 
-let _dialog, _activeInput;
+let _dialog, _activeInput, _x, _y, _url;
 
 getTemporaryKey("linked").then((linked) => {
   console.debug("app linked: " + linked);
@@ -60,6 +60,18 @@ getTemporaryKey("linked").then((linked) => {
           _dialog.close(); 
         } 
       }
+      if (msg.action === "close_credential_dialog") {
+        if (_dialog) {
+          _dialog.close(); 
+        } 
+      }
+      if (msg.action === "refresh_credential_dialog") {
+        if (_dialog) {
+          _dialog.close(); 
+          console.debug("Reopen dialog at" + _x + ", " + _y + " with " + _url);
+          showCredentialModal(_x, _y, _url);
+        } 
+      }
     });
 
     function pasteCredential(p, sendResponse) {
@@ -99,25 +111,9 @@ function addButton(input) {
     input.focus();
     _activeInput = input;//document.activeElement;
 
-    const parsedUrl = new URL(window.location.href);
+    console.log("event", event);
+    showCredentialModal(event.clientX, event.clientY, window.location.href);  
 
-    const isUnlocked = await isLocalVaultUnlocked();
-    if (isUnlocked) { 
-      // unlocked
-      console.log("event", event);
-      showCredentialModal(event.clientX, event.clientY, window.location.href);  
-    }
-    else {
-      //TODO could be in a modal as well
-      chrome.runtime.sendMessage({
-        action: "start_password_request_flow",
-        url: parsedUrl.toString()
-      });
-    }
-
-
-    
-    
   }, false);
 }
 
@@ -125,6 +121,10 @@ function addButton(input) {
 
 const showCredentialModal = (x, y, url) => { 
   console.log("modal");
+
+  _x = x;
+  _y = y;
+  _url = url;
   const modal = document.createElement("dialog"); 
 
   modal.setAttribute("style", `height:400px;width:300px,border: none;top:${y}px;left:${x}px;border-radius:10px;background-color:white;position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`); 

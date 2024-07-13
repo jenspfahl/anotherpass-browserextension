@@ -6,10 +6,8 @@ const linked = localStorage.getItem("linked");
 
 (async () => {
 
-  const isUnlocked = await isLocalVaultUnlocked();
-
-  if (!isUnlocked || !linked) {
-    console.warn("Not linked nor unlocked, cannot present local credentials.");
+  if (!linked) {
+    console.warn("Not linked, cannot continue.");
     return;
   }
 
@@ -19,25 +17,53 @@ const linked = localStorage.getItem("linked");
   document.addEventListener("click", async (e) => {
 
     if (e.target.id === "fetch_credential") {
-      const sending = chrome.runtime.sendMessage({
+      chrome.runtime.sendMessage({
         action: "start_password_request_flow",
         url: url
       });
 
-      //TODO force popup close
+      // force popup close
+      chrome.runtime.sendMessage({ action: "close_credential_dialog", tabId: requestData.tabId });
+
+    }
+
+    if (e.target.id === "lock" || e.target.id === "lock_icon") {
+      const isUnlocked = await isLocalVaultUnlocked();
+      if (isUnlocked) {
+        // lock local vault
+        deleteTemporaryKey("clientKey");
+        updateVaultUi();
+      }
+      else {
+        //request clientKey from app
+        await chrome.runtime.sendMessage({
+          action: "start_client_key_request_flow",
+          tabId: requestData.tabId
+        });
+        const isUnlocked = await isLocalVaultUnlocked();
+        updateVaultUi(isUnlocked);
+      }
     }
 
   });
 
+  const isUnlocked = await isLocalVaultUnlocked();
 
+  updateVaultUi(isUnlocked);
+
+  if (isUnlocked) {
+    const list = document.getElementById("credential_list");
+    await loadCredentials(url, list);
+  }
+
+})()
+
+async function loadCredentials(url, list) {
   const response = await chrome.runtime.sendMessage({
     action: "list_local_credentials",
     url: url
   });
 
-
-
-  const list = document.getElementById("credential_list");
   console.debug("response", response);
 
   const credentials = response.credentials;
@@ -49,7 +75,7 @@ const linked = localStorage.getItem("linked");
   renderSection("Suggested", list);
 
   matches.forEach(credential => {
-    renderCredential(credential, list); 
+    renderCredential(credential, list);
   });
 
   renderLine(list);
@@ -57,11 +83,26 @@ const linked = localStorage.getItem("linked");
   renderSection("All", list);
 
   credentials.forEach(credential => {
-    renderCredential(credential, list); 
+    renderCredential(credential, list);
   });
+}
 
- 
-})()
+function updateVaultUi(unlocked) {
+  if (unlocked) {
+    document.getElementById("lock_icon").innerText = "lock_open";
+    document.getElementById("lock").title = "Lock local vault";
+    document.getElementById("hint").classList.add("d-none");
+  }
+  else {
+    document.getElementById("lock_icon").innerText = "lock";
+    document.getElementById("lock").title = "Unlock local vault";
+    document.getElementById("hint").classList.remove("d-none");
+    document.getElementById("hint").innerText = "Local vault is locked, unlock first or fetch credential from the app.";
+    const list = document.getElementById("credential_list");
+    list.innerHTML = "";
+  }
+}
+
 
 function renderCredential(credential, list) {
   let uuid = credential.uid;
