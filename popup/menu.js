@@ -115,6 +115,11 @@ document.addEventListener("click", async (e) => {
       action: "start_single_password_request_flow"
     });
   }
+  else if (e.target.id === "fetch_all_credentials") {
+    const sending = chrome.runtime.sendMessage({
+      action: "start_all_passwords_request_flow"
+    });
+  }
   else if (e.target.id === "details") {
 
     const clientKeyPair = await getKey("client_keypair");

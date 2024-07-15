@@ -22,19 +22,23 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     return true; 
   }
   else if (message.action === "start_password_request_flow") {
-    openPasswordRequestDialog(undefined, true, message.url);
+    openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url);
     return true; 
   }
   if (message.action === "start_single_password_request_flow") {
-    openPasswordRequestDialog(undefined, false, null);
+    openPasswordRequestDialog("fetch_single_credential", undefined, null);
+    return true; 
+  }
+  if (message.action === "start_all_passwords_request_flow") {
+    openPasswordRequestDialog("fetch_all_credentials", undefined, null);
     return true; 
   }
   if (message.action === "start_client_key_request_flow") {
-    openPasswordRequestDialog(message.tabId); 
+    openPasswordRequestDialog("get_client_key", message.tabId); 
     return true; 
   }
   else if (message.action === "request_credential") {
-    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.requestClientKey);
+    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.command);
     return true;
   }
   else if (message.action === "list_local_credentials") {
@@ -96,7 +100,7 @@ if (linked) {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "anotherpass-request") {
-      openPasswordRequestDialog(tab.id, true, tab.url);
+      openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
     }
   });
 }
@@ -133,14 +137,14 @@ function findLocalByUid(prefix, uid) {
   }
 }
 
-function fetchCredential(requestIdentifier, sendResponse, website, uid, requestClientKey) {
+function fetchCredential(requestIdentifier, sendResponse, website, uid, command) {
 
   const request = {
     action: "request_credential",
+    command: command,
     website: website === null ? undefined : website,
     uid: uid === null ? undefined : uid,
     requestIdentifier: requestIdentifier,
-    requestClientKey: requestClientKey,
   };
   
   remoteCall(request, sendResponse, variables);
@@ -233,7 +237,7 @@ async function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog(tabId, autofill, messageUrl) {
+function openPasswordRequestDialog(command, tabId, messageUrl) {
   var width = 660;
   var height = 540;
   if (messageUrl) {
@@ -241,24 +245,18 @@ function openPasswordRequestDialog(tabId, autofill, messageUrl) {
     height = 630;
   }
 
-  let createData;
-  if (autofill === undefined && messageUrl === undefined) {
-    createData = {
-      type: "detached_panel",
-      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({requestClientKey: true, tabId: tabId})),
-      width: width,
-      height: height,
-    };
-  }
-  else {
-    createData = {
-      type: "detached_panel",
-      url: "popup/request_password.html?data=" + encodeURIComponent(JSON.stringify({autofill: autofill, messageUrl: messageUrl, tabId: tabId})),
-      width: width,
-      height: height,
-    };
-  }
-
+  const requestData = JSON.stringify({ 
+    command: command,
+    tabId: tabId,
+    messageUrl: messageUrl 
+  });
+  const createData = {
+    type: "detached_panel",
+    url: "popup/request_password.html?data=" + encodeURIComponent(requestData),
+    width: width,
+    height: height,
+  };
+  
   console.log("open request password dialog");
 
   browser.windows.create(createData);

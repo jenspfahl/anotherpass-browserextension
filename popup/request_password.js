@@ -41,8 +41,11 @@ else {
   document.getElementById("host").value = ip;
 
 
-  if (requestData.requestClientKey === true) {
+  if (requestData.command === "get_client_key") {
     document.getElementById("instruction").innerText = "Requesting to unlock local vault .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+  }
+  else if (requestData.command === "fetch_all_credentials") {
+    document.getElementById("instruction").innerText = "Requesting to fetch ALL credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
   }
 
   
@@ -80,7 +83,7 @@ else {
       const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
       let targetUid;
-      if (requestData.autofill === true) {
+      if (requestData.command === "fetch_credential_for_url") {
         const index = await createIndex(targetUrl);
 
         targetUid = localStorage.getItem(PREFIX_UID + index);
@@ -102,10 +105,10 @@ else {
         document.getElementById("waiting_time").value = progress;
         const request = {
           action: "request_credential",
+          command: requestData.command,
           requestIdentifier: sessionKeyBase64,
           website: targetUrl,
           uid: targetUid,
-          requestClientKey: requestData.requestClientKey,
         };
         const response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
@@ -130,13 +133,10 @@ else {
 
           destroySessionKey();
           
-          console.debug("autofill " + requestData.autofill);
-
-          const credential = response.credential;
           const clientKeyBase64 = response.clientKey;
 
-        
-          if (requestData.autofill === true) {
+          if (requestData.command === "fetch_credential_for_url") {
+            const credential = response.credential;
             const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
 
             const uid = credential.uid;
@@ -163,7 +163,7 @@ else {
 
             sendPasteCredentialMessage(credential.password);
           }
-          else if (requestData.requestClientKey === true) {
+          else if (requestData.command === "get_client_key") {
             await unlockVault(clientKeyBase64);
 
             //inform credential popup
@@ -177,8 +177,15 @@ else {
               window.close();
             });
           }
-          else {
-            presentCredential(credential, clientKeyBase64);
+          else if (requestData.command === "fetch_all_credentials") {
+            const credentials = response.credentials;
+
+            const clientKey = await unlockVault(clientKeyBase64);
+            const count = await saveAllCredentials(credentials, clientKey);
+            //TODO close automatically if autoclose is enabled
+            bsAlert("Success!", count + " credentials imported.").then(_ => {
+              window.close();
+            });
           }
         }
       }).catch(function (e) {
@@ -309,5 +316,15 @@ async function saveCredential(credential, clientKey) {
   credential.createdAt = Date.now();
   const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
   localStorage.setItem(PREFIX_CREDENTIAL + credential.uid, encCredential);
+}
+
+
+async function saveAllCredentials(credentials, clientKey) {
+  let count = 0;
+  for (const credential of credentials) {
+    await saveCredential(credential, clientKey);
+    count++;
+  }
+  return count;
 }
 
