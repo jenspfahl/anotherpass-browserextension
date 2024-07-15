@@ -306,6 +306,7 @@ else {
 }
 
 async function saveCredential(credential, clientKey) {
+  credential.createdAt = Date.now();
   const encCredential = await encryptMessage(clientKey, JSON.stringify(credential));
   localStorage.setItem(PREFIX_CREDENTIAL + credential.uid, encCredential);
 }

@@ -54,23 +54,37 @@
     
             <br>
             <div class="container justify-content-center">
+              
               <button id="lock" class="btn btn-primary rounded-0 mt-2 mb-3 pt-2" title="Unlock local vault">
                 <span id="lock_icon" class="material-symbols-outlined size-24">
                   lock
                 </span>
               </button>
-              <button id="fetch_credential" class="btn btn-outline-primary rounded-0 mt-2 mb-3 pt-2" title="Fetch single credential">
-                <span id="fetch_credential" class="material-symbols-outlined size-24">
-                  send_to_mobile
-                </span>
-              </button>
 
-              <button id="sync_credentials" class="btn btn-outline-primary rounded-0 mt-2 mb-3 pt-2" title="Sync credentials from the app">
+
+
+
+              <button id="sync_credentials" class="btn btn-outline-primary rounded-0 mt-2 mb-3 pt-2 mx-2" title="Sync credentials from the app">
                 <span id="sync_credentials" class="material-symbols-outlined size-24">
                   sync
                 </span>
               </button>
 
+              
+
+              <div class="btn-group">
+                <button id="fetch_credential" type="button" class="btn btn-outline-primary rounded-0 mt-2 mb-3 pt-2 px-2 ml-2" title="Fetch single credential from the app">
+                  <span id="fetch_credential" class="material-symbols-outlined size-24">
+                    send_to_mobile
+                  </span>
+                </button>
+                <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split rounded-0 mt-2 mb-3 pt-2 px-2" data-bs-toggle="dropdown" aria-expanded="false">
+                </button>
+                <ul class="dropdown-menu">
+                  <button id="fetch_multiple_credentials" class="btn dropdown-item">Fetch multiple credentials</button>
+                  <button id="fetch_all_credentials" class="btn dropdown-item">Fetch all credentials</button>
+              </div>
+              
 
               <br>
               <h7 id="vaultStatus">- local vault locked -</h7>

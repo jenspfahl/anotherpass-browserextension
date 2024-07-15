@@ -310,7 +310,7 @@ function updateMenuUi(webClientId, linked) {
           bsAlert(
             "Details for '" + credential.name + "'",
             ` 
-            <b> UUID:</b> ${credential.uid}
+            <b> Imported at:</b> ${credential.createdAt != undefined ? new Date(credential.createdAt).toLocaleString() : ""}
             <br>
             <b> UID:</b> ${credential.readableUid}
             `
