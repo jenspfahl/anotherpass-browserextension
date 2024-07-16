@@ -44,6 +44,9 @@ else {
   if (requestData.command === "get_client_key") {
     document.getElementById("instruction").innerText = "Requesting to unlock local vault .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
   }
+  else if (requestData.command === "fetch_multiple_credentials") {
+    document.getElementById("instruction").innerText = "Requesting to fetch multiple credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+  }  
   else if (requestData.command === "fetch_all_credentials") {
     document.getElementById("instruction").innerText = "Requesting to fetch ALL credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
   }
@@ -210,7 +213,7 @@ else {
               window.close();
             });
           }
-          else if (requestData.command === "fetch_all_credentials") {
+          else if (requestData.command === "fetch_multiple_credentials" || requestData.command === "fetch_all_credentials") {
             const credentials = response.credentials;
 
             const clientKey = await unlockVault(clientKeyBase64);

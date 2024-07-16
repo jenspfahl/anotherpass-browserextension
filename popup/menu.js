@@ -120,6 +120,11 @@ document.addEventListener("click", async (e) => {
       action: "start_single_password_request_flow"
     });
   }
+  else if (e.target.id === "fetch_multiple_credentials") {
+    chrome.runtime.sendMessage({
+      action: "start_multiple_passwords_request_flow"
+    });
+  }
   else if (e.target.id === "fetch_all_credentials") {
     chrome.runtime.sendMessage({
       action: "start_all_passwords_request_flow"

@@ -44,6 +44,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       return true;  
     }
     
+    case "start_multiple_passwords_request_flow": {
+      openPasswordRequestDialog("fetch_multiple_credentials");
+
+      return true;  
+    }    
+
     case "start_all_passwords_request_flow": {
       openPasswordRequestDialog("fetch_all_credentials");
 
