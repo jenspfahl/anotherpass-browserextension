@@ -5,71 +5,119 @@ const variables = new Map();
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action + ", sender: " + sender.url);
 
-  if (message.action == "get_tab_id") {
-    sendResponse({tabId: sender.tab.id});
-  }
-  else if (message.action == "get") {
-    sendResponse({result: variables.get(message.key)});
-    return true; 
-  } 
-  else if (message.action == "set") {
-    variables.set(message.key, message.value);
-    sendResponse({result: message.value});
-    return true; 
-  }
-  else if (message.action == "delete") {
-    sendResponse({result: variables.delete(message.key)});
-    return true; 
-  }
-  else if (message.action === "start_password_request_flow") {
-    openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url);
-    return true; 
-  }
-  if (message.action === "start_single_password_request_flow") {
-    openPasswordRequestDialog("fetch_single_credential", undefined, null);
-    return true; 
-  }
-  if (message.action === "start_all_passwords_request_flow") {
-    openPasswordRequestDialog("fetch_all_credentials", undefined, null);
-    return true; 
-  }
-  if (message.action === "start_client_key_request_flow") {
-    openPasswordRequestDialog("get_client_key", message.tabId); 
-    return true; 
-  }
-  else if (message.action === "request_credential") {
-    fetchCredential(message.requestIdentifier, sendResponse, message.website, message.uid, message.command);
-    return true;
-  }
-  else if (message.action === "list_local_credentials") {
-    listLocalCredentials(message.url, sendResponse);
-    return true;
-  }
-  else if (message.action === "forward_credential") {
-    forwardCredential(message.tabId, message.uid);
-    return true;
-  }
-  else if (message.action === "close_credential_dialog") {
-    chrome.tabs.sendMessage(message.tabId, { action: "close_credential_dialog" });
-    return true;
-  }
-  else if (message.action === "refresh_credential_dialog") {
-    chrome.tabs.sendMessage(message.tabId, { action: "refresh_credential_dialog" });
-    return true;
-  }
-  else if (message.action === "start_link_flow") {
-    openLinkWithQrCodeDialog(message.relink);
-    return true; 
-  }
-  else if (message.action === "start_unlink_flow") {
-    unlinkApp().then(async _ => {
-      sendResponse();
-    });
-    return true; 
-  }
-  else if (message.action === "link_to_app") {
-    linkToApp(sendResponse);
-    return true; 
+  switch (message.action) {
+
+    case "get_tab_id": {
+      sendResponse({tabId: sender.tab.id});
+
+      return true;
+   }
+   
+    case "get": {
+      sendResponse({result: variables.get(message.key)});
+
+      return true;  
+    }
+    
+    case "set": {
+      variables.set(message.key, message.value);
+      sendResponse({result: message.value});
+
+      return true;  
+    }
+    
+    case "delete": {
+      sendResponse({result: variables.delete(message.key)});
+
+      return true;  
+    }
+    
+    case "start_password_request_flow": {
+      openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url);
+
+      return true;  
+    }
+    
+    case "start_single_password_request_flow": {
+      openPasswordRequestDialog("fetch_single_credential");
+
+      return true;  
+    }
+    
+    case "start_all_passwords_request_flow": {
+      openPasswordRequestDialog("fetch_all_credentials");
+
+      return true;  
+    }
+    
+    case "start_sync_password_request_flow": {
+      openPasswordRequestDialog("fetch_credential_for_uid", undefined, undefined, message.uid);
+
+      return true;  
+    }
+        
+    case "start_sync_passwords_request_flow": {
+      openPasswordRequestDialog("fetch_credentials_for_uids");
+
+      return true;  
+    }
+    
+    case "start_client_key_request_flow": {
+      openPasswordRequestDialog("get_client_key", message.tabId); 
+
+      return true;  
+    }
+    
+    case "request_credential": {
+      fetchCredential(message, sendResponse);
+
+      return true;  
+    }
+    
+    case "list_local_credentials": {
+      listLocalCredentials(message.url, sendResponse);
+
+      return true;  
+    }
+    
+    case "forward_credential": {
+      forwardCredential(message.tabId, message.uid);
+
+      return true;  
+    }
+    
+    case "close_credential_dialog": {
+      chrome.tabs.sendMessage(message.tabId, { action: "close_credential_dialog" });
+
+      return true;  
+    }
+    
+    case "refresh_credential_dialog": {
+      chrome.tabs.sendMessage(message.tabId, { action: "refresh_credential_dialog" });
+
+      return true;  
+    }
+    
+    case "start_link_flow": {
+      openLinkWithQrCodeDialog(message.relink);
+
+      return true;  
+    }
+    
+    case "start_unlink_flow": {
+      unlinkApp().then(async _ => {
+        sendResponse();
+      });
+
+      return true;  
+    }
+    
+    case "link_to_app": {
+      linkToApp(sendResponse);
+
+      return true;  
+    }
+    
   }
 
   return false; 
@@ -137,14 +185,15 @@ function findLocalByUid(prefix, uid) {
   }
 }
 
-function fetchCredential(requestIdentifier, sendResponse, website, uid, command) {
+function fetchCredential(message, sendResponse) {
 
   const request = {
     action: "request_credential",
-    command: command,
-    website: website === null ? undefined : website,
-    uid: uid === null ? undefined : uid,
-    requestIdentifier: requestIdentifier,
+    command: message.command,
+    requestIdentifier: message.requestIdentifier,
+    website: message.website === null ? undefined : message.website,
+    uid: message.uid === null ? undefined : message.uid,
+    uids: message.uids,
   };
   
   remoteCall(request, sendResponse, variables);
@@ -152,6 +201,7 @@ function fetchCredential(requestIdentifier, sendResponse, website, uid, command)
 }
 
 async function listLocalCredentials(url, sendResponse) {
+
   const clientKey = await getClientKey(variables);
 
   if (clientKey) {
@@ -159,12 +209,15 @@ async function listLocalCredentials(url, sendResponse) {
     const allCredentialNames = [];
     const suggestedCredentialNames = [];
 
-    const index = await createIndex(url);
-    const preferedUid = localStorage.getItem(PREFIX_UID + index);
-    const preferedHostname = new URL(url).hostname.toLowerCase();
-    console.debug("found prefered for " + url + " (hostname=" + preferedHostname + "): " + preferedUid);
+    let preferedUid, preferedHostname;
+    if (url) {
+      const index = await createIndex(url);
+      preferedUid = localStorage.getItem(PREFIX_UID + index);
+      preferedHostname = new URL(url).hostname.toLowerCase();
+      console.debug("found prefered for " + url + " (hostname=" + preferedHostname + "): " + preferedUid);
+    }
 
-
+    console.debug("read local credentials", url);
     for (var i = 0; i < localStorage.length; i++){
       const key = localStorage.key(i);
       const value = localStorage.getItem(key);
@@ -178,10 +231,11 @@ async function listLocalCredentials(url, sendResponse) {
           (credential.website.toLowerCase().includes(url) || url.includes(credential.website.toLowerCase()))) {
             suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
         }
-        else if (credential.uid === preferedUid) {
+        else if (preferedUid && credential.uid === preferedUid) {
           suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
         }
-        else if (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase())) {
+        else if (preferedUid 
+          && (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase()))) {
           suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
 
         }
@@ -196,6 +250,9 @@ async function listLocalCredentials(url, sendResponse) {
   
 
     sendResponse({matches: suggestedCredentialNames, credentials: allCredentialNames});
+  }
+  else {
+    console.log("Local vault locked for this operation!");
   }
 }
 
@@ -237,7 +294,7 @@ async function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog(command, tabId, messageUrl) {
+function openPasswordRequestDialog(command, tabId, messageUrl, credentialUid) {
   var width = 660;
   var height = 540;
   if (messageUrl) {
@@ -248,7 +305,8 @@ function openPasswordRequestDialog(command, tabId, messageUrl) {
   const requestData = JSON.stringify({ 
     command: command,
     tabId: tabId,
-    messageUrl: messageUrl 
+    messageUrl: messageUrl, 
+    credentialUid: credentialUid,
   });
   const createData = {
     type: "detached_panel",

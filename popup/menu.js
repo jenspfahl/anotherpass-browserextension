@@ -110,6 +110,11 @@ document.addEventListener("click", async (e) => {
       });
     }
   }
+  else if (e.target.id === "sync_credentials") {
+    chrome.runtime.sendMessage({
+      action: "start_sync_passwords_request_flow"
+    });
+  }
   else if (e.target.id === "fetch_credential") {
     chrome.runtime.sendMessage({
       action: "start_single_password_request_flow"
@@ -151,11 +156,13 @@ function updateVaultUi(unlocked) {
   if (unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
     document.getElementById("lock").title = "Lock local vault";
+    document.getElementById("sync_credentials").classList.remove("d-none");
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
     document.getElementById("lock").title = "Unlock local vault";
     document.getElementById("vaultStatus").innerText = "- local vault locked -";
+    document.getElementById("sync_credentials").classList.add("d-none");
   }
 }
 

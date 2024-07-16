@@ -47,9 +47,13 @@ else {
   else if (requestData.command === "fetch_all_credentials") {
     document.getElementById("instruction").innerText = "Requesting to fetch ALL credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
   }
+  else if (requestData.command === "fetch_credentials_for_uids") {
+    document.getElementById("instruction").innerText = "Requesting to synchronize local vault.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+  }
 
   
   const targetUrl = requestData.messageUrl;
+  let targetUid = requestData.credentialUid;
 
   if (!targetUrl) {
     document.getElementById("websiteDetails").classList.add("d-none");
@@ -82,7 +86,6 @@ else {
       const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
       const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
-      let targetUid;
       if (requestData.command === "fetch_credential_for_url") {
         const index = await createIndex(targetUrl);
 
@@ -101,15 +104,45 @@ else {
         }
       }
 
+      let targetUids;
+      if (requestData.command === "fetch_credentials_for_uids") {
+        console.debug("Lookup local vault");
+
+        const response = await chrome.runtime.sendMessage({
+          action: "list_local_credentials",
+        });
+      
+        console.debug("found local credentials", response);
+      
+        const credentials = response.credentials;
+        targetUids = credentials.map((credential) => credential.uid);
+        console.debug("Sync for uids:", targetUids);
+      }
+
       poll(async function (progress) {
         document.getElementById("waiting_time").value = progress;
-        const request = {
-          action: "request_credential",
-          command: requestData.command,
-          requestIdentifier: sessionKeyBase64,
-          website: targetUrl,
-          uid: targetUid,
-        };
+
+        let request;
+        if (requestData.command === "fetch_credentials_for_uids") {
+          
+          request = {
+            action: "request_credential",
+            command: requestData.command,
+            requestIdentifier: sessionKeyBase64,
+            uids: targetUids,
+          };
+        }
+        else {
+          request = {
+            action: "request_credential",
+            command: requestData.command,
+            requestIdentifier: sessionKeyBase64,
+            website: targetUrl,
+            uid: targetUid,
+            uids: targetUids
+          };
+        }
+        
         const response = await chrome.runtime.sendMessage(request);
         console.debug("response = " + JSON.stringify(response));
         if (response.status == 403) {
@@ -184,6 +217,31 @@ else {
             const count = await saveAllCredentials(credentials, clientKey);
             //TODO close automatically if autoclose is enabled
             bsAlert("Success!", count + " credentials imported.").then(_ => {
+              window.close();
+            });
+          }
+          else if (requestData.command === "fetch_single_credential") {
+            const credential = response.credential;
+
+            presentCredential(credential, clientKeyBase64);
+          }
+          else if (requestData.command === "fetch_credential_for_uid") {
+            const credential = response.credential;
+            const clientKey = await unlockVault(clientKeyBase64);
+
+            saveCredential(credential, clientKey);
+            //TODO close automatically if autoclose is enabled
+            bsAlert("Success!", "Credential synchronised.").then(_ => {
+              window.close();
+            });
+          } 
+          else if (requestData.command === "fetch_credentials_for_uids") {
+            const credentials = response.credentials;
+            const clientKey = await unlockVault(clientKeyBase64);
+
+            const count = await saveAllCredentials(credentials, clientKey);
+            //TODO close automatically if autoclose is enabled
+            bsAlert("Success!", count + " credentials synchronised.").then(_ => {
               window.close();
             });
           }
