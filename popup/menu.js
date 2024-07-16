@@ -105,18 +105,18 @@ document.addEventListener("click", async (e) => {
     }
     else {
       //request clientKey from app
-      const sending = chrome.runtime.sendMessage({
+      chrome.runtime.sendMessage({
         action: "start_client_key_request_flow"
       });
     }
   }
   else if (e.target.id === "fetch_credential") {
-    const sending = chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       action: "start_single_password_request_flow"
     });
   }
   else if (e.target.id === "fetch_all_credentials") {
-    const sending = chrome.runtime.sendMessage({
+    chrome.runtime.sendMessage({
       action: "start_all_passwords_request_flow"
     });
   }
@@ -322,7 +322,10 @@ function updateMenuUi(webClientId, linked) {
           );
         }
         if (e.target.id === "syncWithApp_" + uuid) {
-          //TODO trigger new feth
+          chrome.runtime.sendMessage({
+            action: "start_sync_password_request_flow",
+            uid: uuid
+          });
         }
         if (e.target.id === "delete_" + uuid) {
           bsConfirm(

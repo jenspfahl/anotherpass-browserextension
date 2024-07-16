@@ -127,7 +127,7 @@ async function linkApp(relink, webClientId) {
         await setKey("temp_client_keypair", clientKeyPair); // we cannot set this as TemporaryKey due to privileged access to CryptoKeys
         
         // remote call to the app
-        const sending = chrome.runtime.sendMessage({
+        chrome.runtime.sendMessage({
           action: "link_to_app",
         }).then(async response => {
 

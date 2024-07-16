@@ -106,7 +106,7 @@ Each communication is secured by two layers of encryption:
             *  response (app to extension): **Response Transport Key** --> `TKrs = SHA256(BK + OTKrs + TKrq)`
 
 1. RSA encryption of the **One-Time Keys** (`OTKn`)
-    * since the `BK` is shared and known by each side, only the `OTK` must be send to the peer
+    * since the `BK` is shared and known by each side, only the `OTK` must be sent to the peer
         * `OTKrq` is encrypted with the **Public Key of the app** (`PKapp`)
         * `OTKrs` is encrypted with the **Public Key of the extension** (`PKext`)
 
