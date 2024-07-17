@@ -11,6 +11,13 @@ const linked = localStorage.getItem("linked");
     return;
   }
 
+  document.onkeydown = function(evt) {
+    console.debug("key", evt);
+    evt = evt || window.event;
+    if (evt.key === "Escape") {
+      chrome.runtime.sendMessage({ action: "close_credential_dialog", tabId: requestData.tabId });
+    }
+  };
 
   const url = requestData.url.toLowerCase();
 

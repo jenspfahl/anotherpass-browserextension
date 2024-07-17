@@ -73,6 +73,7 @@ getTemporaryKey("linked").then((linked) => {
         } 
       }
     });
+  
 
     function pasteCredential(p, sendResponse) {
       console.debug("received password to paste: '" + p + "'");
@@ -148,13 +149,14 @@ const showCredentialModal = (x, y, url) => {
   modal.innerHTML = `
   <iframe id="popup-content"; style="height:100%; width: 100%"></iframe>
   <div style="position:absolute; top:5px; right:5px;">
-    <button style="padding: 8px 12px; font-size: 14px; border: none; border-radius: 15px;">
-     x
+    <button style="padding: 8px 12px; font-size: 14px; border: none; border-radius: 10px; background-color: #444; color: white">
+     X
     </button>
   </div>`; 
   document.body.appendChild(modal); 
   const dialog = document.querySelector("dialog"); 
   _dialog = dialog;
+
 
   dialog.showModal(); 
   const iframe = document.getElementById("popup-content"); 
