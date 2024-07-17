@@ -22,7 +22,10 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
-    const copyButton = document.getElementById("copy").innerText = "Copied!";
+    document.getElementById("copy").innerText = "Copied!";
+  }
+  else if (e.target.id === "password_field") {
+    document.getElementById("password_field").innerText = _credential.password;
   }
 });
 
@@ -335,7 +338,7 @@ else {
               </div>
               <div class="col col-sm-auto">
                 <div class="mb-1">
-                  <b class="fingerprint_small">${credential.password}</b>
+                  <b id="password_field" class="fingerprint_small cursor-pointer">**************</b>
                 </div>
               </div>
               <div class="col">

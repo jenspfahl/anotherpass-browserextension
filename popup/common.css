@@ -85,3 +85,7 @@
   height: 600px;
 }
 
+
+.cursor-pointer {
+  cursor: pointer;
+}

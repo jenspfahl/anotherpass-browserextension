@@ -119,7 +119,7 @@ function renderCredential(credential, list) {
   li.innerHTML = `
       <div class="nav-link my-1 mr-3">
         <button id="credential_button_${uuid}" class="btn">
-        ${credential.name}
+        ${credential.name.substring(0, 25)}
         </button>
       </div>
     `;

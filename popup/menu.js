@@ -239,7 +239,7 @@ function updateMenuUi(webClientId, linked) {
       li.innerHTML = `
         <div class="nav-link my-1 mr-3">
           <button id="credential_dropdown_${uuid}" class="btn">
-          ${credential.name}
+          ${credential.name.substring(0, 35)}
           </button>
           <div class="btn-group float-end">
             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -260,7 +260,10 @@ function updateMenuUi(webClientId, linked) {
       document.addEventListener("click", async (e) => {
         if (e.target.id === "copy_" + uuid) {
           navigator.clipboard.writeText(credential.password);
-          const copyButton = document.getElementById("copy_" + uuid).innerText = "Copied!";
+          document.getElementById("copy_" + uuid).innerText = "Copied!";
+        }
+        if (e.target.id === "password_field_" + uuid) {
+          document.getElementById("password_field_" + uuid).innerText = credential.password;
         }
         if (e.target.id === "credential_dropdown_" + uuid) {
           bsAlert(
@@ -309,7 +312,7 @@ function updateMenuUi(webClientId, linked) {
                 </div>
                 <div class="col col-sm-auto">
                   <div class="mb-1">
-                    <b class="fingerprint_small">${credential.password}</b>
+                    <b id="password_field_${uuid}" class="fingerprint_small cursor-pointer">**************</b>
                   </div>
                 </div>
                 <div class="col">
