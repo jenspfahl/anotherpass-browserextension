@@ -1,3 +1,27 @@
+function updateExtensionIcon(unlocked) {
+  if (unlocked) {
+    chrome.action.setIcon({
+      path: {
+        24: "/icons/anotherpass-open-24.png",
+        32: "/icons/anotherpass-open-32.png",
+        48: "/icons/anotherpass-open-48.png",
+        96: "/icons/anotherpass-open-96.png"
+      },
+    });
+    chrome.action.setTitle({ title: "ANOTHERpass (Vault unlocked)" });
+  }
+  else {
+    chrome.action.setIcon({
+      path: {
+        24: "/icons/anotherpass-24.png",
+        32: "/icons/anotherpass-32.png",
+        48: "/icons/anotherpass-48.png",
+        96: "/icons/anotherpass-96.png"
+      },
+    });
+    chrome.action.setTitle({ title: "ANOTHERpass (Vault locked)" });
+  }
+}
 
 async function bsAlert(title, message, closeLabel) {
     const modalElem = document.createElement('div')

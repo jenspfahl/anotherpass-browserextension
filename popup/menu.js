@@ -1,3 +1,4 @@
+
 const webClientId = localStorage.getItem("web_client_id");
 const linked = localStorage.getItem("linked");
 
@@ -117,6 +118,7 @@ document.addEventListener("click", async (e) => {
       deleteTemporaryKey("clientKey");
       updateVaultUi();
       document.getElementById("credential_list").remove();
+      updateExtensionIcon();
     }
     else {
       //request clientKey from app
@@ -212,6 +214,7 @@ function updateVaultUi(unlocked) {
     document.getElementById("delete_all_credentials_divider").classList.add("d-none");
     document.getElementById("delete_all_credentials").classList.add("d-none");
   }
+  updateExtensionIcon(unlocked)
 }
 
 function updateMenuUi(webClientId, linked) {

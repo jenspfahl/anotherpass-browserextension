@@ -40,6 +40,9 @@ const linked = localStorage.getItem("linked");
         // lock local vault
         deleteTemporaryKey("clientKey");
         updateVaultUi();
+        await chrome.runtime.sendMessage({
+          action: "update_extension_icon"
+        });
       }
       else {
         //request clientKey from app

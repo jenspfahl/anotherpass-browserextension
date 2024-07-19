@@ -32,6 +32,15 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       return true;  
     }
     
+    case "update_extension_icon": {
+      isLocalVaultUnlocked(variables).then(isUnlocked => {
+        console.log("update_extension_icon", isUnlocked);
+        updateExtensionIcon(isUnlocked);
+      });
+
+      return true;  
+    }
+
     case "start_password_request_flow": {
       openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url);
 
@@ -352,4 +361,31 @@ async function unlinkApp() {
   await destroyAllKeys(); 
   console.log("do unlink done");
 
+}
+
+
+// duplicate of ui.js 
+function updateExtensionIcon(unlocked) {
+  if (unlocked) {
+    chrome.action.setIcon({
+      path: {
+        24: "/icons/anotherpass-open-24.png",
+        32: "/icons/anotherpass-open-32.png",
+        48: "/icons/anotherpass-open-48.png",
+        96: "/icons/anotherpass-open-96.png"
+      },
+    });
+    chrome.action.setTitle({ title: "ANOTHERpass (Vault unlocked)" });
+  }
+  else {
+    chrome.action.setIcon({
+      path: {
+        24: "/icons/anotherpass-24.png",
+        32: "/icons/anotherpass-32.png",
+        48: "/icons/anotherpass-48.png",
+        96: "/icons/anotherpass-96.png"
+      },
+    });
+    chrome.action.setTitle({ title: "ANOTHERpass (Vault locked)" });
+  }
 }

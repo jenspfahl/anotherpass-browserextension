@@ -1,12 +1,12 @@
 {
   "manifest_version": 3,
-  "name": "ANOTHERpass Web",
-  "version": "0.1",
-  "description": "Use ANOTHpass in the browser",
+  "name": "ANOTHERpass Browser Extension",
+  "version": "0.9",
+  "description": "Use ANOTHERpass in the browser",
   "homepage_url": "https://anotherpass.jepfa.de",
   "icons": {
     "24": "icons/anotherpass-24.png",
-    "36": "icons/anotherpass-36.png",
+    "32": "icons/anotherpass-32.png",
     "48": "icons/anotherpass-48.png",
     "96": "icons/anotherpass-96.png"
   },

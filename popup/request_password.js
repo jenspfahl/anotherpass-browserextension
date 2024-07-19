@@ -286,6 +286,8 @@ else {
           timestamp: Date.now(),
         });
 
+        updateExtensionIcon(true);
+
         return clientKey;
       }
 
@@ -360,7 +362,7 @@ else {
             const clientKey = await unlockVault(clientKeyBase64);
             await saveCredential(credential, clientKey);
 
-            //TODO chrome.action.setIcon({ path: "/icons/lock_open_24.png" })
+          
 
             window.close();
           }
