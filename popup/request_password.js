@@ -221,6 +221,7 @@ else {
 
             const clientKey = await unlockVault(clientKeyBase64);
             const count = await saveAllCredentials(credentials, clientKey);
+
             //TODO close automatically if autoclose is enabled
             bsAlert("Success!", count + " credentials imported.").then(_ => {
               window.close();
@@ -358,6 +359,8 @@ else {
           if (decision === true) {
             const clientKey = await unlockVault(clientKeyBase64);
             await saveCredential(credential, clientKey);
+
+            //TODO chrome.action.setIcon({ path: "/icons/lock_open_24.png" })
 
             window.close();
           }

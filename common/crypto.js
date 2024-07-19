@@ -436,16 +436,28 @@ async function getClientKey(variables) {
   const timestamp = clientKeyData.timestamp;
   const now = Date.now();
   const age = now - timestamp;
-  console.debug("client key age", age);
-  if (age > 1000 * 60 * 600) { // accept age less than one minute, TODO later less than 1 hour/configurable
+
+  const lockTimeout = localStorage.getItem("lock_timeout") || 60;
+  const threshold = 1000 * 60 * lockTimeout;
+  console.debug("client key age " + age + "ms, lock timeout (ms): " + threshold);
+  if (age > threshold) { 
     console.log("ClientKey too old, logging out");
-    deleteTemporaryKey("clientKey"); 
+    deleteTemporaryKey("clientKey", variables); 
     return;
   }
 
   const clientKeyBase64 = clientKeyData.clientKey;
-  const clientKeyArray = await base64ToBytes(clientKeyBase64);
+  const clientKeyArray = base64ToBytes(clientKeyBase64);
   const clientKey = await arrayToAesKey(clientKeyArray);
+
+  // update access timestamp
+  await setTemporaryKey("clientKey", 
+  {
+    clientKey: clientKeyBase64,
+    timestamp: Date.now()
+  },
+  variables);
+
   return clientKey;
 }
 

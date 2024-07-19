@@ -81,13 +81,15 @@
                 <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split rounded-0 mt-2 mb-3 pt-2 px-2" data-bs-toggle="dropdown" aria-expanded="false">
                 </button>
                 <ul class="dropdown-menu">
-                  <button id="fetch_multiple_credentials" class="btn dropdown-item">Fetch multiple credentials</button>
-                  <button id="fetch_all_credentials" class="btn dropdown-item">Fetch all credentials</button>
+                  <button id="fetch_multiple_credentials" class="btn dropdown-item" title="Fetch a selection of credentials from the app">Fetch multiple credentials</button>
+                  <button id="fetch_all_credentials" class="btn dropdown-item" title="Fetch all credential from the app, except vailed">Fetch all credentials</button>
+                  <li id="delete_all_credentials_divider" ><hr class="dropdown-divider"></li>
+                  <button id="delete_all_credentials" class="btn dropdown-item" title="Delete all local credentials from the local vault">Delete all credentials</button>
               </div>
               
 
               <br>
-              <h7 id="vaultStatus">- local vault locked -</h7>
+              <h7 id="vaultStatus"></h7>
               <div class="container">
                 <!-- Here the saved credentials-->
 
@@ -134,6 +136,16 @@
             </div>
 
 
+            <hr>
+
+
+            <div class="mb-3">
+              <label for="server-settings-lock-timeout" class="form-label">Minutes after an unlocked local vault becomes locked</label>            
+              <input id="server-settings-lock-timeout" class="form-control" type="number" min="1" max="10080" placeholder="Lock timeout" aria-label="Lock timeout in minutes">
+            </div>
+
+          
+            <hr>
 
             <div class="mb-3">
               <label for="server-settings-host" class="form-label">ANOTHERpass is reachable with this hostname:</label>            

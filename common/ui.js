@@ -142,8 +142,12 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
 
     btnToActive.classList.add('active')
     btnToActive.setAttribute('aria-pressed', 'true')
-    const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`
+
+    const themeSwitcherLabel = capitalizeFirstLetter(btnToActive.dataset.bsThemeValue);
+
     themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
+
+    themeSwitcherText.textContent = themeSwitcherLabel;
 
     if (focus) {
       themeSwitcher.focus()
@@ -172,3 +176,7 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
   })
 })()
 
+
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}

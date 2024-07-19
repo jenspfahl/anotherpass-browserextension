@@ -1,8 +1,10 @@
-
 const webClientId = localStorage.getItem("web_client_id");
 const linked = localStorage.getItem("linked");
 
 const linkedVaultId = localStorage.getItem("linked_vault_id");
+
+const lockTimeout = localStorage.getItem("lock_timeout") || 60;
+
 const ip = localStorage.getItem("server_address");
 const port = localStorage.getItem("server_port");
 
@@ -10,6 +12,9 @@ const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
 const pollingInterval = localStorage.getItem("polling_interval") || 2;
 
 document.getElementById("linked_vault_id").innerText = linkedVaultId;
+
+document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+
 
 document.getElementById("server-settings-host").value = ip;
 document.getElementById("server-settings-port").value = port;
@@ -20,6 +25,8 @@ document.getElementById("server-settings-polling-interval").value = pollingInter
 document.addEventListener("click", async (e) => {
 
   if (e.target.id === "btn-save-settings") {
+
+    const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
 
     const ip = document.getElementById("server-settings-host").value;
     const port = parseInt(document.getElementById("server-settings-port").value);
@@ -40,11 +47,16 @@ document.addEventListener("click", async (e) => {
     else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
       bsAlert("Error", "Invalid polling interval, should be a number between 1 and 60.");
     }
+    else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
+      bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
+    }
     else {
       localStorage.setItem("server_address", ip);
       localStorage.setItem("server_port", port);
       localStorage.setItem("polling_timeout", pollingTimeout);
       localStorage.setItem("polling_interval", pollingInterval);
+      localStorage.setItem("lock_timeout", lockTimeout);
+
 
       bsAlert("Success", "Settings sucessfully updated.");
     }
@@ -57,6 +69,9 @@ document.addEventListener("click", async (e) => {
 
     document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
     document.getElementById("server-settings-polling-interval").value = pollingInterval;
+
+    document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+
   }
 
   if (e.target.id === "link") {
@@ -130,6 +145,28 @@ document.addEventListener("click", async (e) => {
       action: "start_all_passwords_request_flow"
     });
   }
+  else if (e.target.id === "delete_all_credentials") {
+    bsConfirm("Delete all local credentials", 
+    "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
+    .then(async (decision) => {
+      if (decision === true) {
+        console.log("clearing local vault");
+      
+        for (var i = 0; i < localStorage.length; i++){
+          const key = localStorage.key(i);
+    
+          if (key.startsWith(PREFIX_CREDENTIAL)) {
+            localStorage.removeItem(key);
+          }
+        }
+        
+        document.getElementById("credential_list").innerHTML = "";
+        updateCredentialCountUi(0);
+        bsAlert("Success", "Local vault cleared.");
+      }
+    });
+    
+  }
   else if (e.target.id === "details") {
 
     const clientKeyPair = await getKey("client_keypair");
@@ -162,12 +199,18 @@ function updateVaultUi(unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
     document.getElementById("lock").title = "Lock local vault";
     document.getElementById("sync_credentials").classList.remove("d-none");
+    document.getElementById("credential_list").classList.remove("d-none");
+    document.getElementById("delete_all_credentials_divider").classList.remove("d-none");
+    document.getElementById("delete_all_credentials").classList.remove("d-none");
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
     document.getElementById("lock").title = "Unlock local vault";
     document.getElementById("vaultStatus").innerText = "- local vault locked -";
     document.getElementById("sync_credentials").classList.add("d-none");
+    document.getElementById("credential_list").classList.add("d-none");
+    document.getElementById("delete_all_credentials_divider").classList.add("d-none");
+    document.getElementById("delete_all_credentials").classList.add("d-none");
   }
 }
 
@@ -245,11 +288,11 @@ function updateMenuUi(webClientId, linked) {
             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
             <ul class="dropdown-menu">
-              <button id="showDetails_${uuid}" class="btn dropdown-item">Show details</button>
-              <button id="syncWithApp_${uuid}" class="btn dropdown-item">Sync with app</button>
+              <button id="showDetails_${uuid}" class="btn dropdown-item" title="Show details of the credential">Show details</button>
+              <button id="syncWithApp_${uuid}" class="btn dropdown-item" title="Synchronise this credential with the app">Sync with app</button>
    
               <li><hr class="dropdown-divider"></li>
-              <button id="delete_${uuid}" class="btn dropdown-item">Delete</button>
+              <button id="delete_${uuid}" class="btn dropdown-item" title="Delete this credential from the local vault">Delete</button>
 
             </ul>
           </div>
