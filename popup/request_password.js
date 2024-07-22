@@ -299,58 +299,52 @@ else {
           "Credential '" + credential.name + "'", 
           `
           <div class="container text-left">
-            <div class="row">
-              <div class="col">
-                <div class="mb-3">
-                  Website:
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    Website:
+                  </div>
                 </div>
-              </div>
-              <div class="col col-sm-auto">
-                <div class="mb-1">
-                  <a target="_blank" href="${credential.website}">${credential.website}</a>
+                <div class="col-8">
+                  <div class="mb-1">
+                    <a target="_blank" href="${credential.website}">${credential.website}</a>
+                  </div>
                 </div>
+              
+                
               </div>
-              <div class="col">  
+            
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    User:
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="mb-1">
+                    <b>${credential.user}</b>
+                  </div>
+                </div>
+               
               </div>
-            </div>
-          </div>
+           
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    Password:
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="mb-1">
+                    <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
+                    <button type="button" id="copy" title="Copy password to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+                  </div>
+                </div>
+              
+              </div>
 
-          <div class="container text-left">
-            <div class="row">
-              <div class="col">
-                <div class="mb-3">
-                  User:
-                </div>
-              </div>
-              <div class="col col-sm-auto">
-                <div class="mb-1">
-                  <b>${credential.user}</b>
-                </div>
-              </div>
-              <div class="col">  
-              </div>
-            </div>
-          </div>
 
-          <div class="container text-left">
-            <div class="row">
-              <div class="col">
-                <div class="mb-3">
-                  Password:
-                </div>
-              </div>
-              <div class="col col-sm-auto">
-                <div class="mb-1">
-                  <b id="password_field" class="fingerprint_small cursor-pointer">**************</b>
-                </div>
-              </div>
-              <div class="col">
-                <div class="mb-3">
-                  <button type="button" id="copy" title="Copy to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
-                </div>
-              </div>
             </div>
-          </div>
 
           `,
           "Import and Close",
