@@ -89,11 +89,24 @@
               
 
               <br>
+
+
+              <div id="search_group" class="input-group mt-1 mb-1">
+                <input id="search_input" type="text" class="form-control rounded-0" placeholder="Search credentials" title="Search credentials in local vault" aria-label="Search" aria-describedby="search">
+                <div class="input-group-append">
+                  <button class="btn" type="button" id="clear_search">
+                    <span id="clear_search_icon" class="material-symbols-outlined size-24">
+                      clear
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <h7 id="vaultStatus"></h7>
-              <div class="container">
+              <div>
                 <!-- Here the saved credentials-->
 
-                <div id="credential_list" class="justify-content-center flex-column shadow mh-50 mv-4 scrollable-250 pre-scrollable-250">
+                <div id="credential_list" class="justify-content-center flex-column shadow scrollable-200 pre-scrollable-200">
                 </div>
 
               </div>
@@ -140,7 +153,7 @@
 
 
             <div class="mb-3">
-              <label for="server-settings-lock-timeout" class="form-label">Minutes after an unlocked local vault becomes locked</label>            
+              <label for="server-settings-lock-timeout" class="form-label">Minutes after the unlocked local vault becomes locked:</label>            
               <input id="server-settings-lock-timeout" class="form-control" type="number" min="1" max="10080" placeholder="Lock timeout" aria-label="Lock timeout in minutes">
             </div>
 

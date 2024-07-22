@@ -3,10 +3,16 @@
   --bg-color: #f6f3f2;;
 }
 
+.scrollable-200 {
+  min-height: 200px;
+  overflow-x: scroll;
+}
+
 .scrollable-250 {
   min-height: 250px;
   overflow-x: scroll;
 }
+
 
 .pre-scrollable-100 {
   max-height: 100px;

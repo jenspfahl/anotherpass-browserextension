@@ -3,6 +3,8 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
 const webClientId = localStorage.getItem("web_client_id");
 const linked = localStorage.getItem("linked");
 
+const searchInput = document.getElementById("search_input");
+
 
 (async () => {
 
@@ -10,6 +12,9 @@ const linked = localStorage.getItem("linked");
     console.warn("Not linked, cannot continue.");
     return;
   }
+
+  searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
+
 
   document.onkeydown = function(evt) {
     console.debug("key", evt);
@@ -54,6 +59,11 @@ const linked = localStorage.getItem("linked");
         updateVaultUi(isUnlocked);
       }
     }
+    else if (e.target.id === "clear_search" || e.target.id === "clear_search_icon") {
+      searchInput.value = "";
+      updateCredentialList("");
+      searchInput.focus();
+    }
 
   });
 
@@ -82,13 +92,15 @@ async function loadCredentials(url, list) {
   console.debug("credentials", credentials);
   console.debug("matches", matches);
 
-  renderSection("Suggested", list);
+  if (matches.length > 0) {
+    renderSection("Suggested", list);
 
-  matches.forEach(credential => {
-    renderCredential(credential, list);
-  });
+    matches.forEach(credential => {
+      renderCredential(credential, list);
+    });
 
-  renderLine(list);
+    renderLine(list);
+  }
 
   renderSection("All", list);
 
@@ -102,6 +114,10 @@ function updateVaultUi(unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
     document.getElementById("lock").title = "Lock local vault";
     document.getElementById("hint").classList.add("d-none");
+    document.getElementById("search_group").classList.remove("d-none");
+
+    searchInput.focus();
+
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
@@ -110,6 +126,8 @@ function updateVaultUi(unlocked) {
     document.getElementById("hint").innerText = "Local vault is locked, unlock first or fetch credential from the app.";
     const list = document.getElementById("credential_list");
     list.innerHTML = "";
+    document.getElementById("search_group").classList.add("d-none");
+
   }
 }
 
@@ -118,6 +136,13 @@ function renderCredential(credential, list) {
   let uuid = credential.uid;
 
   const li = document.createElement("li");
+
+  let searchable = credential.name.trim().toLowerCase();
+  if (credential.website) {
+    searchable = searchable + " " + credential.website.trim().toLowerCase();
+  }
+  li.setAttribute("searchable", searchable);
+
   li.classList.add("no-bullets");
   li.innerHTML = `
       <div class="nav-link my-1 mr-3">
@@ -158,6 +183,27 @@ function renderLine(list) {
   list.appendChild(li);
   
 }
+
+function updateCredentialList(searchFor) {
+
+  const searchString = searchFor.toLowerCase().trim();
+
+  const list = document.getElementById("credential_list");
+  const children = list.children;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    const searchable = child.getAttribute("searchable");
+    if (searchable) {
+      if (searchable.includes(searchString)) {
+        child.classList.remove("d-none");
+      }
+      else {
+        child.classList.add("d-none");
+      }
+    }
+  }
+}
+
 
 
 function sendPasteCredentialMessage(tabId, uid) {

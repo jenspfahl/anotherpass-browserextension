@@ -23,6 +23,10 @@ document.getElementById("server-settings-port").value = port;
 document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
 document.getElementById("server-settings-polling-interval").value = pollingInterval;
 
+const searchInput = document.getElementById("search_input");
+
+searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
+
 document.addEventListener("click", async (e) => {
 
   if (e.target.id === "btn-save-settings") {
@@ -190,6 +194,11 @@ document.addEventListener("click", async (e) => {
     </div>
     `);
   }
+  else if (e.target.id === "clear_search" || e.target.id === "clear_search_icon") {
+    searchInput.value = "";
+    updateCredentialList("");
+    searchInput.focus();
+  }
 });
 
 
@@ -204,6 +213,10 @@ function updateVaultUi(unlocked) {
     document.getElementById("credential_list").classList.remove("d-none");
     document.getElementById("delete_all_credentials_divider").classList.remove("d-none");
     document.getElementById("delete_all_credentials").classList.remove("d-none");
+    document.getElementById("search_group").classList.remove("d-none");
+
+    searchInput.focus();
+
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
@@ -213,6 +226,8 @@ function updateVaultUi(unlocked) {
     document.getElementById("credential_list").classList.add("d-none");
     document.getElementById("delete_all_credentials_divider").classList.add("d-none");
     document.getElementById("delete_all_credentials").classList.add("d-none");
+    document.getElementById("search_group").classList.add("d-none");
+
   }
   updateExtensionIcon(unlocked)
 }
@@ -281,6 +296,12 @@ function updateMenuUi(webClientId, linked) {
       let uuid = credential.uid;
 
       const li = document.createElement("li");
+
+      let searchable = credential.name.trim().toLowerCase();
+      if (credential.website) {
+        searchable = searchable + " " + credential.website.trim().toLowerCase();
+      }
+      li.setAttribute("searchable", searchable);
       li.classList.add("no-bullets");
       li.innerHTML = `
         <div class="nav-link my-1 mr-3">
@@ -414,6 +435,27 @@ function updateMenuUi(webClientId, linked) {
 
  
 })()
+
+function updateCredentialList(searchFor) {
+
+  const searchString = searchFor.toLowerCase().trim();
+
+  const list = document.getElementById("credential_list");
+  const children = list.children;
+  let count = 0;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+    const searchable =  child.getAttribute("searchable");
+    if (searchable.includes(searchString)) {
+      child.classList.remove("d-none");
+      count++;
+    }
+    else {
+      child.classList.add("d-none");
+    }
+  }
+  updateCredentialCountUi(count);
+}
 
 
 function updateCredentialCountUi(credentialCount) {
