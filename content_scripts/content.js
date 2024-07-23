@@ -2,7 +2,7 @@
 
 console.debug("app content inject");
 
-let _dialog, _activeInput, _x, _y, _url;
+let _dialog, _activeInput, _x, _y, _url, popupOpen;
 
 getTemporaryKey("linked").then((linked) => {
   console.debug("app linked: " + linked);
@@ -57,16 +57,19 @@ getTemporaryKey("linked").then((linked) => {
       if (msg.action === "paste_credential") {
         pasteCredential(msg.password, sendResponse);
         if (_dialog) {
+          popupOpen = false;
           _dialog.close(); 
         } 
       }
       if (msg.action === "close_credential_dialog") {
         if (_dialog) {
+          popupOpen = false;
           _dialog.close(); 
         } 
       }
       if (msg.action === "refresh_credential_dialog") {
         if (_dialog) {
+          popupOpen = false;
           _dialog.close(); 
           console.debug("Reopen dialog at x:" + _x + ", y:" + _y + " with url:" + _url);
           showCredentialModal(_x, _y, _url);
@@ -98,7 +101,27 @@ getTemporaryKey("linked").then((linked) => {
 function addButton(input) {
   const button = document.createElement('button');
   button.type = "button";
-  button.className = "requestCredentialButton";
+  button.classList.add("requestCredentialButton");
+
+  const inputHeight = input.clientHeight + 2;
+  const inputWidth = input.clientWidth - inputHeight;
+
+  console.debug("inputHeight", inputHeight);
+  console.debug("inputWidth", inputWidth);
+  //button.style.left = inputWidth + "px";
+
+  if (inputHeight <= 24) {
+    button.classList.add("dimension-24");
+  }
+  else if (inputHeight <= 32) {
+    button.classList.add("dimension-32");
+  }
+  else {
+    button.classList.add("dimension-48");
+  }
+  button.style.width = inputHeight + "px";
+  button.style.height = inputHeight + "px";
+  button.style.border = input.border;
 
   const target = input.parentNode;
   const oldButton = target.querySelector(".requestCredentialButton");
@@ -108,31 +131,16 @@ function addButton(input) {
   }
   target.insertBefore(button, input);
 
-  button.addEventListener("click", async function (event) {
-    input.focus();
-    _activeInput = input;//document.activeElement;
 
-    console.log("event", event);
-    const w = window.innerWidth;
-    const h = window.innerHeight; 
-    let x = event.pageX;
-    let y = event.pageY;
-
-
-    if (y > h - 450) {
-      console.log("adjust y:", y);
-
-      y = h - 450;
-      if (y < 0) y = 0;
+  /*input.addEventListener("focus", (e) => {
+    if (!popupOpen) {
+      console.debug("focus", e);
+      openPopup(e.target.offsetLeft, e.target.offsetHeight, input)
     }
-    console.log("x:", x);
-    console.log("y:", y);
+  });*/
 
 
-    console.log("window w:" + w + ", h:" + h);
-    showCredentialModal(x, y , window.location.href);  
-
-  }, false);
+  button.addEventListener("click", (e) => openPopup(e.pageX, e.pageY, input), false);
 }
 
 
@@ -164,6 +172,7 @@ const showCredentialModal = (x, y, url) => {
 
   iframe.frameBorder = 0; 
   dialog.querySelector("button").addEventListener("click", () => { 
+    popupOpen = false;
     dialog.close(); 
   }); 
 
@@ -175,3 +184,31 @@ const showCredentialModal = (x, y, url) => {
 
   
 }
+
+async function openPopup (posX, posY, input) {
+  popupOpen = true;
+  input.focus();
+  _activeInput = input; //document.activeElement;
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  let x = posX;
+  let y = posY;
+
+
+  if (y > h - 450) {
+    console.log("adjust y:", y);
+
+    y = h - 450;
+    if (y < 0)
+      y = 0;
+  }
+  console.log("x:", x);
+  console.log("y:", y);
+
+
+  console.log("window w:" + w + ", h:" + h);
+  showCredentialModal(x, y, window.location.href);
+
+}
+
