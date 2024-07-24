@@ -147,23 +147,31 @@ if (linked) {
   variables.set("linked", linked);
 
 
-  // Callback reads runtime.lastError to prevent an unchecked error from being 
-  // logged when the extension attempt to register the already-registered menu 
-  // again. Menu registrations in event pages persist across extension restarts.
+
   browser.contextMenus.create({
-    id: "anotherpass-request",
+    id: "anotherpass-open-dialog",
+    title: "Open ANOTHERpass dialog",
+    contexts: ["editable"],
+  },
+    () => void browser.runtime.lastError,
+  );
+
+  browser.contextMenus.create({
+    id: "anotherpass-credential-request",
     title: "Request credential from ANOTHERpass",
-    contexts: ["password"], // or "editable"?
+    contexts: ["editable"], 
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
     // for information on the purpose of this error capture.
     () => void browser.runtime.lastError,
   );
 
-
   browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "anotherpass-request") {
+    if (info.menuItemId === "anotherpass-credential-request") {
       openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
+    }
+    else if (info.menuItemId === "anotherpass-open-dialog") {
+      chrome.tabs.sendMessage(tab.id, { action: "open_credential_dialog" });
     }
   });
 }
@@ -228,7 +236,10 @@ async function listLocalCredentials(url, sendResponse) {
     if (url) {
       const index = await createIndex(url);
       preferedUid = localStorage.getItem(PREFIX_UID + index);
-      preferedHostname = new URL(url).hostname.toLowerCase();
+      const splitted = new URL(url).hostname.toLowerCase().split(".");
+      if (splitted.length >= 2) {
+        preferedHostname = splitted[splitted.length - 2] + "." + splitted[splitted.length - 1];
+      }
       console.debug("found prefered for " + url + " (hostname=" + preferedHostname + "): " + preferedUid);
     }
 
@@ -242,17 +253,15 @@ async function listLocalCredentials(url, sendResponse) {
         //console.debug("credential", credential);
         allCredentialNames.push({name: credential.name, uid: credential.uid});
 
-        if (credential.website && url && 
-          (credential.website.toLowerCase().includes(url) || url.includes(credential.website.toLowerCase()))) {
-            suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+        if (credential.website && preferedHostname && credential.website.toLowerCase().includes(preferedHostname)) {
+          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+        }
+        else if (preferedHostname
+          && (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase()))) {
+          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
         }
         else if (preferedUid && credential.uid === preferedUid) {
           suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
-        }
-        else if (preferedUid 
-          && (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase()))) {
-          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
-
         }
       }
     }

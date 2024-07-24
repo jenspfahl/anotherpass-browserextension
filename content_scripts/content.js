@@ -75,6 +75,10 @@ getTemporaryKey("linked").then((linked) => {
           showCredentialModal(_x, _y, _url);
         } 
       }
+      if (msg.action === "open_credential_dialog") {
+        const input = document.activeElement;
+        openPopup(input.offsetLeft, input.offsetHeight, input);
+      }
     });
   
 
