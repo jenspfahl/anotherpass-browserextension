@@ -57,7 +57,7 @@ else {
     document.getElementById("instruction").innerText = "Requesting to synchronize local vault.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
   }
 
-  
+  console.debug("requestData", requestData);
   const targetUrl = requestData.messageUrl;
   let targetUid = requestData.credentialUid;
 
@@ -200,7 +200,7 @@ else {
               await saveCredential(credential, clientKey);
             }
 
-            sendPasteCredentialMessage(credential.password);
+            sendPasteCredentialMessage(credential.password, credential.user);
           }
           else if (requestData.command === "get_client_key") {
             await unlockVault(clientKeyBase64);
@@ -267,10 +267,10 @@ else {
       });
 
 
-      function sendPasteCredentialMessage(p) {
+      function sendPasteCredentialMessage(password, user) {
 
         browser.tabs.query({ active: true, currentWindow: false /* true for active popup, false for request password popup */ }, function (tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: p }, function () {
+          chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: password, user: user }, function () {
             window.close();
           });
         });

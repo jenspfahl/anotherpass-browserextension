@@ -5,6 +5,8 @@ const linked = localStorage.getItem("linked");
 const linkedVaultId = localStorage.getItem("linked_vault_id");
 
 const lockTimeout = localStorage.getItem("lock_timeout") || 60;
+const renderContentIcon = localStorage.getItem("render_content_icon");
+
 
 const ip = localStorage.getItem("server_address");
 const port = localStorage.getItem("server_port");
@@ -15,6 +17,7 @@ const pollingInterval = localStorage.getItem("polling_interval") || 2;
 document.getElementById("linked_vault_id").innerText = linkedVaultId;
 
 document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
 
 
 document.getElementById("server-settings-host").value = ip;
@@ -32,6 +35,8 @@ document.addEventListener("click", async (e) => {
   if (e.target.id === "btn-save-settings") {
 
     const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
+    const renderContentIcon = document.getElementById("render_content_icon").checked;
+
 
     const ip = document.getElementById("server-settings-host").value;
     const port = parseInt(document.getElementById("server-settings-port").value);
@@ -61,7 +66,8 @@ document.addEventListener("click", async (e) => {
       localStorage.setItem("polling_timeout", pollingTimeout);
       localStorage.setItem("polling_interval", pollingInterval);
       localStorage.setItem("lock_timeout", lockTimeout);
-
+      localStorage.setItem("render_content_icon", renderContentIcon);
+      setTemporaryKey("render_content_icon", renderContentIcon);
 
       bsAlert("Success", "Settings sucessfully updated.");
     }
@@ -76,6 +82,8 @@ document.addEventListener("click", async (e) => {
     document.getElementById("server-settings-polling-interval").value = pollingInterval;
 
     document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+    document.getElementById("render_content_icon").checked = true;
+
 
   }
 

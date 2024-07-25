@@ -141,10 +141,17 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 
 const linked = localStorage.getItem("linked");
+
+console.debug("app linked: " + linked);
+
 if (linked) {
 
   // init internal cache to avoid accessing localStorage from content script
   variables.set("linked", linked);
+
+  const renderContentIcon = localStorage.getItem("render_content_icon");
+  variables.set("render_content_icon", renderContentIcon);
+  console.debug("renderContentIcon = " + renderContentIcon);
 
 
 
@@ -168,6 +175,7 @@ if (linked) {
 
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "anotherpass-credential-request") {
+      console.debug("tabUrl", tab.url);
       openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
     }
     else if (info.menuItemId === "anotherpass-open-dialog") {
@@ -188,7 +196,7 @@ async function forwardCredential(tabId, uid) {
 
     if (encCredential) {
       const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
-      chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password });
+      chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user });
     }
     
   }
@@ -362,8 +370,7 @@ async function unlinkApp() {
 
   console.log("do unlink");
 
-  variables.delete("linked");
-
+  variables.clear();
   localStorage.clear();
 
 

@@ -1,7 +1,7 @@
 .requestCredentialButton {
     cursor: pointer;
     position: absolute;
-    z-index: 100000;
+    z-index: 1000000000;
     border: none;
     background-size: 100%;
     background-color: white;

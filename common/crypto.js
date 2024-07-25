@@ -58,7 +58,7 @@ async function hashKeys(key1, key2, key3) {
 
 async function sha256(byteArray) {
 
-  var key = new Uint8Array(byteArray.byteLength);
+  const key = new Uint8Array(byteArray.byteLength);
   key.set(new Uint8Array(byteArray), 0);
 
   const digest = await crypto.subtle.digest("SHA-256", key);
@@ -472,5 +472,15 @@ async function isLocalVaultUnlocked(variables) {
 
 
 async function createIndex(targetUrl) {
-  return bytesToBase64(await sha256(new URL(targetUrl).hostname.toLowerCase()));
+  let hostname = new URL(targetUrl).hostname.toLowerCase();
+  const splitted = hostname.split(".");
+
+  if (splitted.length >= 2) {
+    hostname = splitted[splitted.length - 2] + "." + splitted[splitted.length - 1];
+  }
+  const utf8Encoded = new TextEncoder();
+  const hash = await sha256(utf8Encoded.encode(hostname));
+  const index = bytesToBase64(hash);
+  console.debug("index for " + hostname, index);
+  return index;
 }
