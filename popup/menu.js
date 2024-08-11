@@ -265,6 +265,10 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("nav-help").classList.add("show");
     document.getElementById("nav-help").classList.add("active");
 
+    const hint = document.createElement('small');
+    hint.innerText = "To get it working, you have to link the extension with your ANOTHERpass app by clicking on the link icon displayed above :-)";
+    document.getElementById("nav-help").appendChild(hint);
+
   }
 }
 
