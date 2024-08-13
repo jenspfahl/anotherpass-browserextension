@@ -324,12 +324,10 @@ function updateMenuUi(webClientId, linked) {
             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
             <ul class="dropdown-menu">
-              <button id="showDetails_${uuid}" class="btn dropdown-item" title="Show details of the credential">Show details</button>
+              <button id="apply_${uuid}" class="btn dropdown-item" title="Apply this credential on current website">Apply on website</button>
               <button id="syncWithApp_${uuid}" class="btn dropdown-item" title="Synchronise this credential with the app">Sync with app</button>
-   
               <li><hr class="dropdown-divider"></li>
               <button id="delete_${uuid}" class="btn dropdown-item" title="Delete this credential from the local vault">Delete</button>
-
             </ul>
           </div>
         </div>
@@ -349,6 +347,34 @@ function updateMenuUi(webClientId, linked) {
             "Credential '" + credential.name + "'", 
             `
             <div class="container text-left">
+
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    UID:
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="mb-1">
+                    <b>${credential.readableUid}</b>
+                  </div>
+                </div> 
+              </div>
+              
+              <div class="row">
+                <div class="col">
+                  <div class="mb-3">
+                    Imported at:
+                  </div>
+                </div>
+                <div class="col-8">
+                  <div class="mb-1">
+                    <b>${credential.createdAt != undefined ? new Date(credential.createdAt).toLocaleString() : ""}</b>
+                  </div>
+                </div> 
+              </div>
+
+
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
@@ -360,8 +386,6 @@ function updateMenuUi(webClientId, linked) {
                     <a target="_blank" href="${credential.website}">${credential.website}</a>
                   </div>
                 </div>
-              
-                
               </div>
             
               <div class="row">
@@ -374,8 +398,7 @@ function updateMenuUi(webClientId, linked) {
                   <div class="mb-1">
                     <b>${credential.user}</b>
                   </div>
-                </div>
-               
+                </div> 
               </div>
            
               <div class="row">
@@ -390,24 +413,20 @@ function updateMenuUi(webClientId, linked) {
                     <button type="button" id="copy_${uuid}" title="Copy password to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
                   </div>
                 </div>
-              
               </div>
 
+             
 
             </div>
   
             `
           );
         }
-        if (e.target.id === "showDetails_" + uuid) {
-          bsAlert(
-            "Details for '" + credential.name + "'",
-            ` 
-            <b> Imported at:</b> ${credential.createdAt != undefined ? new Date(credential.createdAt).toLocaleString() : ""}
-            <br>
-            <b> UID:</b> ${credential.readableUid}
-            `
-          );
+        if (e.target.id === "apply_" + uuid) {
+          chrome.runtime.sendMessage({
+            action: "apply_credential",
+            uid: uuid
+          });
         }
         if (e.target.id === "syncWithApp_" + uuid) {
           chrome.runtime.sendMessage({

@@ -39,6 +39,18 @@ const searchInput = document.getElementById("search_input");
 
     }
 
+
+    if (e.target.id === "create_credential") {
+      chrome.runtime.sendMessage({
+        action: "start_password_creation_flow",
+        url: url
+      });
+
+      // force popup close
+      chrome.runtime.sendMessage({ action: "close_credential_dialog", tabId: requestData.tabId });
+
+    }
+
     if (e.target.id === "lock" || e.target.id === "lock_icon") {
       const isUnlocked = await isLocalVaultUnlocked();
       if (isUnlocked) {

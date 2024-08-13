@@ -174,7 +174,7 @@ else {
           
           const clientKeyBase64 = response.clientKey;
 
-          if (requestData.command === "fetch_credential_for_url") {
+          if (requestData.command === "fetch_credential_for_url" || requestData.command === "create_credential_for_url") {
             const credential = response.credential;
             const rememberCredentialSelection = document.getElementById("rememberCredentialSelection");
 
@@ -269,10 +269,12 @@ else {
 
       function sendPasteCredentialMessage(password, user) {
 
-        browser.tabs.query({ active: true, currentWindow: false /* true for active popup, false for request password popup */ }, function (tabs) {
-          chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: password, user: user }, function () {
-            window.close();
-          });
+        chrome.tabs.query({ active: true, currentWindow: false /* true for active popup, false for request password popup */ }, function (tabs) {
+          if (tabs.length > 0) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: password, user: user }, function () {
+              window.close();
+            });        
+          }
         });
       }
 

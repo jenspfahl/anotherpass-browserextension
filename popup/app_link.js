@@ -30,11 +30,11 @@ if (!linked || relink) {
       let webClientId;
       if (relink) {
         document.getElementById("headline").innerHTML = "Re-link with ANOTHERpass app";
-        document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below and input the provided IP / hostname.";
+        document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP / hostname and click Next. The re-linking may take a few minutes.";
         webClientId = localStorage.getItem("web_client_id");
       }
       else {
-        document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app and input the provided IP / hostname.";
+        document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app, input the provided IP / hostname and click Next. The linking-process may take a few minutes.";
         webClientId = generateWebClientId();
       }
 
@@ -182,7 +182,7 @@ async function linkApp(relink, webClientId) {
             const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(appPublicKey);
 
             bsConfirm(
-              "Confirm app link", 
+              "Confirm app link <b>" + webClientId + "</b>", 
               "Ensure that the fingerprint <h1 class=\"fingerprint\">" + publicKeyFingerprint + "</h1> is the same as shown in the app and don't forget to accept there too.",
               "Yes, same",
               "No, different"

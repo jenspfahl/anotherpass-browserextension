@@ -46,6 +46,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
       return true;  
     }
+
+    case "start_password_creation_flow": {
+      openPasswordRequestDialog("create_credential_for_url", undefined, message.url);
+
+      return true;  
+    }
     
     case "start_single_password_request_flow": {
       openPasswordRequestDialog("fetch_single_credential");
@@ -97,6 +103,19 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     
     case "forward_credential": {
       forwardCredential(message.tabId, message.uid);
+
+      return true;  
+    }
+
+        
+    case "apply_credential": {
+
+
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        if (tabs.length > 0) {
+          forwardCredential(tabs[0].id, message.uid);
+        }
+      });
 
       return true;  
     }
@@ -173,10 +192,24 @@ if (linked) {
     () => void browser.runtime.lastError,
   );
 
+  browser.contextMenus.create({
+    id: "anotherpass-credential-create-request",
+    title: "Create new credential in ANOTHERpass",
+    contexts: ["editable"], 
+  },
+    // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
+    // for information on the purpose of this error capture.
+    () => void browser.runtime.lastError,
+  );
+
   browser.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === "anotherpass-credential-request") {
       console.debug("tabUrl", tab.url);
       openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
+    }
+    else if (info.menuItemId === "anotherpass-credential-create-request") {
+      console.debug("tabUrl", tab.url);
+      openPasswordRequestDialog("create_credential_for_url", tab.id, tab.url);
     }
     else if (info.menuItemId === "anotherpass-open-dialog") {
       chrome.tabs.sendMessage(tab.id, { action: "open_credential_dialog" });
@@ -351,7 +384,6 @@ function openPasswordRequestDialog(command, tabId, messageUrl, credentialUid) {
 
   browser.windows.create(createData);
 }
-
 
 function openLinkWithQrCodeDialog(relink) {
   
