@@ -60,9 +60,20 @@ getTemporaryKey("linked").then(async (linked) => {
       }
     }
 
+    const response = await chrome.runtime.sendMessage({ action: "get_tab_id" });
+    const currentTabId = response.tabId;
 
 
-    /*chrome.extension*/browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+    if (browser.runtime.onMessage.hasListener(eventHandler)) {
+      console.debug("Already found a listener");
+      browser.runtime.onMessage.removeListener(eventHandler);
+    }
+    /*chrome.extension*/browser.runtime.onMessage.addListener(eventHandler);
+
+
+    function eventHandler(msg, sender, sendResponse) {
+
+      console.debug("content msg received: action=" + msg.action + " currentTabId=" + currentTabId);
 
       if (msg.action === "paste_credential") {
         pasteCredential(msg.password, msg.user);
@@ -70,6 +81,22 @@ getTemporaryKey("linked").then(async (linked) => {
           popupOpen = false;
           _dialog.close();
         }
+      }
+      if (msg.action === "get_username_from_field") {
+
+        let username;
+        for (var i = 0; i < usernameFields.length; i++) {
+          const usernameValue = usernameFields[i].value;
+          console.debug("check user " + usernameValue);
+
+          if (usernameValue !== undefined && usernameValue !== null && usernameValue.trim().length > 0) {
+            username = usernameValue;
+            break;
+          }
+        }
+        console.debug("found user " + username);
+
+        sendResponse({user: username});
       }
       if (msg.action === "close_credential_dialog") {
         if (_dialog) {
@@ -89,7 +116,7 @@ getTemporaryKey("linked").then(async (linked) => {
         const input = document.activeElement;
         openPopup(input.offsetLeft, input.offsetHeight, input);
       }
-    });
+    }
 
 
     function pasteCredential(password, user) {
@@ -108,6 +135,9 @@ getTemporaryKey("linked").then(async (linked) => {
 
     }
 
+  }
+  else {
+    console.warn("Cannot inject due to not linked extension");
   }
 
 

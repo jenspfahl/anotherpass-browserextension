@@ -41,9 +41,19 @@ const searchInput = document.getElementById("search_input");
 
 
     if (e.target.id === "create_credential") {
+      const response = await chrome.runtime.sendMessage({
+        action: "get_username_from_field",
+        tabId: requestData.tabId 
+      });
+    
+      console.debug("create credential prep response", response);
+    
+      const user = response.user
+
       chrome.runtime.sendMessage({
         action: "start_password_creation_flow",
-        url: url
+        url: url,
+        user: user
       });
 
       // force popup close

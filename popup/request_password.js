@@ -58,7 +58,8 @@ else {
   }
 
   console.debug("requestData", requestData);
-  const targetUrl = requestData.messageUrl;
+  const targetUrl = requestData.website;
+  const user = requestData.user;
   let targetUid = requestData.credentialUid;
 
   if (!targetUrl) {
@@ -144,6 +145,7 @@ else {
             command: requestData.command,
             requestIdentifier: sessionKeyBase64,
             website: targetUrl,
+            user: user,
             uid: targetUid,
             uids: targetUids
           };

@@ -42,13 +42,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     case "start_password_request_flow": {
-      openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url);
+      openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url, undefined, message.user);
 
       return true;  
     }
 
     case "start_password_creation_flow": {
-      openPasswordRequestDialog("create_credential_for_url", undefined, message.url);
+      openPasswordRequestDialog("create_credential_for_url", undefined, message.url, undefined, message.user);
 
       return true;  
     }
@@ -120,6 +120,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       return true;  
     }
     
+    case "get_username_from_field": {
+      chrome.tabs.sendMessage(message.tabId, { action: "get_username_from_field" })
+        .then(sendResponse);
+
+      return true;  
+    }
+        
     case "close_credential_dialog": {
       chrome.tabs.sendMessage(message.tabId, { action: "close_credential_dialog" });
 
@@ -256,6 +263,7 @@ function fetchCredential(message, sendResponse) {
     command: message.command,
     requestIdentifier: message.requestIdentifier,
     website: message.website === null ? undefined : message.website,
+    user: message.user,
     uid: message.uid === null ? undefined : message.uid,
     uids: message.uids,
   };
@@ -359,10 +367,10 @@ async function linkToApp(sendResponse) {
 }
 
 
-function openPasswordRequestDialog(command, tabId, messageUrl, credentialUid) {
+function openPasswordRequestDialog(command, tabId, website, credentialUid, user) {
   var width = 660;
   var height = 540;
-  if (messageUrl) {
+  if (website) {
     width = 680;
     height = 630;
   }
@@ -370,7 +378,8 @@ function openPasswordRequestDialog(command, tabId, messageUrl, credentialUid) {
   const requestData = JSON.stringify({ 
     command: command,
     tabId: tabId,
-    messageUrl: messageUrl, 
+    website: website, 
+    user: user,
     credentialUid: credentialUid,
   });
   const createData = {
