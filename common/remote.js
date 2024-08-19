@@ -50,7 +50,7 @@ async function getAddress(variables) {
  * @param {*} message 
  * @param {*} sendResponse 
  */
-async function remoteCall(message, sendResponse, variables) {
+async function remoteCall(message, sendResponse, variables, timeout) {
   const isLinking = await getTemporaryKey("is_linking", variables);
   const webClientId = await getTempOrLocalKey("web_client_id", variables);
   const linked = await getLocalKey("linked");
@@ -100,7 +100,8 @@ async function remoteCall(message, sendResponse, variables) {
           "Content-Type": "application/json",
           "Accept": "application/json",
         },
-        body: JSON.stringify(request)
+        body: JSON.stringify(request),
+        signal: AbortSignal.timeout(timeout)
       });
 
     console.log("received HTTP Status: " + res.status);

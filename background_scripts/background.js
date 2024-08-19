@@ -267,8 +267,12 @@ function fetchCredential(message, sendResponse) {
     uid: message.uid === null ? undefined : message.uid,
     uids: message.uids,
   };
+
+  const pollingInterval = (localStorage.getItem("polling_interval") || 2) * 1000;
+
+
   
-  remoteCall(request, sendResponse, variables);
+  remoteCall(request, sendResponse, variables, Math.min(pollingInterval, 2000));
 
 }
 
@@ -363,7 +367,7 @@ async function linkToApp(sendResponse) {
     };  
   }
   
-  remoteCall(request, sendResponse, variables);
+  remoteCall(request, sendResponse, variables, 1000 * 60 * 4); // 4 Minutes before timeout to give the app time to generate the keys
 }
 
 
