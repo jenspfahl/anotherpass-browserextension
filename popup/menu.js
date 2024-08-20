@@ -350,13 +350,13 @@ function updateMenuUi(webClientId, linked) {
 
               <div class="row">
                 <div class="col">
-                  <div class="mb-3">
-                    UID:
+                  <div>
+                    <small>UID:</small>
                   </div>
                 </div>
                 <div class="col-8">
                   <div class="mb-1">
-                    <b>${credential.readableUid}</b>
+                    <small>${credential.readableUid}</small>
                   </div>
                 </div> 
               </div>
@@ -364,12 +364,12 @@ function updateMenuUi(webClientId, linked) {
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
-                    Imported at:
+                    <small>Imported at:</small>
                   </div>
                 </div>
                 <div class="col-8">
                   <div class="mb-1">
-                    <b>${credential.createdAt != undefined ? new Date(credential.createdAt).toLocaleString() : ""}</b>
+                    <small>${credential.createdAt != undefined ? new Date(credential.createdAt).toLocaleString() : ""}</small>
                   </div>
                 </div> 
               </div>

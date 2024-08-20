@@ -22,3 +22,23 @@
 .dimension-48 {
     background-image: url("/icons/anotherpass-48.png");
 }
+
+.credential_popup {
+    height:100%;
+    width: 100%:
+}
+
+.close_button_position {
+    position:absolute; 
+    top:5px; 
+    right:5px;
+}
+
+.close_button_style {
+    padding: 8px 12px; 
+    font-size: 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #444;
+    color: white;
+}

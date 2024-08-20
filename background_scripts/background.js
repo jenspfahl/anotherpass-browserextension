@@ -373,10 +373,10 @@ async function linkToApp(sendResponse) {
 
 function openPasswordRequestDialog(command, tabId, website, credentialUid, user) {
   var width = 660;
-  var height = 540;
+  var height = 570;
   if (website) {
     width = 680;
-    height = 630;
+    height = 680;
   }
 
   const requestData = JSON.stringify({ 
@@ -404,7 +404,7 @@ function openLinkWithQrCodeDialog(relink) {
     type: "detached_panel",
     url: "popup/app_link.html?data=" + encodeURIComponent(JSON.stringify({relink: relink})),
     width: 800,
-    height: 765,
+    height: 810,
   };
   
   browser.windows.create(createData);

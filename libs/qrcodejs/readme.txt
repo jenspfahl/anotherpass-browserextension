@@ -1,0 +1,1 @@
+The sourcecode can be found here: https://github.com/davidshimjs/qrcodejs

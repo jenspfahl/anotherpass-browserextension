@@ -45,19 +45,38 @@ getTemporaryKey("linked").then(async (linked) => {
 
       });
 
+      console.log("add observation listener");
       obs.observe(document.body, { childList: true, subtree: true, attributes: false, characterData: false });
 
 
-
-
+      console.log("presearch credential fields");
       const inputs = document.querySelectorAll("input");
+      console.log("found input count on research", inputs.length);
+
       for (var j = 0; j < inputs.length; j++) {
         const input = inputs[j];
 
         console.debug("found password field");
         addButton(input);
-
       }
+
+      // delayed search in case of missing loaded elements
+      setTimeout(() => {
+        console.log("search credential fields");
+        const inputs = document.querySelectorAll("input");
+        console.log("found input count", inputs.length);
+
+        for (var j = 0; j < inputs.length; j++) {
+          const input = inputs[j];
+
+          console.debug("found password field");
+          addButton(input);
+
+        }
+
+      }, 1500);
+
+      
     }
 
     const response = await chrome.runtime.sendMessage({ action: "get_tab_id" });
@@ -214,7 +233,7 @@ function checkUsernameField(field) {
   return (string.includes("login")
     || string.includes("email")
     || string.includes("user")
-    || string.includes("acount")
+    || string.includes("account")
   )
 }
 
@@ -230,9 +249,9 @@ const showCredentialModal = (x, y, url) => {
 
   modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 450px; width: 300px; border: none; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`);
   modal.innerHTML = `
-  <iframe id="popup-content"; style="height:100%; width: 100%"></iframe>
-  <div style="position:absolute; top:5px; right:5px;">
-    <button style="padding: 8px 12px; font-size: 14px; border: none; border-radius: 10px; background-color: #444; color: white">
+  <iframe id="popup-content" class="credential_popup"></iframe>
+  <div class="close_button_position">
+    <button class="close_button_style">
      X
     </button>
   </div>`;
