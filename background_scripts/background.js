@@ -235,8 +235,12 @@ async function forwardCredential(tabId, uid) {
     const encCredential = findLocalByUid(PREFIX_CREDENTIAL, uid);
 
     if (encCredential) {
-      const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
-      chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user });
+      try {
+        const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
+        chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user });
+      } catch(e) {
+        console.error("cannot decrypt credential with uid " + uid + ". Ignored.", e);
+      }
     }
     
   }
@@ -302,19 +306,23 @@ async function listLocalCredentials(url, sendResponse) {
       const value = localStorage.getItem(key);
 
       if (key.startsWith(PREFIX_CREDENTIAL)) {
-        const credential = JSON.parse(await decryptMessage(clientKey, value));
-        //console.debug("credential", credential);
-        allCredentialNames.push({name: credential.name, uid: credential.uid});
+        try {
+          const credential = JSON.parse(await decryptMessage(clientKey, value));
+          //console.debug("credential", credential);
+          allCredentialNames.push({name: credential.name, uid: credential.uid});
 
-        if (credential.website && preferedHostname && credential.website.toLowerCase().includes(preferedHostname)) {
-          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
-        }
-        else if (preferedHostname
-          && (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase()))) {
-          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
-        }
-        else if (preferedUid && credential.uid === preferedUid) {
-          suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+          if (credential.website && preferedHostname && credential.website.toLowerCase().includes(preferedHostname)) {
+            suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+          }
+          else if (preferedHostname
+            && (credential.name.toLowerCase().includes(preferedHostname) || preferedHostname.includes(credential.name.toLowerCase()))) {
+            suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+          }
+          else if (preferedUid && credential.uid === preferedUid) {
+            suggestedCredentialNames.push({name: credential.name, uid: credential.uid});
+          }
+        } catch(e) {
+          console.error("cannot decrypt credential with key " + key + ". Ignored.", e);
         }
       }
     }

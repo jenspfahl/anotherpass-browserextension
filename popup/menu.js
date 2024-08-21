@@ -293,9 +293,13 @@ function updateMenuUi(webClientId, linked) {
       const value = localStorage.getItem(key);
 
       if (key.startsWith(PREFIX_CREDENTIAL)) {
-        const credential = JSON.parse(await decryptMessage(clientKey, value));
-        //console.debug("credential", credential);
-        credentials.push(credential);
+        try {
+          const credential = JSON.parse(await decryptMessage(clientKey, value));
+          //console.debug("credential", credential);
+          credentials.push(credential);
+        } catch(e) {
+          console.error("cannot decrypt credential with key " + key + ". Ignored.", e);
+        }
       }
     }
 
