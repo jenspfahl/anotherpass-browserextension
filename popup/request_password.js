@@ -8,15 +8,16 @@ document.addEventListener("click", (e) => {
     destroySessionKey();
     window.close();
   }
-  else if (e.target.id === "update") {
+  else if (e.target.id === "update_server") {
 
-    const ip = document.getElementById("host").value;
+    const newServer = document.getElementById("host").value;
 
-    if (!ip || ip == "") {
-      bsAlert("Error", "A host is required");
+    if (!newServer || newServer == "") {
+      bsAlert("Error", "A hostname or IP address is required");
     }
     else {
-      localStorage.setItem("server_address", ip);
+      addNewAlternativeServer(newServer);
+      loadAlternativeServers(newServer);
     }
 
   }
@@ -40,8 +41,26 @@ if (!linked) {
 } 
 else {
 
-  const ip = localStorage.getItem("server_address");
-  document.getElementById("host").value = ip;
+  // load current configurated server
+  const server = localStorage.getItem("server_address");
+  const hostField = document.getElementById("host");
+  hostField.value = server;
+
+
+  // load all known servers
+  loadAlternativeServers(server);
+  const hostSelector = document.getElementById("host_selector");
+  hostSelector.addEventListener("change", function() {
+    if (hostField.value) {
+      hostField.value = hostSelector.value;
+      const options = hostSelector.querySelectorAll("option");
+      if (options.length > 0) {
+          options[0].selected = true;
+      }
+      addNewAlternativeServer(hostField.value);
+      loadAlternativeServers(hostField.value);
+    }
+  });
 
 
   if (requestData.command === "get_client_key") {
@@ -377,6 +396,60 @@ else {
     }
   });
 
+}
+
+function addNewAlternativeServer(newServer) {
+  const currentServer = localStorage.getItem("server_address");
+  const currentServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + currentServer);
+  const newServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + newServer);
+
+  localStorage.setItem("server_address", newServer);
+  localStorage.setItem(PREFIX_ALT_SERVER + currentServer, currentServerDesc);
+  localStorage.setItem(PREFIX_ALT_SERVER + newServer, newServerDesc);
+}
+
+function loadAlternativeServers(currentServer) {
+  const alternativeServers = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+
+    if (key.startsWith(PREFIX_ALT_SERVER)) {
+      const host = key.substring(PREFIX_ALT_SERVER.length);
+      alternativeServers.push({ host: host, description: value });
+    }
+  }
+  alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
+  const hostSelector = document.getElementById("host_selector");
+  hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
+  
+  if (alternativeServers.length > 0) {
+    hostSelector.classList.remove("d-none");
+  }
+  else {
+    hostSelector.classList.add("d-none");
+  }
+
+
+  alternativeServers
+    .filter((altServer) => (altServer.host !== currentServer))
+    .map((altServer) => {
+    const opt = document.createElement("option");
+    
+    opt.value = altServer.host;
+
+    let text;
+    if (altServer.description !== undefined && altServer.description !== null && altServer.description !== "null" && altServer.description !== "undefined") {
+      text = altServer.host + " (" + altServer.description + ")";
+    }
+    else {
+      text = altServer.host;
+    }
+    
+  
+    opt.innerText = text;
+    hostSelector.append(opt);
+  });
 }
 
 async function saveCredential(credential, clientKey) {

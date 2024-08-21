@@ -2,6 +2,7 @@
 const PREFIX_UID = "remembered_uid_for_"
 const PREFIX_REMEMBER_DENIED = "remembered_denied_for_"
 const PREFIX_CREDENTIAL = "credential_"
+const PREFIX_ALT_SERVER = "alternative_server_"
 
 
 function generateWebClientId() {

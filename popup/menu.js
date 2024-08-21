@@ -46,7 +46,7 @@ document.addEventListener("click", async (e) => {
 
 
     if (!ip || ip == "") {
-      bsAlert("Error", "A host is required");
+      bsAlert("Error", "A hostname or IP address is required");
     }
     else if (isNaN(port) || port < 1024 || port > 49151) {
       bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
