@@ -20,7 +20,7 @@ document.addEventListener("click", (e) => {
     }
     else {
       addNewAlternativeServer(newServer);
-      loadAlternativeServers(newServer);
+      loadAlternativeServersToUi(newServer);
     }
 
   }
@@ -51,7 +51,7 @@ else {
 
 
   // load all known servers
-  loadAlternativeServers(server);
+  loadAlternativeServersToUi(server);
   const hostSelector = document.getElementById("host_selector");
   hostSelector.addEventListener("change", function() {
     if (hostField.value) {
@@ -61,7 +61,7 @@ else {
           options[0].selected = true;
       }
       addNewAlternativeServer(hostField.value);
-      loadAlternativeServers(hostField.value);
+      loadAlternativeServersToUi(hostField.value);
     }
   });
 
@@ -411,7 +411,7 @@ function addNewAlternativeServer(newServer) {
   localStorage.setItem(PREFIX_ALT_SERVER + newServer, newServerDesc);
 }
 
-function loadAlternativeServers(currentServer) {
+function loadAlternativeServersToUi(currentServer) {
   const alternativeServers = [];
   for (var i = 0; i < localStorage.length; i++) {
     const key = localStorage.key(i);
@@ -419,7 +419,8 @@ function loadAlternativeServers(currentServer) {
 
     if (key.startsWith(PREFIX_ALT_SERVER)) {
       const host = key.substring(PREFIX_ALT_SERVER.length);
-      alternativeServers.push({ host: host, description: value });
+      const description = value === undefined || value === null  || value === "null" ? "" : value.trim();
+      alternativeServers.push({ host: host, description: description });
     }
   }
   alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
@@ -442,7 +443,7 @@ function loadAlternativeServers(currentServer) {
     opt.value = altServer.host;
 
     let text;
-    if (altServer.description !== undefined && altServer.description !== null && altServer.description !== "null" && altServer.description !== "undefined") {
+    if (altServer.description.length > 0) {
       text = altServer.host + " (" + altServer.description + ")";
     }
     else {
