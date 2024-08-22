@@ -15,6 +15,9 @@ document.addEventListener("click", (e) => {
     if (!newServer || newServer == "") {
       bsAlert("Error", "A hostname or IP address is required");
     }
+    else if (!isValidIPAdressOrHostname(newServer)) {
+      bsAlert("Error", "Invalid hostname or IP address");
+    }
     else {
       addNewAlternativeServer(newServer);
       loadAlternativeServers(newServer);

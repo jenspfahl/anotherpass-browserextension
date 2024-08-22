@@ -174,3 +174,24 @@ async function remoteCall(message, sendResponse, variables, timeout) {
     
    
 }
+
+
+function isValidIPAdressOrHostname(string) {  
+  if (isIntentedIPAdress(string)) {
+    return isValidIPAdress(string);
+  }
+  return isValidHostname(string);
+}  
+
+
+function isIntentedIPAdress(ipAddress) {  
+  return (/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.test(ipAddress));
+}  
+
+function isValidIPAdress(ipAddress) {  
+  return (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipAddress));
+}  
+
+function isValidHostname(hostname) {  // includes invalid IP adresses!
+  return (/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/.test(hostname));
+}  

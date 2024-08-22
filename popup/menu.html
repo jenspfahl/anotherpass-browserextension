@@ -115,7 +115,7 @@
           </p>
         </div>
         <div class="tab-pane fade pre-scrollable-400" id="nav-settings" role="tabpanel" aria-labelledby="nav-settings-tab" tabindex="0">
-          <p>
+          <div class="container">
 
             <div class="mb-3">
               <label for="settings-theme" class="form-label">Color theme:</label>            
@@ -167,8 +167,14 @@
             <hr>
 
             <div class="mb-3">
-              <label for="server-settings-host" class="form-label">ANOTHERpass is reachable with this hostname:</label>            
+              <label for="server-settings-host" class="form-label">ANOTHERpass server hostname or IP address:</label>            
               <input id="server-settings-host" class="form-control" type="text" placeholder="Host or IP" aria-label="The hostname or IP address">
+              <select id="host_selector" class="form-select form-select-sm" aria-label="Other known servers">
+                <option selected>other servers ...</option>
+              </select> 
+              <div class="mt-0">
+                <button id="manage_servers" type="button" class="btn btn-outline-secondary rounded-0">Manage servers</button>
+              </div>
             </div>
 
 
@@ -200,7 +206,7 @@
               <button id="relink" type="button" class="btn btn-secondary rounded-0">Relink</button>
             </div>
 
-          </p>
+          </div>
         </div>
         <div class="tab-pane fade " id="nav-help" role="tabpanel" aria-labelledby="nav-help-tab" tabindex="0">
           <p>
