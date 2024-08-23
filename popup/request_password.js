@@ -55,13 +55,15 @@ else {
   const hostSelector = document.getElementById("host_selector");
   hostSelector.addEventListener("change", function() {
     if (hostField.value) {
-      hostField.value = hostSelector.value;
+      const newServer = hostSelector.value;
+
+      hostField.value = newServer;
       const options = hostSelector.querySelectorAll("option");
       if (options.length > 0) {
           options[0].selected = true;
       }
-      addNewAlternativeServer(hostField.value);
-      loadAlternativeServersToUi(hostField.value);
+      addNewAlternativeServer(newServer);
+      loadAlternativeServersToUi(newServer);
     }
   });
 
@@ -444,7 +446,7 @@ function loadAlternativeServersToUi(currentServer) {
 
     let text;
     if (altServer.description.length > 0) {
-      text = altServer.host + " (" + altServer.description + ")";
+      text = altServer.host + " ( " + altServer.description + " )";
     }
     else {
       text = altServer.host;

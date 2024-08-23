@@ -95,3 +95,9 @@
 .cursor-pointer {
   cursor: pointer;
 }
+
+
+.invalid-state {
+  color: red !important;
+  border-color: red !important;
+}

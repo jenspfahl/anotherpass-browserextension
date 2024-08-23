@@ -8,7 +8,25 @@ const lockTimeout = localStorage.getItem("lock_timeout") || 60;
 const renderContentIcon = localStorage.getItem("render_content_icon");
 
 
-const ip = localStorage.getItem("server_address");
+// load current configurated server
+const server = localStorage.getItem("server_address");
+const hostField = document.getElementById("server-settings-host");
+hostField.value = server;
+
+
+// load all known servers
+loadAlternativeServersToUi();
+const hostSelector = document.getElementById("host_selector");
+hostSelector.addEventListener("change", function() {
+  if (hostField.value) {
+    hostField.value = hostSelector.value;
+    const options = hostSelector.querySelectorAll("option");
+    if (options.length > 0) {
+        options[0].selected = true;
+    }
+  }
+});
+
 const port = localStorage.getItem("server_port");
 
 const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
@@ -20,7 +38,6 @@ document.getElementById("server-settings-lock-timeout").value = lockTimeout;
 document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
 
 
-document.getElementById("server-settings-host").value = ip;
 document.getElementById("server-settings-port").value = port;
 
 document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
@@ -38,17 +55,17 @@ document.addEventListener("click", async (e) => {
     const renderContentIcon = document.getElementById("render_content_icon").checked;
 
 
-    const ip = document.getElementById("server-settings-host").value;
+    const server = hostField.value;
     const port = parseInt(document.getElementById("server-settings-port").value);
 
     const pollingTimeout = parseInt(document.getElementById("server-settings-polling-timeout").value);
     const pollingInterval = parseInt(document.getElementById("server-settings-polling-interval").value);
 
 
-    if (!ip || ip == "") {
+    if (!server || server == "") {
       bsAlert("Error", "A hostname or IP address is required");
     }
-    else if (!isValidIPAdressOrHostname(ip)) {
+    else if (!isValidIPAdressOrHostname(server)) {
       bsAlert("Error", "Invalid hostname or IP address");
     }
     else if (isNaN(port) || port < 1024 || port > 49151) {
@@ -64,7 +81,9 @@ document.addEventListener("click", async (e) => {
       bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
     }
     else {
-      localStorage.setItem("server_address", ip);
+      addNewAlternativeServer(server);
+      loadAlternativeServersToUi();
+            
       localStorage.setItem("server_port", port);
       localStorage.setItem("polling_timeout", pollingTimeout);
       localStorage.setItem("polling_interval", pollingInterval);
@@ -78,7 +97,7 @@ document.addEventListener("click", async (e) => {
   }
 
   if (e.target.id === "btn-reset-settings") {
-    document.getElementById("server-settings-host").value = ip;
+    document.getElementById("server-settings-host").value = server;
     document.getElementById("server-settings-port").value = port;
 
     document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
@@ -116,6 +135,9 @@ document.addEventListener("click", async (e) => {
           action: "start_unlink_flow",
         }).then((response) => {
           updateMenuUi(null, null);
+
+          loadAlternativeServersToUi()
+
 
           bsAlert("Success", "App successfully un-linked! You can remove the linked device <b class=\"fingerprint_small\">" + webClientId + "</b> from your app.").then(_ => {
             window.close();
@@ -209,6 +231,169 @@ document.addEventListener("click", async (e) => {
     searchInput.value = "";
     updateCredentialList("");
     searchInput.focus();
+  }
+  else if (e.target.id === "manage_servers") {
+
+    const currentServer = localStorage.getItem("server_address");
+
+    const allServers = loadAllServers();
+    // wrong! allServers.sort((a, b) => (a.host === currentServer && b.host !== currentServer ? 0 : 1));
+   
+
+    const html = [];
+    const serversToBeDeleted = [];
+    const changedHosts = new Map();
+    const changedDescriptions = new Map();
+    let addedHost, addedDescription;
+
+    html.push("<h6>All server addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in different networks, server addresses of the phone to connect can differ. Changing anything here doesn'r effect the current configured server address.</h6>");
+  
+
+    allServers.map((server) => {
+            
+      let htmlLine;
+      if (server.host === currentServer) {
+        htmlLine = `
+        <h8> - Current server -</h8>
+        <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
+          <div class="col-6">
+            <input id="server_host_${server.host}" value="${server.host}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+          </div>
+          <div class="col-4">
+            <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+          </div>
+        </div>
+
+    `;
+      }
+      else {
+        htmlLine = `
+        <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
+          <div class="col-6">
+            <input id="server_host_${server.host}" value="${server.host}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+          </div>
+          <div class="col-4">
+            <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+          </div>
+          <div class="col-1">
+            <button id="delete_server_${server.host}" class="btn">
+              <span id="delete_server_${server.host}" class="material-symbols-outlined size-24">
+                delete
+              </span>
+            </button>
+          </div>
+        </div>
+
+    `;
+      }
+      
+      html.push(htmlLine);
+  
+
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "server_host_" + server.host) {
+          if (isValidIPAdressOrHostname(e.target.value)) {
+            changedHosts.set(server.host, e.target.value);
+            e.target.classList.remove("invalid-state");
+          }
+          else {
+            console.log("host invald", e.target.value);
+            e.target.classList.add("invalid-state");
+          }
+        }
+        else if (e.target.id === "server_description_" + server.host) {
+          changedDescriptions.set(server.host, e.target.value);
+        }
+        else if (e.target.id === "new_server_host") {
+          if (isValidIPAdressOrHostname(e.target.value)) {
+            addedHost = e.target.value;
+            e.target.classList.remove("invalid-state");
+          }
+          else {
+            console.log("host invald", e.target.value);
+            e.target.classList.add("invalid-state");
+          }
+        }
+        else if (e.target.id === "new_server_description") {
+          addedDescription = e.target.value;
+        }
+      });
+
+
+      document.addEventListener("click", (e) => {
+        if (e.target.id === "delete_server_" + server.host) {
+          e.target.innerText = "";
+          const row = document.getElementById("server_row_" + server.host);
+          if (row) {
+            row.innerHTML = "<i> - " + server.host + " marked for deletion - </i>";
+            serversToBeDeleted.push(server.host);
+          }
+        }
+
+      }); 
+
+    });
+
+    html.push(`
+      <h8> - New server -</h8>
+        <div id="new_server_row" class="row mh-0 ph-0 mb-2">
+          <div class="col-6">
+            <input id="new_server_host" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+          </div>
+          <div class="col-4">
+            <input id="new_server_description" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+          </div>
+        </div>
+      `);
+
+    bsConfirm("Manage alternative servers", `
+    <div class="container">
+      ${html.join("")}
+    </div>
+    `, "Save", "Cancel")
+    .then((decision) => {
+      if (decision === true) {
+        // delete all altServers and insert all from UI
+        console.debug("serversToBeDeleted", serversToBeDeleted);
+        console.debug("changedHosts", changedHosts);
+        console.debug("changedDescriptions", changedDescriptions);
+
+        // first delete all marked
+        allServers.forEach((server) => {
+
+          if (serversToBeDeleted.includes(server.host)) {
+            console.debug("delete server " + PREFIX_ALT_SERVER + server.host);
+            localStorage.removeItem(PREFIX_ALT_SERVER + server.host);
+          }
+          
+        });
+
+        // then update current
+        allServers.forEach((server) => {
+
+          if (!serversToBeDeleted.includes(server.host)) {
+            const currentDescription = localStorage.getItem(PREFIX_ALT_SERVER + server.host);
+
+            const changedHost = changedHosts.get(server.host);
+            const changedDescription = changedDescriptions.get(server.host);
+            console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
+            localStorage.removeItem(PREFIX_ALT_SERVER + server.host);
+            localStorage.setItem(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
+            
+          }
+        });
+
+        // handle creation
+        if (addedHost && addedHost.trim().length > 0) {
+          const currentDescription = localStorage.getItem(PREFIX_ALT_SERVER + addedHost);
+          console.debug("add server " + PREFIX_ALT_SERVER + addedHost + " with " + addedDescription);
+          localStorage.setItem(PREFIX_ALT_SERVER + addedHost, addedDescription || "");
+        }
+
+
+        loadAlternativeServersToUi()
+      }
+     });
   }
 });
 
@@ -494,3 +679,54 @@ function updateCredentialCountUi(credentialCount) {
   document.getElementById("vaultStatus").innerText = credentialCount + " credentials";
 }
 
+
+function loadAlternativeServersToUi() {
+  const alternativeServers = loadAllServers();
+  const hostSelector = document.getElementById("host_selector");
+  hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
+
+  alternativeServers
+    .map((altServer) => {
+    const opt = document.createElement("option");
+    
+    opt.value = altServer.host;
+
+    let text;
+    if (altServer.description.length > 0) {
+      text = altServer.host + " ( " + altServer.description + " )";
+    }
+    else {
+      text = altServer.host;
+    }
+    
+  
+    opt.innerText = text;
+    hostSelector.append(opt);
+  });
+}
+
+function loadAllServers() {
+  const alternativeServers = [];
+  for (var i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key);
+
+    if (key.startsWith(PREFIX_ALT_SERVER)) {
+      const host = key.substring(PREFIX_ALT_SERVER.length);
+      const description = value === undefined || value === null  || value === "null" ? "" : value.trim();
+      alternativeServers.push({ host: host, description: description });
+    }
+  }
+  alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
+  return alternativeServers;
+}
+
+function addNewAlternativeServer(newServer) {
+  const currentServer = localStorage.getItem("server_address");
+  const currentServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + currentServer);
+  const newServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + newServer);
+
+  localStorage.setItem("server_address", newServer);
+  localStorage.setItem(PREFIX_ALT_SERVER + currentServer, currentServerDesc);
+  localStorage.setItem(PREFIX_ALT_SERVER + newServer, newServerDesc);
+}
