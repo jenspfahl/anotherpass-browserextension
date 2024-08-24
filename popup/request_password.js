@@ -10,17 +10,25 @@ document.addEventListener("click", (e) => {
   }
   else if (e.target.id === "update_server") {
 
-    const newServer = document.getElementById("host").value;
+    const hostField = document.getElementById("host");
+    const newServer = hostField.value;
 
     if (!newServer || newServer == "") {
-      bsAlert("Error", "A hostname or IP address is required");
+      bsAlert("Error", "A handle, hostname or IP address is required");
     }
-    else if (!isValidIPAdressOrHostname(newServer)) {
-      bsAlert("Error", "Invalid hostname or IP address");
+    else if (!isValidIPAdressOrHostnameOrHandle(newServer)) {
+      bsAlert("Error", "Invalid handle, hostname or IP address");
     }
     else {
       addNewAlternativeServer(newServer);
       loadAlternativeServersToUi(newServer);
+      const ipFromHandle = handleToIpAddress(newServer);
+      if (ipFromHandle) {
+        hostField.title = "Handle will be tranlated to " + ipFromHandle;
+      }
+      else {
+        hostField.title = "";
+      } 
     }
 
   }
@@ -48,6 +56,13 @@ else {
   const server = localStorage.getItem("server_address");
   const hostField = document.getElementById("host");
   hostField.value = server;
+  const ipFromHandle = handleToIpAddress(hostField.value);
+  if (ipFromHandle) {
+    hostField.title = "Handle will be tranlated to " + ipFromHandle;
+  }
+  else {
+    hostField.title = "";
+  }
 
 
   // load all known servers
@@ -64,6 +79,13 @@ else {
       }
       addNewAlternativeServer(newServer);
       loadAlternativeServersToUi(newServer);
+      const ipFromHandle = handleToIpAddress(newServer);
+      if (ipFromHandle) {
+        hostField.title = "Handle will be tranlated to " + ipFromHandle;
+      }
+      else {
+        hostField.title = "";
+      }
     }
   });
 
@@ -450,6 +472,11 @@ function loadAlternativeServersToUi(currentServer) {
     }
     else {
       text = altServer.host;
+    }
+
+    const ipFromHandle = handleToIpAddress(altServer.host);
+    if (ipFromHandle) {
+      text = text + " - " + ipFromHandle;
     }
     
   

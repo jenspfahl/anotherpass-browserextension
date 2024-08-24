@@ -12,6 +12,10 @@ const renderContentIcon = localStorage.getItem("render_content_icon");
 const server = localStorage.getItem("server_address");
 const hostField = document.getElementById("server-settings-host");
 hostField.value = server;
+const ipFromHandle = handleToIpAddress(server);
+if (ipFromHandle) {
+  hostField.title = "Handle will be tranlated to " + ipFromHandle;
+}
 
 
 // load all known servers
@@ -20,6 +24,13 @@ const hostSelector = document.getElementById("host_selector");
 hostSelector.addEventListener("change", function() {
   if (hostField.value) {
     hostField.value = hostSelector.value;
+    const ipFromHandle = handleToIpAddress(hostField.value);
+    if (ipFromHandle) {
+      hostField.title = "Handle will be tranlated to " + ipFromHandle;
+    }
+    else {
+      hostField.title = "";
+    }
     const options = hostSelector.querySelectorAll("option");
     if (options.length > 0) {
         options[0].selected = true;
@@ -63,10 +74,10 @@ document.addEventListener("click", async (e) => {
 
 
     if (!server || server == "") {
-      bsAlert("Error", "A hostname or IP address is required");
+      bsAlert("Error", "A handle, hostname or IP address is required");
     }
-    else if (!isValidIPAdressOrHostname(server)) {
-      bsAlert("Error", "Invalid hostname or IP address");
+    else if (!isValidIPAdressOrHostnameOrHandle(server)) {
+      bsAlert("Error", "Invalid handle, hostname or IP address");
     }
     else if (isNaN(port) || port < 1024 || port > 49151) {
       bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
@@ -250,6 +261,12 @@ document.addEventListener("click", async (e) => {
   
 
     allServers.map((server) => {
+
+      const ipFromHandle = handleToIpAddress(server.host);
+      let hostTooltip = "";
+      if (ipFromHandle) {
+        hostTooltip = "Handle will be tranlated to " + ipFromHandle;
+      }
             
       let htmlLine;
       if (server.host === currentServer) {
@@ -257,7 +274,7 @@ document.addEventListener("click", async (e) => {
         <h8> - Current server -</h8>
         <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
           <div class="col-6">
-            <input id="server_host_${server.host}" value="${server.host}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+            <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
           </div>
           <div class="col-4">
             <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
@@ -270,7 +287,7 @@ document.addEventListener("click", async (e) => {
         htmlLine = `
         <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
           <div class="col-6">
-            <input id="server_host_${server.host}" value="${server.host}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+            <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
           </div>
           <div class="col-4">
             <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
@@ -292,20 +309,29 @@ document.addEventListener("click", async (e) => {
 
       document.addEventListener("input", (e) => {
         if (e.target.id === "server_host_" + server.host) {
-          if (isValidIPAdressOrHostname(e.target.value)) {
+          e.target.title = "";
+
+          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
             changedHosts.set(server.host, e.target.value);
             e.target.classList.remove("invalid-state");
+            const ipFromHandle = handleToIpAddress(e.target.value);
+            if (ipFromHandle) {
+              e.target.title = "Handle will be tranlated to " + ipFromHandle;
+            }
           }
           else {
             console.log("host invald", e.target.value);
             e.target.classList.add("invalid-state");
+            e.target.title = "Server address invalid! Wont be stored.";
           }
+    
+          
         }
         else if (e.target.id === "server_description_" + server.host) {
           changedDescriptions.set(server.host, e.target.value);
         }
         else if (e.target.id === "new_server_host") {
-          if (isValidIPAdressOrHostname(e.target.value)) {
+          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
             addedHost = e.target.value;
             e.target.classList.remove("invalid-state");
           }
@@ -698,6 +724,11 @@ function loadAlternativeServersToUi() {
     else {
       text = altServer.host;
     }
+    const ipFromHandle = handleToIpAddress(altServer.host);
+    if (ipFromHandle) {
+      text = text + " - " + ipFromHandle;
+    }
+    
     
   
     opt.innerText = text;

@@ -34,7 +34,16 @@ function poll(fn, timeout, interval) {
 
 
 async function getAddress(variables) {
-  const server = await getTempOrLocalKey("server_address", variables);
+  let server = await getTempOrLocalKey("server_address", variables);
+  console.debug("stored server address", server);
+
+  if (isIntentedHandle(server)) {
+    const serverFromHandle = handleToIpAddress(server);
+    console.debug("IP from handle " + server, serverFromHandle);
+    if (serverFromHandle) {
+      server = serverFromHandle;
+    }
+  }
   const port = await getTempOrLocalKey("server_port", variables);
   return server + ":" + port;
 }
@@ -176,16 +185,20 @@ async function remoteCall(message, sendResponse, variables, timeout) {
 }
 
 
-function isValidIPAdressOrHostname(string) {  
+function isValidIPAdressOrHostnameOrHandle(string) {  
   if (isIntentedIPAdress(string)) {
     return isValidIPAdress(string);
   }
-  return isValidHostname(string);
+  return handleToIpAddress(string) || isValidHostname(string);
 }  
 
 
 function isIntentedIPAdress(ipAddress) {  
   return (/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/.test(ipAddress));
+}  
+
+function isIntentedHandle(handle) {  
+  return (/^\@[aei][a-z]{1,6}$/.test(handle));
 }  
 
 function isValidIPAdress(ipAddress) {  
@@ -195,3 +208,63 @@ function isValidIPAdress(ipAddress) {
 function isValidHostname(hostname) {  // includes invalid IP adresses!
   return (/^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$/.test(hostname));
 }  
+
+const BASE_CHARS = "abcdefghijklmnopqrstuvwxyz"
+
+function handleToIpAddress(handle) {
+  if (!isIntentedHandle(handle)) {
+    console.warn("invalid handle", handle);
+    return undefined;
+  }
+  const classifier = handle.charAt(1);
+  let offset;
+  if (classifier == "a") { // Class A
+    offset = 0x0a000000;
+  }
+  else if (classifier == "e") { // Class B
+    offset = 0xac100000;
+  }
+  else if (classifier == "i") { // Class C
+    offset = 0xc0a80000;
+  }
+  const data = handle.substring(2);
+  const num = fromBasedStringToNumber(data);
+  const ipAsLong = offset + num;
+
+
+  if (classifier == "a" && ipAsLong > 0x0affffff) { // Class A
+    console.warn("hanlde not a class A net IP address");
+  }
+  else if (classifier == "e" && ipAsLong > 0xac1fffff) { // Class B
+    console.warn("hanlde not a class B net IP address");
+  }
+  else if (classifier == "i" && ipAsLong > 0xc0a8ffff) { // Class C
+    console.warn("hanlde not a class C net IP address");
+  }
+
+  
+  return numberToIp(ipAsLong);
+}
+
+function fromBasedStringToNumber(basedString) {
+  let base = BASE_CHARS.length;
+  let num = 0;
+
+  for (let i = 0; i < basedString.length; i++) {
+      num = num * base + BASE_CHARS.indexOf(basedString[i]);
+  }
+
+  return num;
+}
+
+function numberToIp(num) { 
+  // Ensure the number is within the valid range for an IPv4 address 
+  if (num < 0 || num > 4294967295) { 
+    return undefined;
+  } 
+  return [ (num >>> 24) & 255, // First octet 
+           (num >>> 16) & 255, // Second octet 
+           (num >>> 8) & 255, // Third octet 
+            num & 255 // Fourth octet 
+         ].join('.'); 
+  } 
