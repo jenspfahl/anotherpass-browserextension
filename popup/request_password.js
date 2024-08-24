@@ -24,7 +24,7 @@ document.addEventListener("click", (e) => {
       loadAlternativeServersToUi(newServer);
       const ipFromHandle = handleToIpAddress(newServer);
       if (ipFromHandle) {
-        hostField.title = "Handle will be tranlated to " + ipFromHandle;
+        hostField.title = "The handle will be translated to " + ipFromHandle;
       }
       else {
         hostField.title = "";
@@ -58,11 +58,29 @@ else {
   hostField.value = server;
   const ipFromHandle = handleToIpAddress(hostField.value);
   if (ipFromHandle) {
-    hostField.title = "Handle will be tranlated to " + ipFromHandle;
+    hostField.title = "The handle will be translated to " + ipFromHandle;
   }
   else {
     hostField.title = "";
   }
+
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "host") {
+      e.target.title = "";
+
+      if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+        e.target.classList.remove("invalid-state");
+        const ipFromHandle = handleToIpAddress(e.target.value);
+        if (ipFromHandle) {
+          e.target.title = "The handle will be translated to " + ipFromHandle;
+        }
+      }
+      else {
+        e.target.classList.add("invalid-state");
+        e.target.title = "Server address invalid! Won't be stored.";
+      }
+    }
+  });
 
 
   // load all known servers
@@ -81,7 +99,7 @@ else {
       loadAlternativeServersToUi(newServer);
       const ipFromHandle = handleToIpAddress(newServer);
       if (ipFromHandle) {
-        hostField.title = "Handle will be tranlated to " + ipFromHandle;
+        hostField.title = "The handle will be translated to " + ipFromHandle;
       }
       else {
         hostField.title = "";

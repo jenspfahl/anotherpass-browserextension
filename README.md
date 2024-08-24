@@ -162,7 +162,7 @@ Meant is an attacker who is able to capture the QR code during the linking phase
 
 Mitigations:
 
-  * If an attacker is able to capture `SK` they wont be able to read the `BK`, since it is encrypted with a `TKrs` derived and encrypted by `PKext`. 
+  * If an attacker is able to capture `SK` they Won't be able to read the `BK`, since it is encrypted with a `TKrs` derived and encrypted by `PKext`. 
 
 
 ### Leak of stored extension secret keys

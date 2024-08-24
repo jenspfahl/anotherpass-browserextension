@@ -12,10 +12,28 @@ const renderContentIcon = localStorage.getItem("render_content_icon");
 const server = localStorage.getItem("server_address");
 const hostField = document.getElementById("server-settings-host");
 hostField.value = server;
-const ipFromHandle = handleToIpAddress(server);
+const ipFromHandle = handleToIpAddress(hostField);
 if (ipFromHandle) {
-  hostField.title = "Handle will be tranlated to " + ipFromHandle;
+  hostField.title = "The handle will be translated to " + ipFromHandle;
 }
+
+document.addEventListener("input", (e) => {
+  if (e.target.id === "server-settings-host") {
+    e.target.title = "";
+
+    if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+      e.target.classList.remove("invalid-state");
+      const ipFromHandle = handleToIpAddress(e.target.value);
+      if (ipFromHandle) {
+        e.target.title = "The handle will be translated to " + ipFromHandle;
+      }
+    }
+    else {
+      e.target.classList.add("invalid-state");
+      e.target.title = "Server address invalid! Won't be stored.";
+    }
+  }
+});
 
 
 // load all known servers
@@ -26,7 +44,7 @@ hostSelector.addEventListener("change", function() {
     hostField.value = hostSelector.value;
     const ipFromHandle = handleToIpAddress(hostField.value);
     if (ipFromHandle) {
-      hostField.title = "Handle will be tranlated to " + ipFromHandle;
+      hostField.title = "The handle will be translated to " + ipFromHandle;
     }
     else {
       hostField.title = "";
@@ -265,7 +283,7 @@ document.addEventListener("click", async (e) => {
       const ipFromHandle = handleToIpAddress(server.host);
       let hostTooltip = "";
       if (ipFromHandle) {
-        hostTooltip = "Handle will be tranlated to " + ipFromHandle;
+        hostTooltip = "The handle will be translated to " + ipFromHandle;
       }
             
       let htmlLine;
@@ -316,13 +334,13 @@ document.addEventListener("click", async (e) => {
             e.target.classList.remove("invalid-state");
             const ipFromHandle = handleToIpAddress(e.target.value);
             if (ipFromHandle) {
-              e.target.title = "Handle will be tranlated to " + ipFromHandle;
+              e.target.title = "The handle will be translated to " + ipFromHandle;
             }
           }
           else {
             console.log("host invald", e.target.value);
             e.target.classList.add("invalid-state");
-            e.target.title = "Server address invalid! Wont be stored.";
+            e.target.title = "Server address invalid! Won't be stored.";
           }
     
           
