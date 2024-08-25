@@ -44,6 +44,26 @@ if (!linked || relink) {
       const ip = localStorage.getItem("server_address");
       const port = localStorage.getItem("server_port");
       document.getElementById("host").value = ip;
+
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "host") {
+          e.target.title = "";
+    
+          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+            e.target.classList.remove("invalid-state");
+            const ipFromHandle = handleToIpAddress(e.target.value);
+            if (ipFromHandle) {
+              e.target.title = "The handle will be translated to " + ipFromHandle;
+            }
+          }
+          else {
+            e.target.classList.add("invalid-state");
+            e.target.title = "Server address invalid! Won't be stored.";
+          }
+        }
+      });
+
+      
       document.getElementById("port").value = port || 8787;
   
       document.getElementById("next").disabled = true;
@@ -110,7 +130,7 @@ async function linkApp(relink, webClientId) {
       if (!ip || ip == "") {
         bsAlert("Error", "A handle, hostname or IP address is required");
       }
-      else if (!isValidIPAdressOrHostname(ip)) {
+      else if (!isValidIPAdressOrHostnameOrHandle(ip)) {
         bsAlert("Error", "Invalid handle, hostname or IP address");
       }
       else if (isNaN(port) || port < 1024 || port > 49151) {
