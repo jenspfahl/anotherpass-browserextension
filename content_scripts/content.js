@@ -247,7 +247,7 @@ const showCredentialModal = (x, y, url) => {
   _url = url;
   const modal = document.createElement("dialog");
 
-  modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 450px; width: 300px; border: none; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`);
+  modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 450px; width: 300px; border: 0.5px solid black; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`);
   modal.innerHTML = `
   <iframe id="popup-content" class="credential_popup"></iframe>
   <div class="close_button_position">
