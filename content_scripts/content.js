@@ -162,6 +162,8 @@ getTemporaryKey("linked").then(async (linked) => {
 
 });
 
+const injectedButtonId = "___synthetic_ANOTHERpass_____";
+
 function addButton(input) {
 
   console.debug("input.type", input.type);
@@ -186,40 +188,39 @@ function addButton(input) {
     return;
   }
 
-  const button = document.createElement('button');
-  button.type = "button";
-  button.classList.add("requestCredentialButton");
-
-  const inputHeight = input.clientHeight + 2;
-  const inputWidth = input.clientWidth - inputHeight;
-
-  console.debug("inputHeight", inputHeight);
-  console.debug("inputWidth", inputWidth);
-  //button.style.left = inputWidth + "px";
-
-  if (inputHeight <= 24) {
-    button.classList.add("dimension-24");
-  }
-  else if (inputHeight <= 32) {
-    button.classList.add("dimension-32");
-  }
-  else {
-    button.classList.add("dimension-48");
-  }
-  button.style.width = inputHeight + "px";
-  button.style.height = inputHeight + "px";
-  button.style.border = input.border;
+  
 
   const target = input.parentNode;
-  const oldButton = target.querySelector(".requestCredentialButton");
+  if (target.id !== injectedButtonId) {
+    const div = document.createElement('div');
+    div.id = injectedButtonId;
 
-  if (oldButton) {
-    target.removeChild(oldButton);
+    const button = document.createElement('button');
+    button.type = "button";
+    button.classList.add("requestCredentialButton");
+
+    const inputHeight = input.clientHeight + 2;
+    if (inputHeight <= 24) {
+      button.classList.add("dimension-24");
+    }
+    else if (inputHeight <= 32) {
+      button.classList.add("dimension-32");
+    }
+    else {
+      button.classList.add("dimension-48");
+    }
+    button.style.width = inputHeight + "px";
+    button.style.height = inputHeight + "px";
+    button.style.border = input.border;
+
+    target.insertBefore(div, input);
+
+    div.append(button, input);
+
+
+    button.addEventListener("click", (e) => openPopup(e.pageX, e.pageY, input), false);
   }
-  target.insertBefore(button, input);
-
-
-  button.addEventListener("click", (e) => openPopup(e.pageX, e.pageY, input), false);
+  
 }
 
 
@@ -304,4 +305,5 @@ async function openPopup(posX, posY, input) {
   showCredentialModal(x, y, window.location.href);
 
 }
+
 
