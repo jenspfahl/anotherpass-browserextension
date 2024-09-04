@@ -1,4 +1,9 @@
 
+chrome.runtime.sendMessage({
+  action: "close_all_credential_dialogs",
+});
+
+
 const webClientId = localStorage.getItem("web_client_id");
 const linked = localStorage.getItem("linked");
 

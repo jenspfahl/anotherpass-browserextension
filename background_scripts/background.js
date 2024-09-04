@@ -6,12 +6,23 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
   console.log("background action: " + message.action + ", sender: " + sender.url);
 
   switch (message.action) {
+    case "create_context_menu": {
+      createContextMenu();
+
+      return true;
+    }
+
+    case "remove_context_menu": {
+      removeContextMenu();
+
+      return true;
+    }
 
     case "get_tab_id": {
       sendResponse({tabId: sender.tab.id});
 
       return true;
-   }
+    }
    
     case "get": {
       sendResponse({result: variables.get(message.key)});
@@ -132,6 +143,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
       return true;  
     }
+
+            
+    case "close_all_credential_dialogs": {
+      closeAllCredentialDialogs(message);
+
+      return true;  
+    }
     
     case "refresh_credential_dialog": {
       chrome.tabs.sendMessage(message.tabId, { action: "refresh_credential_dialog" });
@@ -181,49 +199,74 @@ if (linked) {
 
 
 
+  createContextMenu();
+}
+
+
+function closeAllCredentialDialogs() {
+  chrome.tabs.query({ currentWindow: true }, function (tabs) {
+
+    for (var i = 0; i < tabs.length; i++) {
+      chrome.tabs.sendMessage(tabs[i].id, { action: "close_credential_dialog" });
+    }
+  });
+}
+
+function createContextMenu() {
   browser.contextMenus.create({
     id: "anotherpass-open-dialog",
     title: "Open ANOTHERpass dialog",
     contexts: ["editable"],
   },
-    () => void browser.runtime.lastError,
+    () => void browser.runtime.lastError
   );
 
   browser.contextMenus.create({
     id: "anotherpass-credential-request",
     title: "Request credential from ANOTHERpass",
-    contexts: ["editable"], 
+    contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
     // for information on the purpose of this error capture.
-    () => void browser.runtime.lastError,
+    () => void browser.runtime.lastError
   );
 
   browser.contextMenus.create({
     id: "anotherpass-credential-create-request",
     title: "Create new credential in ANOTHERpass",
-    contexts: ["editable"], 
+    contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
     // for information on the purpose of this error capture.
-    () => void browser.runtime.lastError,
+    () => void browser.runtime.lastError
   );
 
-  browser.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "anotherpass-credential-request") {
-      console.debug("tabUrl", tab.url);
-      openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
-    }
-    else if (info.menuItemId === "anotherpass-credential-create-request") {
-      console.debug("tabUrl", tab.url);
-      openPasswordRequestDialog("create_credential_for_url", tab.id, tab.url);
-    }
-    else if (info.menuItemId === "anotherpass-open-dialog") {
-      chrome.tabs.sendMessage(tab.id, { action: "open_credential_dialog" });
-    }
-  });
+  browser.contextMenus.onClicked.addListener(onContextMenuClicked);
 }
 
+
+function removeContextMenu() {
+  browser.contextMenus.remove("anotherpass-open-dialog");
+  browser.contextMenus.remove("anotherpass-credential-request");
+  browser.contextMenus.remove("anotherpass-credential-create-request");
+
+  browser.contextMenus.onClicked.removeListener(onContextMenuClicked);
+}
+
+
+function onContextMenuClicked(info, tab) {
+  if (info.menuItemId === "anotherpass-credential-request") {
+    console.debug("tabUrl", tab.url);
+    openPasswordRequestDialog("fetch_credential_for_url", tab.id, tab.url);
+  }
+  else if (info.menuItemId === "anotherpass-credential-create-request") {
+    console.debug("tabUrl", tab.url);
+    openPasswordRequestDialog("create_credential_for_url", tab.id, tab.url);
+  }
+  else if (info.menuItemId === "anotherpass-open-dialog") {
+    chrome.tabs.sendMessage(tab.id, { action: "open_credential_dialog" });
+  }
+}
 
 
 async function forwardCredential(tabId, uid) {
@@ -426,6 +469,8 @@ async function unlinkApp() {
   variables.clear();
   localStorage.clear();
 
+  removeContextMenu();
+  closeAllCredentialDialogs();
 
   await destroyAllKeys(); 
   console.log("do unlink done");

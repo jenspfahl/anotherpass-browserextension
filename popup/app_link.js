@@ -228,6 +228,10 @@ async function linkApp(relink, webClientId) {
                 deleteTemporaryKeys();
                 destroySessionKey();
 
+                chrome.runtime.sendMessage({
+                  action: "create_context_menu"
+                });
+
                 setTemporaryKey("linked", true);
 
                 bsAlert("Success", "Extension successfully linked to vault <b>" + newVaultId + "</b> with the link identifier <b class=\"fingerprint\">" + webClientId + "</b>.").then(_ => {

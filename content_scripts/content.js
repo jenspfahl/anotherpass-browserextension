@@ -241,42 +241,53 @@ function checkUsernameField(field) {
 
 
 const showCredentialModal = (x, y, url) => {
-  console.log("modal");
 
-  _x = x;
-  _y = y;
-  _url = url;
-  const modal = document.createElement("dialog");
+  getTemporaryKey("linked").then((linked) => {
+    if (linked) {
+      console.log("modal");
 
-  modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 450px; width: 300px; border: 0.5px solid black; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`);
-  modal.innerHTML = `
-  <iframe id="popup-content" class="credential_popup"></iframe>
-  <div class="close_button_position">
-    <button class="close_button_style">
-     X
-    </button>
-  </div>`;
-  document.body.appendChild(modal);
-  const dialog = document.querySelector("dialog");
-  _dialog = dialog;
+      _x = x;
+      _y = y;
+      _url = url;
+      const modal = document.createElement("dialog");
+    
+      modal.setAttribute("style", `overflow: hidden; padding: 0px; height: 450px; width: 300px; border: 0.5px solid black; top: ${y}px; left: ${x}px; border-radius: 10px; background-color: white; position: fixed; box-shadow: 0px 12px 48px rgba(29, 5, 64, 0.32);`);
+      modal.innerHTML = `
+      <iframe id="popup-content" class="credential_popup"></iframe>
+      <div class="close_button_position">
+        <button class="close_button_style">
+         X
+        </button>
+      </div>`;
+      document.body.appendChild(modal);
+      const dialog = document.querySelector("dialog");
+      _dialog = dialog;
+    
+    
+      dialog.showModal();
+      const iframe = document.getElementById("popup-content");
+      console.log("iframe", iframe);
+    
+      iframe.frameBorder = 0;
+      dialog.querySelector("button").addEventListener("click", () => {
+        popupOpen = false;
+        dialog.close();
+      });
+    
+    
+      chrome.runtime.sendMessage({ action: "get_tab_id" }, response => {
+        console.debug("tabId", response.tabId);
+        iframe.src = browser.runtime.getURL("../popup/choose_credential.html?data=" + encodeURIComponent(JSON.stringify({ tabId: response.tabId, url: url })));
+      });
+    
+    }
+    else {
+      alert("Please reload the page!");
+    }
+  }
+  );
 
-
-  dialog.showModal();
-  const iframe = document.getElementById("popup-content");
-  console.log("iframe", iframe);
-
-  iframe.frameBorder = 0;
-  dialog.querySelector("button").addEventListener("click", () => {
-    popupOpen = false;
-    dialog.close();
-  });
-
-
-  chrome.runtime.sendMessage({ action: "get_tab_id" }, response => {
-    console.debug("tabId", response.tabId);
-    iframe.src = browser.runtime.getURL("../popup/choose_credential.html?data=" + encodeURIComponent(JSON.stringify({ tabId: response.tabId, url: url })));
-  });
-
+  
 
 }
 
