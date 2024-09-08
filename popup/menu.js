@@ -4,450 +4,452 @@ chrome.runtime.sendMessage({
 });
 
 
-const webClientId = localStorage.getItem("web_client_id");
-const linked = localStorage.getItem("linked");
+getLocalValue("linked").then(async (linked) => {
 
-const linkedVaultId = localStorage.getItem("linked_vault_id");
+  const webClientId = await getLocalValue("web_client_id");
+  const linkedVaultId = await getLocalValue("linked_vault_id");
 
-const lockTimeout = localStorage.getItem("lock_timeout") || 60;
-const renderContentIcon = localStorage.getItem("render_content_icon");
-
-
-// load current configurated server
-const server = localStorage.getItem("server_address");
-const hostField = document.getElementById("server-settings-host");
-hostField.value = server;
-const ipFromHandle = handleToIpAddress(hostField);
-if (ipFromHandle) {
-  hostField.title = "The handle will be translated to " + ipFromHandle;
-}
-
-document.addEventListener("input", (e) => {
-  if (e.target.id === "server-settings-host") {
-    e.target.title = "";
-
-    if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-      e.target.classList.remove("invalid-state");
-      const ipFromHandle = handleToIpAddress(e.target.value);
-      if (ipFromHandle) {
-        e.target.title = "The handle will be translated to " + ipFromHandle;
-      }
-    }
-    else {
-      e.target.classList.add("invalid-state");
-      e.target.title = "Server address invalid! Won't be stored.";
-    }
-  }
-});
+  const lockTimeout = await getLocalValue("lock_timeout") || 60;
+  const renderContentIcon = await getLocalValue("render_content_icon");
 
 
-// load all known servers
-loadAlternativeServersToUi();
-const hostSelector = document.getElementById("host_selector");
-hostSelector.addEventListener("change", function() {
-  if (hostField.value) {
-    hostField.value = hostSelector.value;
-    const ipFromHandle = handleToIpAddress(hostField.value);
-    if (ipFromHandle) {
-      hostField.title = "The handle will be translated to " + ipFromHandle;
-    }
-    else {
-      hostField.title = "";
-    }
-    const options = hostSelector.querySelectorAll("option");
-    if (options.length > 0) {
-        options[0].selected = true;
-    }
-  }
-});
-
-const port = localStorage.getItem("server_port");
-
-const pollingTimeout = localStorage.getItem("polling_timeout") || 60;
-const pollingInterval = localStorage.getItem("polling_interval") || 2;
-
-document.getElementById("linked_vault_id").innerText = linkedVaultId;
-
-document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
-
-
-document.getElementById("server-settings-port").value = port;
-
-document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
-document.getElementById("server-settings-polling-interval").value = pollingInterval;
-
-const searchInput = document.getElementById("search_input");
-
-searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
-
-document.addEventListener("click", async (e) => {
-
-  if (e.target.id === "btn-save-settings") {
-
-    const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
-    const renderContentIcon = document.getElementById("render_content_icon").checked;
-
-
-    const server = hostField.value;
-    const port = parseInt(document.getElementById("server-settings-port").value);
-
-    const pollingTimeout = parseInt(document.getElementById("server-settings-polling-timeout").value);
-    const pollingInterval = parseInt(document.getElementById("server-settings-polling-interval").value);
-
-
-    if (!server || server == "") {
-      bsAlert("Error", "A handle, hostname or IP address is required");
-    }
-    else if (!isValidIPAdressOrHostnameOrHandle(server)) {
-      bsAlert("Error", "Invalid handle, hostname or IP address");
-    }
-    else if (isNaN(port) || port < 1024 || port > 49151) {
-      bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
-    }
-    else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
-      bsAlert("Error", "Invalid polling timeout, should be a number between 1 and 300.");
-    }
-    else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
-      bsAlert("Error", "Invalid polling interval, should be a number between 1 and 60.");
-    }
-    else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
-      bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
-    }
-    else {
-      addNewAlternativeServer(server);
-      loadAlternativeServersToUi();
-            
-      localStorage.setItem("server_port", port);
-      localStorage.setItem("polling_timeout", pollingTimeout);
-      localStorage.setItem("polling_interval", pollingInterval);
-      localStorage.setItem("lock_timeout", lockTimeout);
-      localStorage.setItem("render_content_icon", renderContentIcon);
-      setTemporaryKey("render_content_icon", renderContentIcon);
-
-      bsAlert("Success", "Settings sucessfully updated.");
-    }
-
+  // load current configurated server
+  const server = await getLocalValue("server_address");
+  const hostField = document.getElementById("server-settings-host");
+  hostField.value = server;
+  const ipFromHandle = handleToIpAddress(hostField);
+  if (ipFromHandle) {
+    hostField.title = "The handle will be translated to " + ipFromHandle;
   }
 
-  if (e.target.id === "btn-reset-settings") {
-    document.getElementById("server-settings-host").value = server;
-    document.getElementById("server-settings-port").value = port;
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "server-settings-host") {
+      e.target.title = "";
 
-    document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
-    document.getElementById("server-settings-polling-interval").value = pollingInterval;
-
-    document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-    document.getElementById("render_content_icon").checked = true;
-
-
-  }
-
-  if (e.target.id === "link") {
-
-    chrome.runtime.sendMessage({
-      action: "start_link_flow",
-    });
-
-  } else if (e.target.id === "relink") {
-
-    chrome.runtime.sendMessage({
-      action: "start_link_flow",
-      relink: true
-    });
-
-  } else if (e.target.id === "unlink") {
-
-     bsConfirm(
-      "Unlink from app", 
-      "Are you sure to unlink <b class=\"fingerprint_small\">" + webClientId + "</b> from the app?",
-      "Unlink"
-    )
-    .then((decision) => {
-      if (decision === true) {
-        chrome.runtime.sendMessage({
-          action: "start_unlink_flow",
-        }).then((response) => {
-          updateMenuUi(null, null);
-
-          loadAlternativeServersToUi()
-
-
-          bsAlert("Success", "App successfully un-linked! You can remove the linked device <b class=\"fingerprint_small\">" + webClientId + "</b> from your app.").then(_ => {
-            window.close();
-          });
-
-        });
-      }
-     });
-
-  }
-  else if (e.target.id === "lock" || e.target.id === "lock_icon") {
-    const isUnlocked = await isLocalVaultUnlocked();
-    if (isUnlocked) {
-      // lock local vault
-      deleteTemporaryKey("clientKey");
-      updateVaultUi();
-      document.getElementById("credential_list").remove();
-      updateExtensionIcon();
-    }
-    else {
-      //request clientKey from app
-      chrome.runtime.sendMessage({
-        action: "start_client_key_request_flow"
-      });
-    }
-  }
-  else if (e.target.id === "sync_credentials") {
-    chrome.runtime.sendMessage({
-      action: "start_sync_passwords_request_flow"
-    });
-  }
-  else if (e.target.id === "fetch_credential") {
-    chrome.runtime.sendMessage({
-      action: "start_single_password_request_flow"
-    });
-  }
-  else if (e.target.id === "fetch_multiple_credentials") {
-    chrome.runtime.sendMessage({
-      action: "start_multiple_passwords_request_flow"
-    });
-  }
-  else if (e.target.id === "fetch_all_credentials") {
-    chrome.runtime.sendMessage({
-      action: "start_all_passwords_request_flow"
-    });
-  }
-  else if (e.target.id === "delete_all_credentials") {
-    bsConfirm("Delete all local credentials", 
-    "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
-    .then(async (decision) => {
-      if (decision === true) {
-        console.log("clearing local vault");
-      
-        for (var i = 0; i < localStorage.length; i++){
-          const key = localStorage.key(i);
-    
-          if (key.startsWith(PREFIX_CREDENTIAL)) {
-            localStorage.removeItem(key);
-          }
+      if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+        e.target.classList.remove("invalid-state");
+        const ipFromHandle = handleToIpAddress(e.target.value);
+        if (ipFromHandle) {
+          e.target.title = "The handle will be translated to " + ipFromHandle;
         }
-        
-        document.getElementById("credential_list").innerHTML = "";
-        updateCredentialCountUi(0);
-        bsAlert("Success", "Local vault cleared.");
-      }
-    });
-    
-  }
-  else if (e.target.id === "details") {
-
-    const clientKeyPair = await getKey("client_keypair");
-    const clientPublicKeyFingerprint = await getPublicKeyStandarizedFingerprint(clientKeyPair.publicKey, ":");
-    
-    const appPublicKey = await getKey("app_public_key");
-    const appKeyFingerprint = await getPublicKeyStandarizedFingerprint(appPublicKey, ":");
-
-
-    const baseKey = await getKey("base_key");
-    const baseKeyAsArray = await aesKeyToArray(baseKey);
-    const baseKeyFingerprint = await sha256(baseKeyAsArray);
-
-    bsAlert("Info for " + webClientId, `
-    <div class="container">
-      App Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${appKeyFingerprint}</b>&nbsp;&nbsp;<br>
-      Device Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${clientPublicKeyFingerprint}</b>&nbsp;&nbsp;<br>
-      Shared Secret Fingerprint: <b class=\"fingerprint_small font-monospace\">${bytesToHex(baseKeyFingerprint, ":")}</b>&nbsp;&nbsp;<br>
-    </div>
-    `);
-  }
-  else if (e.target.id === "clear_search" || e.target.id === "clear_search_icon") {
-    searchInput.value = "";
-    updateCredentialList("");
-    searchInput.focus();
-  }
-  else if (e.target.id === "manage_servers") {
-
-    const currentServer = localStorage.getItem("server_address");
-
-    const allServers = loadAllServers();
-    // wrong! allServers.sort((a, b) => (a.host === currentServer && b.host !== currentServer ? 0 : 1));
-   
-
-    const html = [];
-    const serversToBeDeleted = [];
-    const changedHosts = new Map();
-    const changedDescriptions = new Map();
-    let addedHost, addedDescription;
-
-    html.push("<h6>All server addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in different networks, server addresses of the phone to connect can differ. Changing anything here doesn'r effect the current configured server address.</h6>");
-  
-
-    allServers.map((server) => {
-
-      const ipFromHandle = handleToIpAddress(server.host);
-      let hostTooltip = "";
-      if (ipFromHandle) {
-        hostTooltip = "The handle will be translated to " + ipFromHandle;
-      }
-            
-      let htmlLine;
-      if (server.host === currentServer) {
-        htmlLine = `
-        <h8> - Current server -</h8>
-        <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
-          <div class="col-6">
-            <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
-          </div>
-          <div class="col-4">
-            <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
-          </div>
-        </div>
-
-    `;
       }
       else {
-        htmlLine = `
-        <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
-          <div class="col-6">
-            <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
-          </div>
-          <div class="col-4">
-            <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
-          </div>
-          <div class="col-1">
-            <button id="delete_server_${server.host}" class="btn">
-              <span id="delete_server_${server.host}" class="material-symbols-outlined size-24">
-                delete
-              </span>
-            </button>
-          </div>
-        </div>
-
-    `;
+        e.target.classList.add("invalid-state");
+        e.target.title = "Server address invalid! Won't be stored.";
       }
-      
-      html.push(htmlLine);
-  
+    }
+  });
 
-      document.addEventListener("input", (e) => {
-        if (e.target.id === "server_host_" + server.host) {
-          e.target.title = "";
 
-          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-            changedHosts.set(server.host, e.target.value);
-            e.target.classList.remove("invalid-state");
-            const ipFromHandle = handleToIpAddress(e.target.value);
-            if (ipFromHandle) {
-              e.target.title = "The handle will be translated to " + ipFromHandle;
-            }
-          }
-          else {
-            console.log("host invald", e.target.value);
-            e.target.classList.add("invalid-state");
-            e.target.title = "Server address invalid! Won't be stored.";
-          }
-    
-          
-        }
-        else if (e.target.id === "server_description_" + server.host) {
-          changedDescriptions.set(server.host, e.target.value);
-        }
-        else if (e.target.id === "new_server_host") {
-          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-            addedHost = e.target.value;
-            e.target.classList.remove("invalid-state");
-          }
-          else {
-            console.log("host invald", e.target.value);
-            e.target.classList.add("invalid-state");
-          }
-        }
-        else if (e.target.id === "new_server_description") {
-          addedDescription = e.target.value;
+  // load all known servers
+  await loadAlternativeServersToUi();
+  const hostSelector = document.getElementById("host_selector");
+  hostSelector.addEventListener("change", function() {
+    if (hostField.value) {
+      hostField.value = hostSelector.value;
+      const ipFromHandle = handleToIpAddress(hostField.value);
+      if (ipFromHandle) {
+        hostField.title = "The handle will be translated to " + ipFromHandle;
+      }
+      else {
+        hostField.title = "";
+      }
+      const options = hostSelector.querySelectorAll("option");
+      if (options.length > 0) {
+          options[0].selected = true;
+      }
+    }
+  });
+
+  const port = await getLocalValue("server_port");
+
+  const pollingTimeout = await getLocalValue("polling_timeout") || 60;
+  const pollingInterval = await getLocalValue("polling_interval") || 2;
+
+  document.getElementById("linked_vault_id").innerText = linkedVaultId;
+
+  document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+  document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
+
+
+  document.getElementById("server-settings-port").value = port;
+
+  document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
+  document.getElementById("server-settings-polling-interval").value = pollingInterval;
+
+  const searchInput = document.getElementById("search_input");
+
+  searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
+
+  document.addEventListener("click", async (e) => {
+
+    if (e.target.id === "btn-save-settings") {
+
+      const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
+      const renderContentIcon = document.getElementById("render_content_icon").checked;
+
+
+      const server = hostField.value;
+      const port = parseInt(document.getElementById("server-settings-port").value);
+
+      const pollingTimeout = parseInt(document.getElementById("server-settings-polling-timeout").value);
+      const pollingInterval = parseInt(document.getElementById("server-settings-polling-interval").value);
+
+
+      if (!server || server == "") {
+        bsAlert("Error", "A handle, hostname or IP address is required");
+      }
+      else if (!isValidIPAdressOrHostnameOrHandle(server)) {
+        bsAlert("Error", "Invalid handle, hostname or IP address");
+      }
+      else if (isNaN(port) || port < 1024 || port > 49151) {
+        bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
+      }
+      else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
+        bsAlert("Error", "Invalid polling timeout, should be a number between 1 and 300.");
+      }
+      else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
+        bsAlert("Error", "Invalid polling interval, should be a number between 1 and 60.");
+      }
+      else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
+        bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
+      }
+      else {
+        await addNewAlternativeServer(server);
+        await loadAlternativeServersToUi();
+              
+        await setLocalValue("server_port", port);
+        await setLocalValue("polling_timeout", pollingTimeout);
+        await setLocalValue("polling_interval", pollingInterval);
+        await setLocalValue("lock_timeout", lockTimeout);
+        await setLocalValue("render_content_icon", renderContentIcon);
+        setTemporaryKey("render_content_icon", renderContentIcon);
+
+        bsAlert("Success", "Settings sucessfully updated.");
+      }
+
+    }
+
+    if (e.target.id === "btn-reset-settings") {
+      document.getElementById("server-settings-host").value = server;
+      document.getElementById("server-settings-port").value = port;
+
+      document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
+      document.getElementById("server-settings-polling-interval").value = pollingInterval;
+
+      document.getElementById("server-settings-lock-timeout").value = lockTimeout;
+      document.getElementById("render_content_icon").checked = true;
+
+
+    }
+
+    if (e.target.id === "link") {
+
+      chrome.runtime.sendMessage({
+        action: "start_link_flow",
+      });
+
+    } else if (e.target.id === "relink") {
+
+      chrome.runtime.sendMessage({
+        action: "start_link_flow",
+        relink: true
+      });
+
+    } else if (e.target.id === "unlink") {
+
+      bsConfirm(
+        "Unlink from app", 
+        "Are you sure to unlink <b class=\"fingerprint_small\">" + webClientId + "</b> from the app?",
+        "Unlink"
+      )
+      .then((decision) => {
+        if (decision === true) {
+          chrome.runtime.sendMessage({
+            action: "start_unlink_flow",
+          }).then(async (response) => {
+            updateMenuUi(null, null);
+
+            await loadAlternativeServersToUi()
+
+
+            bsAlert("Success", "App successfully un-linked! You can remove the linked device <b class=\"fingerprint_small\">" + webClientId + "</b> from your app.").then(_ => {
+              window.close();
+            });
+
+          });
         }
       });
 
-
-      document.addEventListener("click", (e) => {
-        if (e.target.id === "delete_server_" + server.host) {
-          e.target.innerText = "";
-          const row = document.getElementById("server_row_" + server.host);
-          if (row) {
-            row.innerHTML = "<i> - " + server.host + " marked for deletion - </i>";
-            serversToBeDeleted.push(server.host);
-          }
-        }
-
-      }); 
-
-    });
-
-    html.push(`
-      <h8> - New server -</h8>
-        <div id="new_server_row" class="row mh-0 ph-0 mb-2">
-          <div class="col-6">
-            <input id="new_server_host" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
-          </div>
-          <div class="col-4">
-            <input id="new_server_description" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
-          </div>
-        </div>
-      `);
-
-    bsConfirm("Manage alternative servers", `
-    <div class="container">
-      ${html.join("")}
-    </div>
-    `, "Save", "Cancel")
-    .then((decision) => {
-      if (decision === true) {
-        // delete all altServers and insert all from UI
-        console.debug("serversToBeDeleted", serversToBeDeleted);
-        console.debug("changedHosts", changedHosts);
-        console.debug("changedDescriptions", changedDescriptions);
-
-        // first delete all marked
-        allServers.forEach((server) => {
-
-          if (serversToBeDeleted.includes(server.host)) {
-            console.debug("delete server " + PREFIX_ALT_SERVER + server.host);
-            localStorage.removeItem(PREFIX_ALT_SERVER + server.host);
+    }
+    else if (e.target.id === "lock" || e.target.id === "lock_icon") {
+      const isUnlocked = await isLocalVaultUnlocked();
+      if (isUnlocked) {
+        // lock local vault
+        deleteTemporaryKey("clientKey");
+        updateVaultUi();
+        document.getElementById("credential_list").remove();
+        updateExtensionIcon();
+      }
+      else {
+        //request clientKey from app
+        chrome.runtime.sendMessage({
+          action: "start_client_key_request_flow"
+        });
+      }
+    }
+    else if (e.target.id === "sync_credentials") {
+      chrome.runtime.sendMessage({
+        action: "start_sync_passwords_request_flow"
+      });
+    }
+    else if (e.target.id === "fetch_credential") {
+      chrome.runtime.sendMessage({
+        action: "start_single_password_request_flow"
+      });
+    }
+    else if (e.target.id === "fetch_multiple_credentials") {
+      chrome.runtime.sendMessage({
+        action: "start_multiple_passwords_request_flow"
+      });
+    }
+    else if (e.target.id === "fetch_all_credentials") {
+      chrome.runtime.sendMessage({
+        action: "start_all_passwords_request_flow"
+      });
+    }
+    else if (e.target.id === "delete_all_credentials") {
+      bsConfirm("Delete all local credentials", 
+      "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
+      .then(async (decision) => {
+        if (decision === true) {
+          console.log("clearing local vault");
+        
+          const all = await getAllLocalValues();
+          for (const [key, _] of all) {
+      
+            if (key.startsWith(PREFIX_CREDENTIAL)) {
+              await removeLocalValue(key);
+            }
           }
           
-        });
+          document.getElementById("credential_list").innerHTML = "";
+          updateCredentialCountUi(0);
+          bsAlert("Success", "Local vault cleared.");
+        }
+      });
+      
+    }
+    else if (e.target.id === "details") {
 
-        // then update current
-        allServers.forEach((server) => {
+      const clientKeyPair = await getKey("client_keypair");
+      const clientPublicKeyFingerprint = await getPublicKeyStandarizedFingerprint(clientKeyPair.publicKey, ":");
+      
+      const appPublicKey = await getKey("app_public_key");
+      const appKeyFingerprint = await getPublicKeyStandarizedFingerprint(appPublicKey, ":");
 
-          if (!serversToBeDeleted.includes(server.host)) {
-            const currentDescription = localStorage.getItem(PREFIX_ALT_SERVER + server.host);
 
-            const changedHost = changedHosts.get(server.host);
-            const changedDescription = changedDescriptions.get(server.host);
-            console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
-            localStorage.removeItem(PREFIX_ALT_SERVER + server.host);
-            localStorage.setItem(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
+      const baseKey = await getKey("base_key");
+      const baseKeyAsArray = await aesKeyToArray(baseKey);
+      const baseKeyFingerprint = await sha256(baseKeyAsArray);
+
+      bsAlert("Info for " + webClientId, `
+      <div class="container">
+        App Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${appKeyFingerprint}</b>&nbsp;&nbsp;<br>
+        Device Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${clientPublicKeyFingerprint}</b>&nbsp;&nbsp;<br>
+        Shared Secret Fingerprint: <b class=\"fingerprint_small font-monospace\">${bytesToHex(baseKeyFingerprint, ":")}</b>&nbsp;&nbsp;<br>
+      </div>
+      `);
+    }
+    else if (e.target.id === "clear_search" || e.target.id === "clear_search_icon") {
+      searchInput.value = "";
+      updateCredentialList("");
+      searchInput.focus();
+    }
+    else if (e.target.id === "manage_servers") {
+
+      const currentServer = await getLocalValue("server_address");
+
+      const allServers = await loadAllServers();
+    
+
+      const html = [];
+      const serversToBeDeleted = [];
+      const changedHosts = new Map();
+      const changedDescriptions = new Map();
+      let addedHost, addedDescription;
+
+      html.push("<h6>All server addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in different networks, server addresses of the phone to connect can differ. Changing anything here doesn'r effect the current configured server address.</h6>");
+    
+
+      allServers.map((server) => {
+
+        const ipFromHandle = handleToIpAddress(server.host);
+        let hostTooltip = "";
+        if (ipFromHandle) {
+          hostTooltip = "The handle will be translated to " + ipFromHandle;
+        }
+              
+        let htmlLine;
+        if (server.host === currentServer) {
+          htmlLine = `
+          <h8> - Current server -</h8>
+          <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
+            <div class="col-6">
+              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+            </div>
+            <div class="col-4">
+              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+            </div>
+          </div>
+
+      `;
+        }
+        else {
+          htmlLine = `
+          <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
+            <div class="col-6">
+              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+            </div>
+            <div class="col-4">
+              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+            </div>
+            <div class="col-1">
+              <button id="delete_server_${server.host}" class="btn">
+                <span id="delete_server_${server.host}" class="material-symbols-outlined size-24">
+                  delete
+                </span>
+              </button>
+            </div>
+          </div>
+
+      `;
+        }
+        
+        html.push(htmlLine);
+    
+
+        document.addEventListener("input", (e) => {
+          if (e.target.id === "server_host_" + server.host) {
+            e.target.title = "";
+
+            if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+              changedHosts.set(server.host, e.target.value);
+              e.target.classList.remove("invalid-state");
+              const ipFromHandle = handleToIpAddress(e.target.value);
+              if (ipFromHandle) {
+                e.target.title = "The handle will be translated to " + ipFromHandle;
+              }
+            }
+            else {
+              console.log("host invald", e.target.value);
+              e.target.classList.add("invalid-state");
+              e.target.title = "Server address invalid! Won't be stored.";
+            }
+      
             
+          }
+          else if (e.target.id === "server_description_" + server.host) {
+            changedDescriptions.set(server.host, e.target.value);
+          }
+          else if (e.target.id === "new_server_host") {
+            if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+              addedHost = e.target.value;
+              e.target.classList.remove("invalid-state");
+            }
+            else {
+              console.log("host invald", e.target.value);
+              e.target.classList.add("invalid-state");
+            }
+          }
+          else if (e.target.id === "new_server_description") {
+            addedDescription = e.target.value;
           }
         });
 
-        // handle creation
-        if (addedHost && addedHost.trim().length > 0) {
-          const currentDescription = localStorage.getItem(PREFIX_ALT_SERVER + addedHost);
-          console.debug("add server " + PREFIX_ALT_SERVER + addedHost + " with " + addedDescription);
-          localStorage.setItem(PREFIX_ALT_SERVER + addedHost, addedDescription || "");
+
+        document.addEventListener("click", (e) => {
+          if (e.target.id === "delete_server_" + server.host) {
+            e.target.innerText = "";
+            const row = document.getElementById("server_row_" + server.host);
+            if (row) {
+              row.innerHTML = "<i> - " + server.host + " marked for deletion - </i>";
+              serversToBeDeleted.push(server.host);
+            }
+          }
+
+        }); 
+
+      });
+
+      html.push(`
+        <h8> - New server -</h8>
+          <div id="new_server_row" class="row mh-0 ph-0 mb-2">
+            <div class="col-6">
+              <input id="new_server_host" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+            </div>
+            <div class="col-4">
+              <input id="new_server_description" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+            </div>
+          </div>
+        `);
+
+      bsConfirm("Manage alternative servers", `
+      <div class="container">
+        ${html.join("")}
+      </div>
+      `, "Save", "Cancel")
+      .then(async (decision) => {
+        if (decision === true) {
+          // delete all altServers and insert all from UI
+          console.debug("serversToBeDeleted", serversToBeDeleted);
+          console.debug("changedHosts", changedHosts);
+          console.debug("changedDescriptions", changedDescriptions);
+
+          // first delete all marked
+          allServers.forEach(async (server) => {
+
+            if (serversToBeDeleted.includes(server.host)) {
+              console.debug("delete server " + PREFIX_ALT_SERVER + server.host);
+              await removeLocalValue(PREFIX_ALT_SERVER + server.host);
+            }
+            
+          });
+
+          // then update current
+          allServers.forEach(async (server) => {
+
+            if (!serversToBeDeleted.includes(server.host)) {
+              const currentDescription = await getLocalValue(PREFIX_ALT_SERVER + server.host);
+
+              const changedHost = changedHosts.get(server.host);
+              const changedDescription = changedDescriptions.get(server.host);
+              console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
+              await removeLocalValue(PREFIX_ALT_SERVER + server.host);
+              await setLocalValue(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
+              
+            }
+          });
+
+          // handle creation
+          if (addedHost && addedHost.trim().length > 0) {
+            const currentDescription = await getLocalValue(PREFIX_ALT_SERVER + addedHost);
+            console.debug("add server " + PREFIX_ALT_SERVER + addedHost + " with " + addedDescription);
+            await setLocalValue(PREFIX_ALT_SERVER + addedHost, addedDescription || "");
+          }
+
+
+          await loadAlternativeServersToUi()
         }
+      });
+    }
+  });
 
 
-        loadAlternativeServersToUi()
-      }
-     });
-  }
+  updateMenuUi(webClientId, linked);
+
+
 });
-
-
-updateMenuUi(webClientId, linked);
 
 
 function updateVaultUi(unlocked) {
@@ -460,7 +462,7 @@ function updateVaultUi(unlocked) {
     document.getElementById("delete_all_credentials").classList.remove("d-none");
     document.getElementById("search_group").classList.remove("d-none");
 
-    searchInput.focus();
+    document.getElementById("search_input").focus();
 
   }
   else {
@@ -525,9 +527,8 @@ function updateMenuUi(webClientId, linked) {
     
     const credentials = [];
 
-    for (var i = 0; i < localStorage.length; i++){
-      const key = localStorage.key(i);
-      const value = localStorage.getItem(key);
+    const all = await getAllLocalValues();
+    for (const [key, value] of all) {
 
       if (key.startsWith(PREFIX_CREDENTIAL)) {
         try {
@@ -683,7 +684,7 @@ function updateMenuUi(webClientId, linked) {
           .then(async (decision) => {
             console.log("decision:" + decision);
             if (decision === true) {
-              localStorage.removeItem(PREFIX_CREDENTIAL + uuid);
+              await removeLocalValue(PREFIX_CREDENTIAL + uuid);
               list.removeChild(li);
               credentialCount--;
               updateCredentialCountUi(credentialCount);
@@ -729,8 +730,8 @@ function updateCredentialCountUi(credentialCount) {
 }
 
 
-function loadAlternativeServersToUi() {
-  const alternativeServers = loadAllServers();
+async function loadAlternativeServersToUi() {
+  const alternativeServers = await loadAllServers();
   const hostSelector = document.getElementById("host_selector");
   hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
 
@@ -759,11 +760,10 @@ function loadAlternativeServersToUi() {
   });
 }
 
-function loadAllServers() {
+async function loadAllServers() {
   const alternativeServers = [];
-  for (var i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key);
+  const all = await getAllLocalValues();
+  for (const [key, value] of all) {
 
     if (key.startsWith(PREFIX_ALT_SERVER)) {
       const host = key.substring(PREFIX_ALT_SERVER.length);
@@ -775,12 +775,12 @@ function loadAllServers() {
   return alternativeServers;
 }
 
-function addNewAlternativeServer(newServer) {
-  const currentServer = localStorage.getItem("server_address");
-  const currentServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + currentServer);
-  const newServerDesc = localStorage.getItem(PREFIX_ALT_SERVER + newServer);
+async function addNewAlternativeServer(newServer) {
+  const currentServer = await getLocalValue("server_address");
+  const currentServerDesc = await getLocalValue(PREFIX_ALT_SERVER + currentServer);
+  const newServerDesc = await getLocalValue(PREFIX_ALT_SERVER + newServer);
 
-  localStorage.setItem("server_address", newServer);
-  localStorage.setItem(PREFIX_ALT_SERVER + currentServer, currentServerDesc);
-  localStorage.setItem(PREFIX_ALT_SERVER + newServer, newServerDesc);
+  await setLocalValue("server_address", newServer);
+  await setLocalValue(PREFIX_ALT_SERVER + currentServer, currentServerDesc);
+  await setLocalValue(PREFIX_ALT_SERVER + newServer, newServerDesc);
 }

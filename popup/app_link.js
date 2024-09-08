@@ -1,82 +1,85 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const relink = requestData.relink
-const linked = localStorage.getItem("linked");
+getLocalValue("linked").then((linked) => {
+
+  if (!linked || relink) {
 
 
-if (!linked || relink) {
-
-
-  document.querySelector("#qr_code_pad").style.display = 'none';
-
-  getTemporaryKey("is_linking").then((result) => {    
-
-    const isLinking = result;
-    if (isLinking) {
-      console.log("linking concurrently in process");
-      bsAlert("Error", "It seems there a different linking phase in progress. Please finish or close this one first.").then(_ => {
-        window.close();
-      });
-    }
-    else {
-    
-      window.onbeforeunload = function () {
-        deleteTemporaryKey("is_linking");
-      }
+    document.querySelector("#qr_code_pad").style.display = 'none';
   
-      setTemporaryKey("is_linking", true);
-
-      const currentVaultId = localStorage.getItem("linked_vault_id")
-
-      let webClientId;
-      if (relink) {
-        document.getElementById("headline").innerHTML = "Re-link with ANOTHERpass app";
-        document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP / hostname and click Next. The re-linking may take a few minutes.";
-        webClientId = localStorage.getItem("web_client_id");
+    getTemporaryKey("is_linking").then(async (result) => {    
+  
+      const isLinking = result;
+      if (isLinking) {
+        console.log("linking concurrently in process");
+        bsAlert("Error", "It seems there a different linking phase in progress. Please finish or close this one first.").then(_ => {
+          window.close();
+        });
       }
       else {
-        document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app, input the provided IP / hostname and click Next. The linking-process may take a few minutes.";
-        webClientId = generateWebClientId();
-      }
-
-  
-      console.debug("webClientId = " + webClientId);
-  
-      const ip = localStorage.getItem("server_address");
-      const port = localStorage.getItem("server_port");
-      document.getElementById("host").value = ip;
-
-      document.addEventListener("input", (e) => {
-        if (e.target.id === "host") {
-          e.target.title = "";
+      
+        window.onbeforeunload = function () {
+          deleteTemporaryKey("is_linking");
+        }
     
-          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-            e.target.classList.remove("invalid-state");
-            const ipFromHandle = handleToIpAddress(e.target.value);
-            if (ipFromHandle) {
-              e.target.title = "The handle will be translated to " + ipFromHandle;
+        setTemporaryKey("is_linking", true);
+  
+        const currentVaultId = await getLocalValue("linked_vault_id")
+  
+        let webClientId;
+        if (relink) {
+          document.getElementById("headline").innerHTML = "Re-link with ANOTHERpass app";
+          document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP / hostname and click Next. The re-linking may take a few minutes.";
+          webClientId = await getLocalValue("web_client_id");
+        }
+        else {
+          document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app, input the provided IP / hostname and click Next. The linking-process may take a few minutes.";
+          webClientId = generateWebClientId();
+        }
+  
+    
+        console.debug("webClientId = " + webClientId);
+    
+        const ip = await getLocalValue("server_address");
+        const port = await getLocalValue("server_port");
+        document.getElementById("host").value = ip;
+  
+        document.addEventListener("input", (e) => {
+          if (e.target.id === "host") {
+            e.target.title = "";
+      
+            if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+              e.target.classList.remove("invalid-state");
+              const ipFromHandle = handleToIpAddress(e.target.value);
+              if (ipFromHandle) {
+                e.target.title = "The handle will be translated to " + ipFromHandle;
+              }
+            }
+            else {
+              e.target.classList.add("invalid-state");
+              e.target.title = "Server address invalid! Won't be stored.";
             }
           }
-          else {
-            e.target.classList.add("invalid-state");
-            e.target.title = "Server address invalid! Won't be stored.";
-          }
-        }
-      });
+        });
+  
+        
+        document.getElementById("port").value = port || 8787;
+    
+        document.getElementById("next").disabled = true;
+    
+        linkApp(relink, webClientId)
+      }
+    });
+  }
+  else {
+    bsAlert("Error", "Extension already linked with the app!").then(_ => {
+      window.close();
+    });
+  }
+  
+});
 
-      
-      document.getElementById("port").value = port || 8787;
-  
-      document.getElementById("next").disabled = true;
-  
-      linkApp(relink, webClientId)
-    }
-  });
-}
-else {
-  bsAlert("Error", "Extension already linked with the app!").then(_ => {
-    window.close();
-  });
-}
+
 
 
 function generateQrCode(input) {
@@ -184,7 +187,7 @@ async function linkApp(relink, webClientId) {
 
             // read apps vault id
             const newVaultId = response.response.linkedVaultId;
-            const currentVaultId = localStorage.getItem("linked_vault_id")
+            const currentVaultId = await getLocalValue("linked_vault_id")
             if (relink && newVaultId !== currentVaultId) {
               console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + newVaultId);
               bsAlert("Error", "Cannot re-link to a different vault id (<b>" + newVaultId + "</b>). Current: <b>" + currentVaultId + "</b>").then(_ => {
@@ -214,12 +217,12 @@ async function linkApp(relink, webClientId) {
               if (decision === true) {
 
                 // persist temporary state
-                localStorage.setItem("linked", true);
-                localStorage.setItem("web_client_id", webClientId);
-                localStorage.setItem("server_address", ip);
-                localStorage.setItem("server_port", port);
-                localStorage.setItem("linked_vault_id", newVaultId);
-                localStorage.setItem("symmetric_key_length", baseKeyAsArray.length * 8);
+                await setLocalValue("linked", true);
+                await setLocalValue("web_client_id", webClientId);
+                await setLocalValue("server_address", ip);
+                await setLocalValue("server_port", port);
+                await setLocalValue("linked_vault_id", newVaultId);
+                await setLocalValue("symmetric_key_length", baseKeyAsArray.length * 8);
                 await setKey("client_keypair", clientKeyPair);
                 await setKey("app_public_key", appPublicKey);
                 await setKey("base_key", baseKey);

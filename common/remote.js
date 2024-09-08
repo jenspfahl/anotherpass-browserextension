@@ -64,7 +64,7 @@ async function remoteCall(message, sendResponse, variables, timeout) {
   try {
     const isLinking = await getTemporaryKey("is_linking", variables);
     const webClientId = await getTempOrLocalKey("web_client_id", variables);
-    const linked = await getLocalKey("linked");
+    const linked = await getLocalValue("linked");
     console.debug("remote call asks isLinking? " + isLinking);
     try {
       let request;

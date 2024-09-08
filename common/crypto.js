@@ -328,7 +328,7 @@ function deleteTemporaryKey(key, variables) {
 }
 
 /**
- * Gets the value of a key that first lives in memory and is bound to the background script / extension, or, if nothing found, lives in the localStorage.
+ * Gets the value of a key that first lives in memory and is bound to the background script / extension, or, if nothing found, lives in the local storage.
  * @param {*} key 
  * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
  * @returns 
@@ -342,20 +342,54 @@ function getTempOrLocalKey(key, variables) {
       resolve(value);
       return;
     }
-    resolve(localStorage.getItem(key));
+    resolve(await getLocalValue(key));
   });
 }
 
-/**
- * Gets the value of a key stored in the local storage. Encapsulates different browser APIs.
- * @param {*} key 
- * @returns 
- */
-function getLocalKey(key) {
-  return new Promise(async (resolve, reject) => {
-    resolve(localStorage.getItem(key));
-  });
+async function getLocalValue(key) {
+  const result = await chrome.storage.local.get([key]);
+  if (result === undefined) {
+    return null;
+  }
+  const value = result[key];
+  if (value === undefined) {
+    return null;
+  }
+  else {
+    return value;
+  }
 }
+
+async function setLocalValue(key, value) {
+  return chrome.storage.local.set({ [key]: value });
+}
+
+async function removeLocalValue(key) {
+  const result = await chrome.storage.local.remove([key]);
+  if (result === undefined) {
+    return null;
+  }
+  const value = result[key];
+  if (value === undefined) {
+    return null;
+  }
+  else {
+    return value;
+  }
+}
+
+async function getAllLocalValues() {
+  const all = await chrome.storage.local.get();
+  if (all === undefined) {
+    return [];
+  }
+  return Object.entries(all);
+}
+
+async function clearLocalValues() {
+  return chrome.storage.local.clear();
+}
+
 
 function setKey(key, value) {
   return new Promise(async (resolve, reject) => {
@@ -438,7 +472,7 @@ async function getClientKey(variables) {
   const now = Date.now();
   const age = now - timestamp;
 
-  const lockTimeout = localStorage.getItem("lock_timeout") || 60;
+  const lockTimeout = await getLocalValue("lock_timeout") || 60;
   const threshold = 1000 * 60 * lockTimeout;
   console.debug("client key age " + age + "ms, lock timeout (ms): " + threshold);
   if (age > threshold) { 

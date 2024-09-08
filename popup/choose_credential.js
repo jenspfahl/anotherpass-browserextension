@@ -1,12 +1,12 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
-const webClientId = localStorage.getItem("web_client_id");
-const linked = localStorage.getItem("linked");
-
-const searchInput = document.getElementById("search_input");
-
 
 (async () => {
+  const webClientId = await getLocalValue("web_client_id");
+  const linked = await getLocalValue("linked");
+
+  const searchInput = document.getElementById("search_input");
+
 
   if (!linked) {
     console.warn("Not linked, cannot continue.");
@@ -138,7 +138,7 @@ function updateVaultUi(unlocked) {
     document.getElementById("hint").classList.add("d-none");
     document.getElementById("search_group").classList.remove("d-none");
 
-    searchInput.focus();
+    document.getElementById("search_input").focus();
 
   }
   else {

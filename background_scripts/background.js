@@ -183,24 +183,25 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 });
 
 
+getLocalValue("linked").then(async (linked) => {
+  console.debug("app linked", linked);
 
-const linked = localStorage.getItem("linked");
+  if (linked) {
+  
+    // init internal cache to avoid accessing local storage from content script
+    variables.set("linked", linked);
+  
+    const renderContentIcon = await getLocalValue("render_content_icon");
+    variables.set("render_content_icon", renderContentIcon);
+    console.debug("renderContentIcon = " + renderContentIcon);
+  
+  
+  
+    createContextMenu();
+  }
+});
 
-console.debug("app linked: " + linked);
 
-if (linked) {
-
-  // init internal cache to avoid accessing localStorage from content script
-  variables.set("linked", linked);
-
-  const renderContentIcon = localStorage.getItem("render_content_icon");
-  variables.set("render_content_icon", renderContentIcon);
-  console.debug("renderContentIcon = " + renderContentIcon);
-
-
-
-  createContextMenu();
-}
 
 
 function closeAllCredentialDialogs() {
@@ -275,7 +276,7 @@ async function forwardCredential(tabId, uid) {
 
   if (clientKey) {
 
-    const encCredential = findLocalByUid(PREFIX_CREDENTIAL, uid);
+    const encCredential = await findLocalByUid(PREFIX_CREDENTIAL, uid);
 
     if (encCredential) {
       try {
@@ -289,11 +290,9 @@ async function forwardCredential(tabId, uid) {
   }
 }
 
-function findLocalByUid(prefix, uid) {
-  for (var i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key);
-
+async function findLocalByUid(prefix, uid) {
+  const all = await getAllLocalValues();
+  for (const [key, value] of all) {
     if (key.startsWith(prefix)) {
       const keyUid = key.substring(prefix.length);
       if (keyUid === uid) {
@@ -315,12 +314,12 @@ function fetchCredential(message, sendResponse) {
     uids: message.uids,
   };
 
-  const pollingInterval = (localStorage.getItem("polling_interval") || 2) * 1000;
+  getLocalValue("polling_interval").then((value) => {
+    const pollingInterval = (value || 2) * 1000;
 
-
+    remoteCall(request, sendResponse, variables, Math.min(pollingInterval, 2000));  
+  });
   
-  remoteCall(request, sendResponse, variables, Math.min(pollingInterval, 2000));
-
 }
 
 async function listLocalCredentials(url, sendResponse) {
@@ -335,7 +334,7 @@ async function listLocalCredentials(url, sendResponse) {
     let preferedUid, preferedHostname;
     if (url) {
       const index = await createIndex(url);
-      preferedUid = localStorage.getItem(PREFIX_UID + index);
+      preferedUid = await getLocalValue(PREFIX_UID + index);
       const splitted = new URL(url).hostname.toLowerCase().split(".");
       if (splitted.length >= 2) {
         preferedHostname = splitted[splitted.length - 2] + "." + splitted[splitted.length - 1];
@@ -344,9 +343,8 @@ async function listLocalCredentials(url, sendResponse) {
     }
 
     console.debug("read local credentials", url);
-    for (var i = 0; i < localStorage.length; i++){
-      const key = localStorage.key(i);
-      const value = localStorage.getItem(key);
+    const all = await getAllLocalValues();
+    for (const [key, value] of all) {
 
       if (key.startsWith(PREFIX_CREDENTIAL)) {
         try {
@@ -389,8 +387,8 @@ async function linkToApp(sendResponse) {
 
   let clientKeyPair;
   const isLinking = await getTemporaryKey("is_linking", variables);
-  const linked = await getLocalKey("linked");
-  const currentVaultId = await getLocalKey("linked_vault_id");
+  const linked = await getLocalValue("linked");
+  const currentVaultId = await getLocalValue("linked_vault_id");
 
   console.debug("(1) use temporary client keys:" + isLinking + ", currentVaultId=" + currentVaultId);
 
@@ -467,7 +465,7 @@ async function unlinkApp() {
   console.log("do unlink");
 
   variables.clear();
-  localStorage.clear();
+  await clearLocalValues();
 
   removeContextMenu();
   closeAllCredentialDialogs();

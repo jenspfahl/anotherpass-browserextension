@@ -13,7 +13,8 @@
   "permissions": [
     "activeTab",
     "contextMenus",
-    "clipboardWrite"
+    "clipboardWrite",
+    "storage"
   ],
   "content_security_policy": {
     "extension_pages": "default-src http://*:* https://*:*; script-src 'self'; img-src * data:;"
