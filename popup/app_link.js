@@ -122,6 +122,7 @@ async function linkApp(relink, webClientId) {
   document.addEventListener("click", async (e) => {
 
     if (e.target.id === "cancel") {
+      await deleteTemporaryKey("is_linking");
       window.close();
     }
 

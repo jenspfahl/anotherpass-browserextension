@@ -83,11 +83,11 @@ getTemporaryKey("linked").then(async (linked) => {
     const currentTabId = response.tabId;
 
 
-    if (browser.runtime.onMessage.hasListener(eventHandler)) {
+    if (chrome.runtime.onMessage.hasListener(eventHandler)) {
       console.debug("Already found a listener");
-      browser.runtime.onMessage.removeListener(eventHandler);
+      chrome.runtime.onMessage.removeListener(eventHandler);
     }
-    /*chrome.extension*/browser.runtime.onMessage.addListener(eventHandler);
+    chrome.runtime.onMessage.addListener(eventHandler);
 
 
     function eventHandler(msg, sender, sendResponse) {
@@ -277,7 +277,7 @@ const showCredentialModal = (x, y, url) => {
     
       chrome.runtime.sendMessage({ action: "get_tab_id" }, response => {
         console.debug("tabId", response.tabId);
-        iframe.src = browser.runtime.getURL("../popup/choose_credential.html?data=" + encodeURIComponent(JSON.stringify({ tabId: response.tabId, url: url })));
+        iframe.src = chrome.runtime.getURL("../popup/choose_credential.html?data=" + encodeURIComponent(JSON.stringify({ tabId: response.tabId, url: url })));
       });
     
     }

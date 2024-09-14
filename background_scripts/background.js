@@ -214,44 +214,44 @@ function closeAllCredentialDialogs() {
 }
 
 function createContextMenu() {
-  browser.contextMenus.create({
+  chrome.contextMenus.create({
     id: "anotherpass-open-dialog",
     title: "Open ANOTHERpass dialog",
     contexts: ["editable"],
   },
-    () => void browser.runtime.lastError
+    () => void chrome.runtime.lastError
   );
 
-  browser.contextMenus.create({
+  chrome.contextMenus.create({
     id: "anotherpass-credential-request",
     title: "Request credential from ANOTHERpass",
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
     // for information on the purpose of this error capture.
-    () => void browser.runtime.lastError
+    () => void chrome.runtime.lastError
   );
 
-  browser.contextMenus.create({
+  chrome.contextMenus.create({
     id: "anotherpass-credential-create-request",
     title: "Create new credential in ANOTHERpass",
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
     // for information on the purpose of this error capture.
-    () => void browser.runtime.lastError
+    () => void chrome.runtime.lastError
   );
 
-  browser.contextMenus.onClicked.addListener(onContextMenuClicked);
+  chrome.contextMenus.onClicked.addListener(onContextMenuClicked);
 }
 
 
 function removeContextMenu() {
-  browser.contextMenus.remove("anotherpass-open-dialog");
-  browser.contextMenus.remove("anotherpass-credential-request");
-  browser.contextMenus.remove("anotherpass-credential-create-request");
+  chrome.contextMenus.remove("anotherpass-open-dialog");
+  chrome.contextMenus.remove("anotherpass-credential-request");
+  chrome.contextMenus.remove("anotherpass-credential-create-request");
 
-  browser.contextMenus.onClicked.removeListener(onContextMenuClicked);
+  chrome.contextMenus.onClicked.removeListener(onContextMenuClicked);
 }
 
 
@@ -436,7 +436,7 @@ function openPasswordRequestDialog(command, tabId, website, credentialUid, user)
     credentialUid: credentialUid,
   });
   const createData = {
-    type: "detached_panel",
+    type: "panel",
     url: "popup/request_password.html?data=" + encodeURIComponent(requestData),
     width: width,
     height: height,
@@ -444,19 +444,19 @@ function openPasswordRequestDialog(command, tabId, website, credentialUid, user)
   
   console.log("open request password dialog");
 
-  browser.windows.create(createData);
+  chrome.windows.create(createData);
 }
 
 function openLinkWithQrCodeDialog(relink) {
   
   let createData = {
-    type: "detached_panel",
+    type: "panel",
     url: "popup/app_link.html?data=" + encodeURIComponent(JSON.stringify({relink: relink})),
     width: 800,
     height: 810,
   };
   
-  browser.windows.create(createData);
+  chrome.windows.create(createData);
 }
 
 

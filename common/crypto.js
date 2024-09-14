@@ -6,7 +6,7 @@ const PREFIX_ALT_SERVER = "alternative_server_"
 
 
 function generateWebClientId() {
-  const rnd = window.crypto.getRandomValues(new Uint8Array(32));
+  const rnd = crypto.getRandomValues(new Uint8Array(32));
   const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 6).toUpperCase();
   return [s.slice(0, 3), '-', s.slice(3)].join('');
 }
@@ -26,7 +26,7 @@ async function generateOrGetSessionKey() {
 }
 
 async function generateAesKey(length) {
-  return window.crypto.subtle.generateKey(
+  return crypto.subtle.generateKey(
     {
       name: "AES-GCM",
       length: length,
@@ -68,7 +68,7 @@ async function sha256(byteArray) {
 }
 
 async function generateClientKeyPair() {
-  return await window.crypto.subtle.generateKey(
+  return await crypto.subtle.generateKey(
       {
         name: "RSA-OAEP",
         modulusLength: 4096,
@@ -99,7 +99,7 @@ async function destroySessionKey() {
 
 async function jwkToPublicKey(jwk) {
 
-  return window.crypto.subtle.importKey(
+  return crypto.subtle.importKey(
     "jwk",
     jwk,
     {
@@ -112,7 +112,7 @@ async function jwkToPublicKey(jwk) {
 }
 
 async function publicKeyToJWK(key) {
-  return await window.crypto.subtle.exportKey("jwk", key);
+  return await crypto.subtle.exportKey("jwk", key);
 }
 
 async function getPublicKeyFingerprint(key, separator) {
@@ -143,12 +143,12 @@ function toShortenedFingerprint(keyAsArray) {
 }
 
 async function aesKeyToArray(aesKey) {
-  const exported = await window.crypto.subtle.exportKey("raw", aesKey);
+  const exported = await crypto.subtle.exportKey("raw", aesKey);
   return new Uint8Array(exported); 
 }
 
 async function arrayToAesKey(array) {
-  return window.crypto.subtle.importKey("raw", array, 
+  return crypto.subtle.importKey("raw", array, 
   "AES-GCM", true, [
     "encrypt",
     "decrypt",
@@ -158,8 +158,8 @@ async function arrayToAesKey(array) {
 async function encryptMessage(key, message) {
   const enc = new TextEncoder();
   const encoded = enc.encode(message); 
-  const iv = window.crypto.getRandomValues(new Uint8Array(12));
-  const ciphertext = await window.crypto.subtle.encrypt(
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ciphertext = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv: iv },
     key,
     encoded,
@@ -176,7 +176,7 @@ async function decryptMessage(key, encrypted) {
   }
   const iv = base64ToBytes(splitted[1]);
   const ciphertext = base64ToBytes(splitted[2]);
-  const decrypted = await window.crypto.subtle.decrypt(
+  const decrypted = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv }, 
     key, 
     ciphertext
@@ -186,7 +186,7 @@ async function decryptMessage(key, encrypted) {
 
 
 async function encryptWithPublicKey(publicKey, payload) {
-  const rsaEncrypted = await window.crypto.subtle.encrypt(
+  const rsaEncrypted = await crypto.subtle.encrypt(
     {
       name: "RSA-OAEP",
     },
@@ -198,7 +198,7 @@ async function encryptWithPublicKey(publicKey, payload) {
 }
 
 async function decryptWithPrivateKey(privateKey, encrypted) {
-  const rsaDecrypted = await window.crypto.subtle.decrypt(
+  const rsaDecrypted = await crypto.subtle.decrypt(
     {
       name: "RSA-OAEP",
     },
@@ -232,9 +232,6 @@ function bytesToHex(bytes, separator) {
 
 function openDb() {
   return new Promise((resolve, reject) => {
-
-    // This works on all devices/browsers, and uses IndexedDBShim as a final fallback 
-    var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB;
 
     // Open (or create) the database
     var open = indexedDB.open("anotherpass-webext", 1);
