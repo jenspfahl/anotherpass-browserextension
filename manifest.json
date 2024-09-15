@@ -62,5 +62,11 @@
         "content_scripts/content.css"
       ]
     }
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "anotherpass-browserextension@jepfa.de",
+      "strict_min_version": "120.0"
+    }
+  }  
 }

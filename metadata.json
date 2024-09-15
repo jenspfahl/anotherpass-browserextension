@@ -1,0 +1,24 @@
+{
+    "version": {
+        "license": "GPLv3"
+    },
+    "categories": {
+        "firefox": [
+            "privacy-security",
+            "bookmarks"
+        ]
+    },
+    "name": "ANOTHERpass Browser Extension",
+    "summary": "An extension to use an ANOTHERpass vault in the browser.",
+    "description": "If you already use the ANOTHERpass Android app, you can use this extension to use your credentials in the browser on any device in your local network.",
+    "icon": "icons/anotherpass-512.png",
+    "requires_payment": false,
+    "homepage": {
+        "en-US": "https://anotherpass.jepfa.de"
+    },
+    "tags": [
+        "password manager",
+        "vault",
+        "passwords"
+    ]
+}
