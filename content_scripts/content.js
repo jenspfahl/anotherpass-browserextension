@@ -200,18 +200,21 @@ function addButton(input) {
     button.classList.add("requestCredentialButton");
 
     const inputHeight = input.clientHeight + 2;
+    let iconUrl;
     if (inputHeight <= 24) {
-      button.classList.add("dimension-24");
+      iconUrl = chrome.runtime.getURL("../icons/anotherpass-24.png");
     }
     else if (inputHeight <= 32) {
-      button.classList.add("dimension-32");
+      iconUrl = chrome.runtime.getURL("../icons/anotherpass-32.png");
     }
     else {
-      button.classList.add("dimension-48");
+      iconUrl = chrome.runtime.getURL("../icons/anotherpass-48.png");
     }
     button.style.width = inputHeight + "px";
     button.style.height = inputHeight + "px";
     button.style.border = input.border;
+
+    button.style.backgroundImage = "url(" + iconUrl + ")";
 
     target.insertBefore(div, input);
 

@@ -34,6 +34,7 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "icons/*.png",
         "*.css",
         "*.html",
         "*.js"

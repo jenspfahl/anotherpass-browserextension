@@ -9,20 +9,6 @@
 }
 
 
-.dimension-24 {
-    background-image: url("/icons/anotherpass-24.png");
-}
-
-
-.dimension-32 {
-    background-image: url("/icons/anotherpass-32.png");
-}
-
-
-.dimension-48 {
-    background-image: url("/icons/anotherpass-48.png");
-}
-
 .credential_popup {
     height:100%;
     width: 100%;
