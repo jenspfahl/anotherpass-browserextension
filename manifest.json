@@ -25,6 +25,7 @@
     "default_popup": "popup/menu.html"
   },
   "background": {
+    "service_worker": "background_scripts/service_worker.js",
     "scripts": [
       "common/crypto.js",
       "common/remote.js",
