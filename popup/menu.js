@@ -352,19 +352,6 @@ getLocalValue("linked").then(async (linked) => {
           else if (e.target.id === "server_description_" + server.host) {
             changedDescriptions.set(server.host, e.target.value);
           }
-          else if (e.target.id === "new_server_host") {
-            if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-              addedHost = e.target.value;
-              e.target.classList.remove("invalid-state");
-            }
-            else {
-              console.log("host invald", e.target.value);
-              e.target.classList.add("invalid-state");
-            }
-          }
-          else if (e.target.id === "new_server_description") {
-            addedDescription = e.target.value;
-          }
         });
 
 
@@ -393,6 +380,22 @@ getLocalValue("linked").then(async (linked) => {
             </div>
           </div>
         `);
+
+      document.addEventListener("input", (e) => {
+        if (e.target.id === "new_server_host") {
+          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+            addedHost = e.target.value;
+            e.target.classList.remove("invalid-state");
+          }
+          else {
+            console.log("host invald", e.target.value);
+            e.target.classList.add("invalid-state");
+          }
+        }
+        else if (e.target.id === "new_server_description") {
+          addedDescription = e.target.value;
+        }
+      });
 
       bsConfirm("Manage alternative servers", `
       <div class="container">
