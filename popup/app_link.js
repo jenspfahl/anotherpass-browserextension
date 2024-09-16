@@ -19,10 +19,12 @@ getLocalValue("linked").then((linked) => {
       else {
       
         window.onbeforeunload = function () {
+          // Hopefully this key is deleted before closing the window, because in Chrome this delete request might be terminate before fulfilled.
+          // Adding async would solve this, but would also add a browser confirmation dialog before closing the window ("Leaving the page y/n?")
           deleteTemporaryKey("is_linking");
         }
     
-        setTemporaryKey("is_linking", true);
+        await setTemporaryKey("is_linking", true);
   
         const currentVaultId = await getLocalValue("linked_vault_id")
   
@@ -190,6 +192,7 @@ async function linkApp(relink, webClientId) {
             const newVaultId = response.response.linkedVaultId;
             const currentVaultId = await getLocalValue("linked_vault_id")
             if (relink && newVaultId !== currentVaultId) {
+              await deleteTemporaryKey("is_linking");
               console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + newVaultId);
               bsAlert("Error", "Cannot re-link to a different vault id (<b>" + newVaultId + "</b>). Current: <b>" + currentVaultId + "</b>").then(_ => {
                 window.close();
@@ -197,12 +200,12 @@ async function linkApp(relink, webClientId) {
               return;
             }
 
-            setTemporaryKey("linked_vault_id", newVaultId);
+            await setTemporaryKey("linked_vault_id", newVaultId);
 
             // read app generated base key
             const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
             const baseKey = await arrayToAesKey(baseKeyAsArray);
-            setTemporaryKey("symmetric_key_length", baseKeyAsArray.length * 8);
+            await setTemporaryKey("symmetric_key_length", baseKeyAsArray.length * 8);
           
             //console.debug("save shared base key:", baseKeyAsArray);
 
@@ -229,8 +232,8 @@ async function linkApp(relink, webClientId) {
                 await setKey("base_key", baseKey);
                 
                 // delete temporary state
-                deleteTemporaryKeys();
-                destroySessionKey();
+                await deleteTemporaryKeys();
+                await destroySessionKey();
 
                 chrome.runtime.sendMessage({
                   action: "create_context_menu"
@@ -244,8 +247,8 @@ async function linkApp(relink, webClientId) {
               }
               else if (decision === false) {
                 // delete temporary state, let current persistent state untouched
-                deleteTemporaryKeys();
-                destroySessionKey();
+                await deleteTemporaryKeys();
+                await destroySessionKey();
 
                 bsAlert("Failure", "Linking the extension has been denied in the app.").then(_ => {
                   window.close();
@@ -267,15 +270,16 @@ async function linkApp(relink, webClientId) {
     }
   });
 
-  function deleteTemporaryKeys() {
-    deleteTemporaryKey("web_client_id");
-    deleteTemporaryKey("client_keypair");
-    deleteTemporaryKey("server_address");
-    deleteTemporaryKey("server_port");
-    deleteTemporaryKey("app_public_key");
-    deleteTemporaryKey("linked_vault_id");
-    deleteTemporaryKey("symmetric_key_length");
-    deleteTemporaryKey("base_key");
+  async function deleteTemporaryKeys() {
+    await deleteTemporaryKey("is_linking");
+    await deleteTemporaryKey("web_client_id");
+    await deleteTemporaryKey("client_keypair");
+    await deleteTemporaryKey("server_address");
+    await deleteTemporaryKey("server_port");
+    await deleteTemporaryKey("app_public_key");
+    await deleteTemporaryKey("linked_vault_id");
+    await deleteTemporaryKey("symmetric_key_length");
+    await deleteTemporaryKey("base_key");
   }
 
 }

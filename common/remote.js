@@ -118,8 +118,18 @@ async function remoteCall(message, sendResponse, variables, timeout) {
       console.log("received HTTP Status: " + res.status);
 
       const body = await res.json();
-      if (res.status != 200) {
-        console.error("Unsuccessful! Reason: " + JSON.stringify(body));
+      if (res.status == 100 || res.status == 401) {
+        console.info("Waiting for user interaction!", body);
+        sendResponse({ response: null, status: res.status, error: body.error });
+        return null;
+      }
+      else if (res.status == 403) {
+        console.info("User denied request!", body);
+        sendResponse({ response: null, status: res.status, error: body.error });
+        return null;
+      }
+      else if (res.status != 200 && res.status != 204) {
+        console.error("Unsuccessful!", body);
         sendResponse({ response: null, status: res.status, error: body.error });
         return null;
       }

@@ -219,18 +219,32 @@ getLocalValue("linked").then(async (linked) => {
           const response = await chrome.runtime.sendMessage(request);
           console.debug("response = " + JSON.stringify(response));
           if (response.status == 403) {
-            console.warn("Request rejected");
+            console.info("Request rejected");
             document.getElementById("waiting_time").value = 0;
             document.getElementById("instruction").innerText = "Request was rejected!";
             document.getElementById("close").innerText = "Close";
 
             destroySessionKey();
 
-            bsAlert("Error", "The request has been rejected in the app or the vault was locked.").then(_ => {
+            bsAlert("Warning", "The request has been rejected in the app or the vault was locked.").then(_ => {
               window.close();
             });
             return STOP_POLLING;
           }
+          if (response.status == 400 || response.status == 404 || response.status == 500) {
+            console.warn("Abnormal HHTP response code");
+            document.getElementById("waiting_time").value = 0;
+            document.getElementById("instruction").innerText = "Request failed!";
+            document.getElementById("close").innerText = "Close";
+
+            destroySessionKey();
+
+            bsAlert("Error", "Failed to communicate with the app.<br><code>Error: " + response.error + "</code>").then(_ => {
+              window.close();
+            });
+            return STOP_POLLING;
+          }
+
           return response.response;
         }, pollingTimeout * 1000, pollingInterval * 1000).then(async function (response) { 
           if (response !== STOP_POLLING) {
