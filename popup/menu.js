@@ -569,7 +569,7 @@ function updateMenuUi(webClientId, linked) {
             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
             <ul class="dropdown-menu">
-              <button id="apply_${uuid}" class="btn dropdown-item" title="Apply this credential on current website">Apply on website</button>
+              <button id="apply_${uuid}" class="btn dropdown-item" title="Apply this credential on current website">Apply to website</button>
               <button id="syncWithApp_${uuid}" class="btn dropdown-item" title="Synchronise this credential with the app">Sync with app</button>
               <li><hr class="dropdown-divider"></li>
               <button id="delete_${uuid}" class="btn dropdown-item" title="Delete this credential from the local vault">Delete</button>

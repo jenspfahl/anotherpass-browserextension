@@ -1,10 +1,20 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
-let _credential;
+let _credential, _requestIdentifier, _stopPolling;
 
 document.addEventListener("click", async (e) => {
 
   if (e.target.id === "close") {
+    _stopPolling = true;
+    // send cancel command to server
+    if (_requestIdentifier) {
+      await chrome.runtime.sendMessage({
+        action: "request_credential",
+        command: "cancel_request",
+        requestIdentifier: _requestIdentifier,
+      });
+    }
+
     destroySessionKey();
     window.close();
   }
@@ -121,6 +131,9 @@ getLocalValue("linked").then(async (linked) => {
     else if (requestData.command === "fetch_credentials_for_uids") {
       document.getElementById("instruction").innerText = "Requesting to synchronize local vault.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
     }
+    else if (requestData.command === "create_credential_for_url") {
+      document.getElementById("instruction").innerText = "Requesting to create a new credential in the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+    }
 
     console.debug("requestData", requestData);
     const targetUrl = requestData.website;
@@ -146,6 +159,7 @@ getLocalValue("linked").then(async (linked) => {
         const sessionKeyAsArray = await aesKeyToArray(sessionKey);
         const sessionKeyBase64 = bytesToBase64(sessionKeyAsArray);
         //console.debug("Request Session Key = " + sessionKeyBase64);
+        _requestIdentifier = sessionKeyBase64;
         
         const baseKey = await getKey("base_key");
         const baseKeyAsArray = await aesKeyToArray(baseKey);
@@ -175,6 +189,12 @@ getLocalValue("linked").then(async (linked) => {
             }
           }
         }
+        if (requestData.command === "create_credential_for_url") {
+          const saveCredentialInLocalVault = document.getElementById("saveCredentialInLocalVault");
+          if (saveCredentialInLocalVault) {
+            saveCredentialInLocalVault.checked = true;
+          }
+        }
 
         let targetUids;
         if (requestData.command === "fetch_credentials_for_uids") {
@@ -192,6 +212,11 @@ getLocalValue("linked").then(async (linked) => {
         }
 
         poll(async function (progress) {
+
+          if (_stopPolling) {
+            _stopPolling = false;
+            return STOP_POLLING;
+          }
           document.getElementById("waiting_time").value = progress;
 
           let request;
@@ -239,7 +264,7 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Error", "Failed to communicate with the app.<br><code>Error: " + response.error + "</code>").then(_ => {
+            bsAlert("Error", "Failed to communicate to the app.<br><code>Error: " + response.error + "</code>").then(_ => {
               window.close();
             });
             return STOP_POLLING;

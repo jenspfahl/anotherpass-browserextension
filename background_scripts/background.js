@@ -317,7 +317,11 @@ function fetchCredential(message, sendResponse) {
   getLocalValue("polling_interval").then((value) => {
     const pollingInterval = (value || 2) * 1000;
 
-    remoteCall(request, sendResponse, variables, Math.min(pollingInterval, 2000));  
+    let timeout = Math.min(pollingInterval, 2000);
+    if (message.command === "cancel_request") {
+      timeout = 1000; 
+    }
+    remoteCall(request, sendResponse, variables, timeout);  
   });
   
 }
