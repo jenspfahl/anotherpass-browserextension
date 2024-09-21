@@ -463,6 +463,7 @@ async function getClientKey(variables) {
   const clientKeyData = await getTemporaryKey("clientKey", variables);
 
   if (!clientKeyData) {
+    console.log("No client key found");
     return;
   }
   const timestamp = clientKeyData.timestamp;
@@ -471,9 +472,9 @@ async function getClientKey(variables) {
 
   const lockTimeout = await getLocalValue("lock_timeout") || 60;
   const threshold = 1000 * 60 * lockTimeout;
-  console.debug("client key age " + age + "ms, lock timeout (ms): " + threshold);
+  console.debug("Client key age " + age + "ms (now " + now + " old timestamp " + timestamp + "), lock timeout (ms): " + threshold);
   if (age > threshold) { 
-    console.log("ClientKey too old, logging out");
+    console.log("Client key too old, logging out");
     deleteTemporaryKey("clientKey", variables); 
     return;
   }

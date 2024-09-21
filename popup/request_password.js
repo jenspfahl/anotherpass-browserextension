@@ -1,10 +1,19 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
-let _credential, _requestIdentifier, _stopPolling;
+let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "";
 
 document.addEventListener("click", async (e) => {
 
-  if (e.target.id === "close") {
+  if (e.target.id === "waiting_time") {
+    const waitingStatus = document.getElementById("waiting_status");
+    if (waitingStatus.classList.contains("d-none")) {
+      waitingStatus.classList.remove("d-none");
+    }
+    else {
+      waitingStatus.classList.add("d-none");
+    }
+  }
+  else if (e.target.id === "close") {
     _stopPolling = true;
     // send cancel command to server
     if (_requestIdentifier) {
@@ -217,6 +226,7 @@ getLocalValue("linked").then(async (linked) => {
             _stopPolling = false;
             return STOP_POLLING;
           }
+          document.getElementById("waiting_status").innerText = _lastResponseMsg;
           document.getElementById("waiting_time").value = progress;
 
           let request;
@@ -243,6 +253,8 @@ getLocalValue("linked").then(async (linked) => {
           
           const response = await chrome.runtime.sendMessage(request);
           console.debug("response = " + JSON.stringify(response));
+          _lastResponseMsg = response.error || "";
+
           if (response.status == 403) {
             console.info("Request rejected");
             document.getElementById("waiting_time").value = 0;

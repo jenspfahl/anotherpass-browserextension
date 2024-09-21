@@ -321,6 +321,8 @@ function fetchCredential(message, sendResponse) {
     if (message.command === "cancel_request") {
       timeout = 1000; 
     }
+    console.debug("timeout", timeout);
+    console.debug("pollingInterval", pollingInterval);
     remoteCall(request, sendResponse, variables, timeout);  
   });
   
@@ -393,8 +395,6 @@ async function linkToApp(sendResponse) {
   const isLinking = await getTemporaryKey("is_linking", variables);
   const linked = await getLocalValue("linked");
   const currentVaultId = await getLocalValue("linked_vault_id");
-
-  console.debug("(1) use temporary client keys:" + isLinking + ", currentVaultId=" + currentVaultId);
 
   if (isLinking) {
     clientKeyPair = await getKey("temp_client_keypair");

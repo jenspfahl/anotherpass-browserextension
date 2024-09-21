@@ -60,7 +60,7 @@ async function getAddress(variables) {
  * @param {*} sendResponse 
  */
 async function remoteCall(message, sendResponse, variables, timeout) {
-  let response;
+  let parsedResponse, rawResponse;
   try {
     const isLinking = await getTemporaryKey("is_linking", variables);
     const webClientId = await getTempOrLocalKey("web_client_id", variables);
@@ -104,7 +104,7 @@ async function remoteCall(message, sendResponse, variables, timeout) {
       const address = await getAddress(variables);
       console.debug("fetch from", address);
 
-      const res = await fetch('http://' + address + '/', {
+      rawResponse = await fetch('http://' + address + '/', {
           method: 'POST',
           headers: { 
             "X-WebClientId": webClientId, 
@@ -115,28 +115,28 @@ async function remoteCall(message, sendResponse, variables, timeout) {
           signal: AbortSignal.timeout(timeout)
         });
 
-      console.log("received HTTP Status: " + res.status);
+      console.log("received HTTP Status: ", rawResponse.status);
+      console.log("received HTTP response: ", rawResponse);
 
-      const body = await res.json();
-      if (res.status == 100 || res.status == 401) {
+      const body = await rawResponse.json();
+      if (rawResponse.status == 202 || rawResponse.status == 401) {
         console.info("Waiting for user interaction!", body);
-        sendResponse({ response: null, status: res.status, error: body.error });
+        sendResponse({ response: null, status: rawResponse.status, error: body.error });
         return null;
       }
-      else if (res.status == 403) {
+      else if (rawResponse.status == 403) {
         console.info("User denied request!", body);
-        sendResponse({ response: null, status: res.status, error: body.error });
+        sendResponse({ response: null, status: rawResponse.status, error: body.error });
         return null;
       }
-      else if (res.status != 200 && res.status != 204) {
+      else if (rawResponse.status != 200 && rawResponse.status != 204) {
         console.error("Unsuccessful!", body);
-        sendResponse({ response: null, status: res.status, error: body.error });
+        sendResponse({ response: null, status: rawResponse.status, error: body.error });
         return null;
       }
 
 
       let keyPair;
-      console.debug("(2) use temporary client keys:" + isLinking);
       if (isLinking) {
         keyPair = await getKey("temp_client_keypair");
       }
@@ -173,22 +173,27 @@ async function remoteCall(message, sendResponse, variables, timeout) {
       }
 
       
-      response = JSON.parse(decryptedPayload);
+      parsedResponse = JSON.parse(decryptedPayload);
     }
     catch (e) {
-      console.warn("cannot parse decryptedPayload", e)
-      response = {
-        "raw": res
-      };
+      console.warn("cannot parse decryptedPayload", e) //signal timed out
+      sendResponse({
+        response: null ,
+        error: rawResponse !== undefined ? rawResponse.error || e.message : e.message,
+       });
+       return;
     }
 
-    sendResponse({ response: response });
+    sendResponse({ response: parsedResponse });
 
   }
   catch (e) {
     console.warn("HTTP fetch failed:", e)
 
-    sendResponse({ response: null });
+    sendResponse({
+       response: null ,
+       error: rawResponse !== undefined ? rawResponse.error || e.message : e.message,
+      });
   }  
     
    
