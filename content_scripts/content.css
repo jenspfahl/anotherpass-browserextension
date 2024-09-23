@@ -27,4 +27,6 @@
     border-radius: 10px;
     background-color: #444;
     color: white;
+    min-width: 16px;
+    min-height: 16px;
 }

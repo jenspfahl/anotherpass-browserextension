@@ -211,7 +211,9 @@ function addButton(input) {
       iconUrl = chrome.runtime.getURL("../icons/anotherpass-48.png");
     }
     button.style.width = inputHeight + "px";
+    button.style.minWidth = inputHeight + "px";
     button.style.height = inputHeight + "px";
+    button.style.minHeight = inputHeight + "px";
     button.style.border = input.border;
 
     button.style.backgroundImage = "url(" + iconUrl + ")";
