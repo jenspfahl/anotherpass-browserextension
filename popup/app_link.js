@@ -31,7 +31,7 @@ getLocalValue("linked").then((linked) => {
         let webClientId;
         if (relink) {
           document.getElementById("headline").innerHTML = "Re-link with ANOTHERpass app";
-          document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP / hostname and click Next. The re-linking may take a few minutes.";
+          document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP, hostname or handle and click Next. The re-linking may take a few minutes.";
           webClientId = await getLocalValue("web_client_id");
         }
         else {
