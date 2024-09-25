@@ -160,7 +160,7 @@ getLocalValue("linked").then(async (linked) => {
 
       bsConfirm(
         "Unlink from app", 
-        "Are you sure to unlink <b class=\"fingerprint_small\">" + webClientId + "</b> from the app?",
+        "Are you sure to unlink <b class=\"fingerprint_small\">" + webClientId + "</b> from the app? This will also wipe the local vault with all local credentials.",
         "Unlink"
       )
       .then((decision) => {
