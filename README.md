@@ -24,6 +24,8 @@ To install this extension you have to clone this repository and use `about:debug
 
 # Use Cases (outline)
 
+The use cases are implemented by utilizing the [ANOTHERpass Credential Server API](https://github.com/jenspfahl/ANOTHERpass/blob/rc-2.0.0/SERVER-API-SPEC.md).
+
 ## Link Extension with the App
 
 To achieve a maximum of security the extension and the app must be linked before usage. That basically means both parties exchange certain keys to ensure a secure communication.
@@ -182,35 +184,4 @@ Mitigations:
 
   * The `BK` is shared during the linking phase through a confirmed and secure channel (encrypted by `SK`). As long as `SK` is not leaked, the `BK` should be safe to decrypt the `TKn`.
   
-
-# Future ideas
-
-## Add action to fetch a certain credential from the app
-
-A new action in the extension to just pick up one credential of the users choise from the app and displays it in a new browser dialog (with a "copy to clipboard" option).
-
-## Add option to remember the selected credential
-
-Once a credential is selected in the app and sent back the the extension, its UID is stored together with the current webpage url in the extension storage. When it comes to the next credential request for the same webpage / UID, the corresponding credential will be pushed immediatelly after user approval.
-This would reduce the needed app interaction (selecting the right credential).
-
  
-## Add option to remember the selected credential at all
-
-Once a credential is selected in the app and sent back the the extension, it is stored encryptedly together with the current webpage url in the extension storage. When it comes to the next credential request for the same webpage / UID, the app is only needed to unlock the extension storage (for x minutes or the current session).
-This would reduce the app interaction even more.
-
-## Add action to sync a set of credential UIDs to the extension
-
-A new action in the extension to fetch all or a subset of credential UIDs and its related webpage urls from the app and store them in the extension storage.
-When it comes to any next credential request for any known webpage / UID, the corresponding credential will be pushed immediatelly after user approval.This would even more reduce the app interaction. 
-
-## Add action to sync a set of credentials to the extension
-
-A new action in the extension to fetch all or a subset of credentials from the app and store them encrypted in the extension storage.
-Unlocking of these extensions would done by an unlock request to the app the user has to approve.
-This would even more reduce the app interaction. 
-
-## Add action to push credentials to the app
-
-A new action to push certain credentials stored in the extension back to the app. If they exist in the app, they might be overwritten or created as copy. This feature would only make sense to migrate existing credentials to the app. 
