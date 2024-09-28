@@ -409,14 +409,14 @@ async function linkToApp(sendResponse) {
   if (linked && currentVaultId) {
     request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsJWK,
+      clientPubKey: clientPublicKeyAsJWK,
       vaultId: currentVaultId,
     };  
   }
   else {
     request = {
       action: "link_app",
-      clientPublicKey: clientPublicKeyAsJWK,
+      clientPubKey: clientPublicKeyAsJWK,
     };  
   }
   
