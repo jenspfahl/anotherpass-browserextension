@@ -2,11 +2,11 @@
 
 ## Disclaimer
 
-This extension is still work in progress. Although the security and communication layer should be stable, the extension is not yet finished. 
+This extension is in beta-state. The security and communication layer is stable and the UI should be finished. Smaller bugs in the UI or wrong rendering could happen. If you encounter some, please report an issue. 
 
 ## Purpose
 
-This is a browser extension to communicate with ANOTHERpass app as single source of truth and a browser on a different device.
+This is a browser extension to communicate with the ANOTHERpass Android app from a browser on a different device in the same local network to access the stored credentials in the app and use them in the browser. 
 
 The browser extension (called the extension) can be connected to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
 
