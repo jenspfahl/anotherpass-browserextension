@@ -2,7 +2,6 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
 
 
 (async () => {
-  const webClientId = await getLocalValue("web_client_id");
   const linked = await getLocalValue("linked");
 
   const searchInput = document.getElementById("search_input");
@@ -31,6 +30,7 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
     if (e.target.id === "fetch_credential") {
       chrome.runtime.sendMessage({
         action: "start_password_request_flow",
+        tabId: requestData.tabId,
         url: url
       });
 
@@ -43,6 +43,7 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
     if (e.target.id === "create_credential") {
       const response = await chrome.runtime.sendMessage({
         action: "get_username_from_field",
+        tabId: requestData.tabId,
         tabId: requestData.tabId 
       });
     

@@ -53,13 +53,13 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
 
     case "start_password_request_flow": {
-      openPasswordRequestDialog("fetch_credential_for_url", undefined, message.url, undefined, message.user);
+      openPasswordRequestDialog("fetch_credential_for_url", message.tabId, message.url, undefined, message.user);
 
       return true;  
     }
 
     case "start_password_creation_flow": {
-      openPasswordRequestDialog("create_credential_for_url", undefined, message.url, undefined, message.user);
+      openPasswordRequestDialog("create_credential_for_url", message.tabId, message.url, undefined, message.user);
 
       return true;  
     }
@@ -205,7 +205,7 @@ getLocalValue("linked").then(async (linked) => {
 
 
 function closeAllCredentialDialogs() {
-  chrome.tabs.query({ currentWindow: true }, function (tabs) {
+  chrome.tabs.query({ currentWindow: false }, function (tabs) {
 
     for (var i = 0; i < tabs.length; i++) {
       chrome.tabs.sendMessage(tabs[i].id, { action: "close_credential_dialog" });

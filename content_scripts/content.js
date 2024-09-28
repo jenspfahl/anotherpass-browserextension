@@ -139,8 +139,6 @@ getTemporaryKey("linked").then(async (linked) => {
 
 
     function pasteCredential(password, user) {
-      console.debug("received password to paste: '" + password + "'");
-
 
       passwordFields.forEach(field => {
         field.value = password;

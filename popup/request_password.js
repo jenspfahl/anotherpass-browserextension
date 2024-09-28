@@ -1,4 +1,5 @@
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
+const targetTabId = requestData.tabId;
 
 let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "";
 
@@ -318,15 +319,23 @@ getLocalValue("linked").then(async (linked) => {
                 await saveCredential(credential, clientKey);
               }
 
-              sendPasteCredentialMessage(credential.password, credential.user);
+              if (targetTabId) {
+                sendPasteCredentialMessage(targetTabId, credential.password, credential.user);
+              }
+              else {
+                console.error("No target tabId but expected");
+                bsAlert("Error", "Something went wrong.").then(_ => {
+                  window.close();
+                });
+              }
             }
             else if (requestData.command === "get_client_key") {
               await unlockVault(clientKeyBase64);
 
               //inform credential popup
-              console.debug("refresh popup for tabId " + requestData.tabId);
-              if (requestData.tabId) {
-                chrome.runtime.sendMessage({ action: "refresh_credential_dialog", tabId: requestData.tabId });
+              console.debug("refresh popup for tabId " + targetTabId);
+              if (targetTabId) {
+                chrome.runtime.sendMessage({ action: "refresh_credential_dialog", tabId: targetTabId });
               }
 
               //TODO close automatically if autoclose is enabled
@@ -385,15 +394,12 @@ getLocalValue("linked").then(async (linked) => {
         });
 
 
-        function sendPasteCredentialMessage(password, user) {
+        function sendPasteCredentialMessage(tabId, password, user) {
 
-          chrome.tabs.query({ active: true, currentWindow: false /* true for active popup, false for request password popup */ }, function (tabs) {
-            if (tabs.length > 0) {
-              chrome.tabs.sendMessage(tabs[0].id, { action: "paste_credential", password: password, user: user }, function () {
-                window.close();
-              });        
-            }
-          });
+          console.debug("send to tabId", tabId);
+          chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user }, function () {
+            window.close();
+          });    
         }
 
         async function unlockVault(clientKeyBase64) {
