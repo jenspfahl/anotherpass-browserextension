@@ -43,7 +43,6 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
     if (e.target.id === "create_credential") {
       const response = await chrome.runtime.sendMessage({
         action: "get_username_from_field",
-        tabId: requestData.tabId,
         tabId: requestData.tabId 
       });
     
@@ -53,6 +52,7 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
 
       chrome.runtime.sendMessage({
         action: "start_password_creation_flow",
+        tabId: requestData.tabId,
         url: url,
         user: user
       });

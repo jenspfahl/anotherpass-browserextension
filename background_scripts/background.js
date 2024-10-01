@@ -192,9 +192,10 @@ getLocalValue("linked").then(async (linked) => {
     variables.set("linked", linked);
   
     const renderContentIcon = await getLocalValue("render_content_icon");
+    const opacityOfContentIcon = await getLocalValue("opacity_content_icon");
+
     variables.set("render_content_icon", renderContentIcon);
-    console.debug("renderContentIcon = " + renderContentIcon);
-  
+    variables.set("opacity_content_icon", opacityOfContentIcon);
   
   
     createContextMenu();

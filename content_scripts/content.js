@@ -14,6 +14,8 @@ getTemporaryKey("linked").then(async (linked) => {
   if (linked) {
 
     const renderContentIcon = await getTemporaryKey("render_content_icon");
+    const opacityOfContentIcon = await getTemporaryKey("opacity_content_icon");
+
     console.debug("renderContentIcon", renderContentIcon);
 
     if (renderContentIcon == undefined || renderContentIcon === true || renderContentIcon === "true") {
@@ -35,7 +37,7 @@ getTemporaryKey("linked").then(async (linked) => {
                 const input = inputs[l];
 
                 console.debug("found password field");
-                addButton(input);
+                addButton(input, opacityOfContentIcon);
               }
             }
 
@@ -57,7 +59,7 @@ getTemporaryKey("linked").then(async (linked) => {
         const input = inputs[j];
 
         console.debug("found password field");
-        addButton(input);
+        addButton(input, opacityOfContentIcon);
       }
 
       // delayed search in case of missing loaded elements
@@ -70,11 +72,11 @@ getTemporaryKey("linked").then(async (linked) => {
           const input = inputs[j];
 
           console.debug("found password field");
-          addButton(input);
+          addButton(input, opacityOfContentIcon);
 
         }
 
-      }, 1500);
+      }, 2500);
 
       
     }
@@ -162,7 +164,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
 const injectedButtonId = "___synthetic_ANOTHERpass_____";
 
-function addButton(input) {
+function addButton(input, opacityOfContentIcon) {
 
   console.debug("input.type", input.type);
   console.debug("input.nodeName", input.nodeName);
@@ -187,7 +189,6 @@ function addButton(input) {
   }
 
   
-
   const target = input.parentNode;
   if (target.id !== injectedButtonId) {
     const div = document.createElement('div');
@@ -213,6 +214,7 @@ function addButton(input) {
     button.style.height = inputHeight + "px";
     button.style.minHeight = inputHeight + "px";
     button.style.border = input.border;
+    button.style.opacity = opacityOfContentIcon + "%";
 
     button.style.backgroundImage = "url(" + iconUrl + ")";
 

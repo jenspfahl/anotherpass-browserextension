@@ -2,25 +2,33 @@
 
 ## Disclaimer
 
-This extension is in beta-state. The security and communication layer is stable and the UI should be finished. Smaller bugs in the UI or wrong rendering could happen. If you encounter some, please report an issue. 
+This extension is in beta-state. The security and communication layer is stable and the UI should be finished. Smaller bugs in the UI or wrong rendering could happen. If you encounter some problems, please report an issue. 
 
 ## Purpose
 
-This is a browser extension to communicate with the ANOTHERpass Android app from a browser on a different device in the same local network to access the stored credentials in the app and use them in the browser. 
+This is a browser extension to communicate with the [ANOTHERpass Android app](https://anotherpass.jepfa.de) from a browser on a different device in the same local network to access the stored credentials in the app and use them in the browser. 
 
-The browser extension (called the extension) can be connected to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. To achieve this:
+The browser extension (called the extension) can be connected to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. 
+
+The ANOTHERpass app version 2 will be released on F-Droid and Google Play Store after the extension is published on Addons-Mozilla and Google Web Store.
+
+To achieve this:
 
 - the device where the app runs is connected to the same local network as the device where the browser runs
 - the app acts as server, the extension as client
 - used protocol is HTTP to enable the extension to access the app (HTTPS requires a valid server certificate signed by a CA, which is not available atm)
-- to easily find the app in the network, the app device shall use a device name as hostname (default for most Android devices) or the device IP address is needed by the extension
+- to easily find the app in the network, the app's device can use a device name as hostname (if you administer the local network) or the device IP address is needed by the extension. A so called handle is a shortened IP address in a Base22 format, to avoid fiddling around with changing IP addresses.
 - a port can be configured on both ends (default 8787)
 
 # Installing
 
-This extension is under development and not yet published on any browsers extension stores. The plan is to support at least Firefox and Chrome.
+This extension is under beta and published on AMO (addons.mozilla.org). 
 
-To install this extension you have to clone this repository and use `about:debugging#/runtime/this-firefox` to temporary load this extension to Firefox by selecting the `manifest.json`.
+<a href="https://addons.mozilla.org/en-US/firefox/addon/anotherpass-browser-extension/" target="_blank"><img src="icons/get-addon-on-moz.png"/></a>
+
+The plan is to support also Chrome browsers.
+
+To install this extension from the current code base you have to download this repository and use `about:debugging#/runtime/this-firefox` to temporary load this extension to Firefox by selecting the `manifest.json`. Similar works for Chrome.
 
 # Use Cases (outline)
 
@@ -34,25 +42,25 @@ Using HTTPS is not constructive because the server (the app) cannot provide a TL
 
 1. The user installs the extension in the brower
 2. The user clicks on the extension's action button and select "Link with app"
-3. A page opens which displays a unique identifier and a generated QR code 
-4. The user opens the app and starts the server
+3. A dialog opens which displays a unique identifier and a generated QR code 
+4. The user opens the app on the mobile device and starts the server
 5. The user clicks on "Link new device" and a new screen is shown
 6. The app asks 
     1. for a human name of the new link (e.g. "My laptop")
     2. to scan the QR code presented by the browser extension
 7. Once scanned, the app displays the same unique identifier as the extension
-8. The user has to enter the IP or host name displayed in the app in the related field in the extension and click on "Next" button
+8. The user has to enter the IP, host name or handle displayed in the app in the related field in the extension and click on "Next" button
 9. The app and the extension begin to process. When done, both show a linking confirmation with a fingerprint wich should be equal
 10. If the user confirms equality on both ends, the link process is completed  
 
 
 ## Request a password for a website
 
-1. The user browses a website which contains a password field and the extension marks this field with a "Request password"-button
+1. The user browses a website which contains a username or password field or both and the extension marks this field with an "ANOTHERpass"-button
 2. The user clicks on this button
 3. The extension shows a dialog which:
    - says "Open the app and accept this request"
-   - contains the configured IP address / hostname (see "link" flow above)
+   - contains the configured IP address / hostname / handle (see "link" flow above)
    - also contains a shortened fingerprint
    - shows a timer which runs down beginning with 60s (the request will be aborted once the timer expires)
 4. The extension polls every x seconds to the configured host and port 

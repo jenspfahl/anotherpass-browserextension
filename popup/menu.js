@@ -11,6 +11,7 @@ getLocalValue("linked").then(async (linked) => {
 
   const lockTimeout = await getLocalValue("lock_timeout") || 60;
   const renderContentIcon = await getLocalValue("render_content_icon");
+  const opacityOfContentIcon = await getLocalValue("opacity_content_icon") || 90;
 
 
   // load current configurated server
@@ -71,6 +72,7 @@ getLocalValue("linked").then(async (linked) => {
   document.getElementById("server-settings-lock-timeout").value = lockTimeout;
   document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
 
+  document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
   document.getElementById("server-settings-port").value = port;
 
@@ -87,6 +89,7 @@ getLocalValue("linked").then(async (linked) => {
 
       const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
       const renderContentIcon = document.getElementById("render_content_icon").checked;
+      const opacityOfContentIcon = parseInt(document.getElementById("opacity_content_icon").value);
 
 
       const server = hostField.value;
@@ -114,6 +117,9 @@ getLocalValue("linked").then(async (linked) => {
       else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
         bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
       }
+      else if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
+        bsAlert("Error", "Invalid icon opacity, should be a number between 1 and 100.");
+      }
       else {
         await addNewAlternativeServer(server);
         await loadAlternativeServersToUi();
@@ -123,7 +129,10 @@ getLocalValue("linked").then(async (linked) => {
         await setLocalValue("polling_interval", pollingInterval);
         await setLocalValue("lock_timeout", lockTimeout);
         await setLocalValue("render_content_icon", renderContentIcon);
+        await setLocalValue("opacity_content_icon", opacityOfContentIcon);
+
         setTemporaryKey("render_content_icon", renderContentIcon);
+        setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
 
         bsAlert("Success", "Settings sucessfully updated.");
       }
@@ -140,6 +149,7 @@ getLocalValue("linked").then(async (linked) => {
       document.getElementById("server-settings-lock-timeout").value = lockTimeout;
       document.getElementById("render_content_icon").checked = true;
 
+      document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
     }
 

@@ -157,11 +157,18 @@
               <input id="server-settings-lock-timeout" class="form-control" type="number" min="1" max="10080" placeholder="Lock timeout" aria-label="Lock timeout in minutes">
             </div>
 
+            <hr>
+
             <div class="form-check mb-3">
               <input class="form-check-input" type="checkbox" value="" id="render_content_icon">
               <label class="form-check-label" for="render_content_icon">
                 Render an icon on each username and password input field (refresh your site if changed)
               </label>
+            </div>
+
+            <div class="mb-3">
+              <label for="opacity_content_icon" class="form-label">Opacity of this icon:</label>            
+              <input id="opacity_content_icon" class="form-control" type="number" min="0" max="100" placeholder="Opacity of the icon" aria-label="The opacity of the icon">
             </div>
           
             <hr>
@@ -211,7 +218,7 @@
           <p>
             This is an extension to communicate with a linked <a href="https://anotherpass.jepfa.de">ANOTHERpass</a> vault.
             <p>
-            To use this extension you need the <a href="https://anotherpass.jepfa.de/download">ANOTHERpass Android app</a> on your device.
+            To use this extension you need the <a href="https://anotherpass.jepfa.de/download">ANOTHERpass Android app</a> on your mobile device.
             More details about this extension can be found <a href="https://anotherpass.jepfa.de/extension">here</a>.
             <p>
 
