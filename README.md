@@ -26,7 +26,10 @@ This extension is under beta and published on AMO (addons.mozilla.org).
 
 <a href="https://addons.mozilla.org/en-US/firefox/addon/anotherpass-browser-extension/" target="_blank"><img src="icons/get-addon-on-moz.png"/></a>
 
-The plan is to support also Chrome browsers.
+and on Chrom Web Store as well:
+
+<a href="https://chromewebstore.google.com/detail/anotherpass-browser-exten/hifppbgnnojjdccmikbapfofbloabefb" target="_blank"><img src="icons/get-addon-on-chrome.png"/></a>
+
 
 To install this extension from the current code base you have to download this repository and use `about:debugging#/runtime/this-firefox` to temporary load this extension to Firefox by selecting the `manifest.json`. Similar works for Chrome.
 
