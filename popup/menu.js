@@ -522,6 +522,9 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("nav-help").appendChild(hint);
 
   }
+
+  document.getElementById("version").innerText = "Version: " + chrome.runtime.getManifest().version;
+
 }
 
 

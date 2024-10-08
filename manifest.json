@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ANOTHERpass Browser Extension",
-  "version": "0.10",
+  "version": "1.0",
   "description": "Use ANOTHERpass in the browser",
   "homepage_url": "https://anotherpass.jepfa.de",
   "icons": {
@@ -30,7 +30,8 @@
       "common/crypto.js",
       "common/remote.js",
       "background_scripts/background.js"
-    ]
+    ],
+    "persistent": true
   },
   "web_accessible_resources": [
     {

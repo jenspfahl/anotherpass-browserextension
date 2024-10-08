@@ -37,7 +37,7 @@ async function bsAlert(title, message, closeLabel) {
           <div class="modal-body fs-6 overflow-auto">
             ${message}
         </div>    
-        <div class="modal-footer"">             
+        <div class="modal-footer">             
         <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${closeLabel||"Close"}</button>
         </div>
       </div>
