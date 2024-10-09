@@ -240,7 +240,7 @@ async function linkApp(relink, webClientId) {
                   action: "create_context_menu"
                 });
 
-                setTemporaryKey("linked", true);
+                await setTemporaryKey("linked", true);
 
                 bsAlert("Success", "Extension successfully linked to vault <b>" + newVaultId + "</b> with the link identifier <b class=\"fingerprint\">" + webClientId + "</b>.").then(_ => {
                   window.close();

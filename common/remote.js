@@ -33,8 +33,8 @@ function poll(fn, timeout, interval) {
 }
 
 
-async function getAddress(variables) {
-  let server = await getTempOrLocalKey("server_address", variables);
+async function getAddress(isFromBg) {
+  let server = await getTempOrLocalKey("server_address", isFromBg);
   console.debug("stored server address", server);
 
   if (isIntentedHandle(server)) {
@@ -44,7 +44,7 @@ async function getAddress(variables) {
       server = serverFromHandle;
     }
   }
-  const port = await getTempOrLocalKey("server_port", variables);
+  const port = await getTempOrLocalKey("server_port", isFromBg);
   return server + ":" + port;
 }
 
@@ -59,11 +59,11 @@ async function getAddress(variables) {
  * @param {*} message 
  * @param {*} sendResponse 
  */
-async function remoteCall(message, sendResponse, variables, timeout) {
+async function remoteCall(message, sendResponse, isFromBg, timeout) {
   let parsedResponse, rawResponse;
   try {
-    const isLinking = await getTemporaryKey("is_linking", variables);
-    const webClientId = await getTempOrLocalKey("web_client_id", variables);
+    const isLinking = await getTemporaryKey("is_linking", isFromBg);
+    const webClientId = await getTempOrLocalKey("web_client_id", isFromBg);
     const linked = await getLocalValue("linked");
     console.debug("remote call asks isLinking? " + isLinking);
     try {
@@ -71,7 +71,7 @@ async function remoteCall(message, sendResponse, variables, timeout) {
       let requestTransportKeyAsArray;
       if (!isLinking && linked) {
         const appPublicKey = await getKey("app_public_key");
-        const oneTimeKey = await generateAesKey(await getSupportedKeyLength(variables));
+        const oneTimeKey = await generateAesKey(await getSupportedKeyLength(isFromBg));
         const oneTimeKeyAsArray = await aesKeyToArray(oneTimeKey);
 
         const encOneTimeKey = await encryptWithPublicKey(appPublicKey, oneTimeKeyAsArray);
@@ -101,7 +101,7 @@ async function remoteCall(message, sendResponse, variables, timeout) {
       //console.debug("sending plain request:", JSON.stringify(message));  
       //console.debug("sending request:", JSON.stringify(request));
 
-      const address = await getAddress(variables);
+      const address = await getAddress(isFromBg);
       console.debug("fetch from", address);
 
       rawResponse = await fetch('http://' + address + '/', {

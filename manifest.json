@@ -30,8 +30,7 @@
       "common/crypto.js",
       "common/remote.js",
       "background_scripts/background.js"
-    ],
-    "persistent": true
+    ]
   },
   "web_accessible_resources": [
     {

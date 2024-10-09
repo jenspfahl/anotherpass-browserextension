@@ -131,8 +131,8 @@ getLocalValue("linked").then(async (linked) => {
         await setLocalValue("render_content_icon", renderContentIcon);
         await setLocalValue("opacity_content_icon", opacityOfContentIcon);
 
-        setTemporaryKey("render_content_icon", renderContentIcon);
-        setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
+        await setTemporaryKey("render_content_icon", renderContentIcon);
+        await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
 
         bsAlert("Success", "Settings sucessfully updated.");
       }

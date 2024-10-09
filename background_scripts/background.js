@@ -1,5 +1,4 @@
 console.log("Start extension");
-const variables = new Map();
 
 // global background listener, controlled with an "action"-property
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
@@ -24,27 +23,33 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       return true;
     }
    
-    case "get": {
-      sendResponse({result: variables.get(message.key)});
+    case "get_session_value": {
+      getSessionValue(message.key).then(value => {
+        sendResponse({result: value});
+      });
 
       return true;  
     }
     
-    case "set": {
-      variables.set(message.key, message.value);
-      sendResponse({result: message.value});
+    case "set_session_value": {
+
+      setSessionValue(message.key, message.value).then(value => {
+        sendResponse({result: value});
+      });
 
       return true;  
     }
     
-    case "delete": {
-      sendResponse({result: variables.delete(message.key)});
+    case "delete_session_value": {
+      deleteSessionValue(message.key).then(value => {
+        sendResponse({result: value});
+      });
 
       return true;  
     }
     
     case "update_extension_icon": {
-      isLocalVaultUnlocked(variables).then(isUnlocked => {
+      isLocalVaultUnlocked(true).then(isUnlocked => {
         console.log("update_extension_icon", isUnlocked);
         updateExtensionIcon(isUnlocked);
       });
@@ -189,13 +194,13 @@ getLocalValue("linked").then(async (linked) => {
   if (linked) {
   
     // init internal cache to avoid accessing local storage from content script
-    variables.set("linked", linked);
+    await setSessionValue("linked", linked);
   
     const renderContentIcon = await getLocalValue("render_content_icon");
     const opacityOfContentIcon = await getLocalValue("opacity_content_icon");
 
-    variables.set("render_content_icon", renderContentIcon);
-    variables.set("opacity_content_icon", opacityOfContentIcon);
+    await setSessionValue("render_content_icon", renderContentIcon);
+    await setSessionValue("opacity_content_icon", opacityOfContentIcon);
   
   
     createContextMenu();
@@ -273,7 +278,7 @@ function onContextMenuClicked(info, tab) {
 
 async function forwardCredential(tabId, uid) {
 
-  const clientKey = await getClientKey(variables);
+  const clientKey = await getClientKey(true);
 
   if (clientKey) {
 
@@ -324,14 +329,14 @@ function fetchCredential(message, sendResponse) {
     }
     console.debug("timeout", timeout);
     console.debug("pollingInterval", pollingInterval);
-    remoteCall(request, sendResponse, variables, timeout);  
+    remoteCall(request, sendResponse, true, timeout);  
   });
   
 }
 
 async function listLocalCredentials(url, sendResponse) {
 
-  const clientKey = await getClientKey(variables);
+  const clientKey = await getClientKey(true);
 
   if (clientKey) {
     
@@ -393,7 +398,7 @@ async function listLocalCredentials(url, sendResponse) {
 async function linkToApp(sendResponse) {
 
   let clientKeyPair;
-  const isLinking = await getTemporaryKey("is_linking", variables);
+  const isLinking = await getTemporaryKey("is_linking", true);
   const linked = await getLocalValue("linked");
   const currentVaultId = await getLocalValue("linked_vault_id");
 
@@ -421,7 +426,7 @@ async function linkToApp(sendResponse) {
     };  
   }
   
-  remoteCall(request, sendResponse, variables, 1000 * 60 * 3); // 3 Minutes before timeout to give the app time to generate the keys
+  remoteCall(request, sendResponse, true, 1000 * 60 * 3); // 3 Minutes before timeout to give the app time to generate the keys
 }
 
 
@@ -469,7 +474,7 @@ async function unlinkApp() {
 
   console.log("do unlink");
 
-  variables.clear();
+  await clearSessionValues();
   await clearLocalValues();
 
   removeContextMenu();

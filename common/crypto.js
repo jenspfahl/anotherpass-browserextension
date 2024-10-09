@@ -89,8 +89,8 @@ async function destroyAllKeys() {
   await destroySessionKey();
 }
 
-async function getSupportedKeyLength(variables) {
-  return await getTempOrLocalKey("symmetric_key_length", variables) || 128;
+async function getSupportedKeyLength(isFromBg) {
+  return await getTempOrLocalKey("symmetric_key_length", isFromBg) || 128;
 }
 
 async function destroySessionKey() {
@@ -251,21 +251,18 @@ function openDb() {
 }
 
 /**
- * Sets a key/value pair that only lives in memory and is therefore erased when the process ends.
- * @param {*} key 
- * @param {*} value any value, but no CryptoObjects! (they cannot be accessed through the getTemporaryKey function)
- * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
-* @returns 
+ * Sets a key/value pair that only lives in memory and is bound to the browser session.  
+
  */
-function setTemporaryKey(key, value, variables) {
+function setTemporaryKey(key, value, isFromBg) {
   return new Promise(async (resolve, reject) => {
 
-    if (variables) {  
-      resolve(variables.set(key, value));
+    if (isFromBg) {  
+      setSessionValue(key, value).then(value => resolve(value));
     }
     else {
       chrome.runtime.sendMessage({
-        action: "set",
+        action: "set_session_value",
         key: key,
         value: value,
       })
@@ -280,20 +277,17 @@ function setTemporaryKey(key, value, variables) {
 }
 
 /**
- * Gets the value of a key that only lives in memory and is bound to the background script / extension.  
- * @param {*} key 
- * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
- * @returns 
+ * Gets the value of a key that only lives in memory and is bound to the browser session.  
  */
-function getTemporaryKey(key, variables) {
+function getTemporaryKey(key, isFromBg) {
   return new Promise(async (resolve, reject) => {
 
-    if (variables) {  
-      resolve(variables.get(key));
+    if (isFromBg) {  
+      getSessionValue(key).then(value => resolve(value));
     }
     else {
       const response = await chrome.runtime.sendMessage({
-        action: "get",
+        action: "get_session_value",
         key: key,
       });
       resolve(response.result);
@@ -303,20 +297,17 @@ function getTemporaryKey(key, variables) {
 }
 
 /**
- * Deletes the value of a key that only lived in memory and is bound to the background script / extension.  
- * @param {*} key 
- * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
- * @returns 
+ * Deletes the value of a key that only lived in memory and is bound to the browser session.  
  */
-function deleteTemporaryKey(key, variables) {
+function deleteTemporaryKey(key, isFromBg) {
   return new Promise(async (resolve, reject) => {
 
-    if (variables) {  
-      resolve(variables.delete(key));
+    if (isFromBg) {  
+      deleteSessionValue(key).then(value => resolve(value));
     }
     else {
       const response = await chrome.runtime.sendMessage({
-        action: "delete",
+        action: "delete_session_value",
         key: key,
       });
       resolve(response.result);
@@ -325,14 +316,11 @@ function deleteTemporaryKey(key, variables) {
 }
 
 /**
- * Gets the value of a key that first lives in memory and is bound to the background script / extension, or, if nothing found, lives in the local storage.
- * @param {*} key 
- * @param {*} variables the in-memory storage if accessible (called from the background script) or undefined if called from a popup or content script.
- * @returns 
+ * Gets the value of a key that first lives in memory and is bound to the browser session, or, if nothing found, lives in the local storage.
  */
-function getTempOrLocalKey(key, variables) {
+function getTempOrLocalKey(key, isFromBg) {
   return new Promise(async (resolve, reject) => {
-    const value = await getTemporaryKey(key, variables);
+    const value = await getTemporaryKey(key, isFromBg);
     
     if (value) {
       console.debug("found temp key value for local " + key);
@@ -385,6 +373,43 @@ async function getAllLocalValues() {
 
 async function clearLocalValues() {
   return chrome.storage.local.clear();
+}
+
+
+async function getSessionValue(key) {
+  const result = await chrome.storage.session.get([key]);
+  if (result === undefined) {
+    return null;
+  }
+  const value = result[key];
+  if (value === undefined) {
+    return null;
+  }
+  else {
+    return value;
+  }
+}
+
+async function setSessionValue(key, value) {
+  return chrome.storage.session.set({ [key]: value });
+}
+
+async function deleteSessionValue(key) {
+  const result = await chrome.storage.session.remove([key]);
+  if (result === undefined) {
+    return null;
+  }
+  const value = result[key];
+  if (value === undefined) {
+    return null;
+  }
+  else {
+    return value;
+  }
+}
+
+async function clearSessionValues() {
+  return chrome.storage.session.clear();
 }
 
 
@@ -459,8 +484,8 @@ function deleteKey(key) {
 
 
 
-async function getClientKey(variables) {
-  const clientKeyData = await getTemporaryKey("clientKey", variables);
+async function getClientKey(isFromBg) {
+  const clientKeyData = await getTemporaryKey("clientKey", isFromBg);
 
   if (!clientKeyData) {
     console.log("No client key found");
@@ -475,7 +500,7 @@ async function getClientKey(variables) {
   console.debug("Client key age " + age + "ms (now " + now + " old timestamp " + timestamp + "), lock timeout (ms): " + threshold);
   if (age > threshold) { 
     console.log("Client key too old, logging out");
-    deleteTemporaryKey("clientKey", variables); 
+    deleteTemporaryKey("clientKey", isFromBg); 
     return;
   }
 
@@ -489,14 +514,14 @@ async function getClientKey(variables) {
     clientKey: clientKeyBase64,
     timestamp: Date.now()
   },
-  variables);
+  isFromBg);
 
   return clientKey;
 }
 
 
-async function isLocalVaultUnlocked(variables) {
-  const clientKey = await getClientKey(variables);
+async function isLocalVaultUnlocked(isFromBg) {
+  const clientKey = await getClientKey(isFromBg);
   if (clientKey) {
     return true;
   }
