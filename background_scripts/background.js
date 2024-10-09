@@ -421,7 +421,7 @@ async function linkToApp(sendResponse) {
     };  
   }
   
-  remoteCall(request, sendResponse, variables, 1000 * 60 * 4); // 4 Minutes before timeout to give the app time to generate the keys
+  remoteCall(request, sendResponse, variables, 1000 * 60 * 3); // 3 Minutes before timeout to give the app time to generate the keys
 }
 
 

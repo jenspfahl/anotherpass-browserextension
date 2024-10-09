@@ -150,11 +150,12 @@ async function linkApp(relink, webClientId) {
         document.querySelector("#qr_code_pad").style.display = 'none';
 
         // save state temporary
-        setTemporaryKey("web_client_id", webClientId);
-        setTemporaryKey("server_address", ip);
-        setTemporaryKey("server_port", port);
+        await setTemporaryKey("web_client_id", webClientId);
+        await setTemporaryKey("server_address", ip);
+        await setTemporaryKey("server_port", port);
         await setKey("temp_client_keypair", clientKeyPair); // we cannot set this as TemporaryKey due to privileged access to CryptoKeys
         
+        console.debug("Call link action");
         // remote call to the app
         chrome.runtime.sendMessage({
           action: "link_to_app",
@@ -165,12 +166,12 @@ async function linkApp(relink, webClientId) {
           if (response == null || response.response == null) {
             if (response.error) {
               console.error("linking error from server: " + response.error);
-              bsAlert("Error", "Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.<br><code>Error: " + response.error + "</code>");
+              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app. <br><code>Error: " + response.error + "</code>");
               
             }
             else {
               console.error("linking error from server, see previous logs");
-              bsAlert("Error", "Cannot link with the app. Check whether the IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
+              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
               
             }
             document.getElementById("next").disabled = false;
@@ -261,9 +262,10 @@ async function linkApp(relink, webClientId) {
         },
         error => {
           console.error("unknown linking error from server: ", error);
-          bsAlert("Error", "Cannot link with the app due to an unknown problem").then(_ => {
-            window.close();
-          });
+          bsAlert("Error", "Cannot link with the app due to an unknown problem. Open the app and try again. <br><code>Error: " + response.error + "</code>");
+          document.getElementById("next").disabled = false;
+          document.querySelector("#loading_pad").style.display = 'none';
+          document.querySelector("#qr_code_pad").style.display = '';
         });
 
       }
