@@ -2,15 +2,13 @@
 
 ## Disclaimer
 
-This extension is in beta-state. The security and communication layer is stable and the UI should be finished. Smaller bugs in the UI or wrong rendering could happen. If you encounter some problems, please report an issue. 
+This extension is final. The security and communication layer is stable and the UI should be finished. Smaller bugs in the UI or wrong rendering could happen. If you encounter some problems, please report an issue. 
 
 ## Purpose
 
 This is a browser extension to communicate with the [ANOTHERpass Android app](https://anotherpass.jepfa.de) from a browser on a different device in the same local network to access the stored credentials in the app and use them in the browser. 
 
-The browser extension (called the extension) can be connected to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass/tree/rc-2.0.0) (called the app, download the latest beta [here](https://anotherpass.jepfa.de/app/anotherpass_beta.apk)) running on a device which is reachable from the browser. 
-
-The ANOTHERpass app version 2 will be released on F-Droid and Google Play Store after the extension is published on Addons-Mozilla and Google Web Store.
+The browser extension (called the extension) can be connected to an [ANOTHERpass V2 app](https://github.com/jenspfahl/ANOTHERpass) (called the app, download the latest version [here](https://anotherpass.jepfa.de/download)) running on a device which is reachable from the browser. 
 
 To achieve this:
 
@@ -19,6 +17,8 @@ To achieve this:
 - used protocol is HTTP to enable the extension to access the app (HTTPS requires a valid server certificate signed by a CA, which is not available atm)
 - to easily find the app in the network, the app's device can use a device name as hostname (if you administer the local network) or the device IP address is needed by the extension. A so called handle is a shortened IP address in a Base22 format, to avoid fiddling around with changing IP addresses.
 - a port can be configured on both ends (default 8787)
+
+More information about the extension can be found [here](https://anotherpass.jepfa.de/extension).
 
 # Installing
 
@@ -35,7 +35,7 @@ To install this extension from the current code base you have to download this r
 
 # Use Cases (outline)
 
-The use cases are implemented by utilizing the [ANOTHERpass Credential Server API](https://github.com/jenspfahl/ANOTHERpass/blob/rc-2.0.0/SERVER-API-SPEC.md).
+The use cases are implemented by utilizing the [ANOTHERpass Credential Server API](https://github.com/jenspfahl/ANOTHERpass/blob/master/SERVER-API-SPEC.md).
 
 ## Link Extension with the App
 
