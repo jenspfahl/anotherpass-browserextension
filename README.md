@@ -144,12 +144,12 @@ Exchange happens through these steps:
     * verifies `PKext` with `F` to mitigate MITM key substitution (fails if not valid)
     * stores `PKext` for future communication
 1. The app generates:
-    * the **app-side RSA key pair** (`PKapp` and `PrivKapp`, latter will never leave the extension)
-    * the shared **Base Key** (`BK`) and stores it for future communication
+    * the **app-side RSA key pair** (`PKapp` and `PrivKapp`, latter will never leave the app)
+    * the shared **Base Key** (`BK`) and stores it for future communication (either 128 or 256 bit, depending on the app's device)
     * a **One-Time Key** (`OTKrs`)
     * a **Transport Key** derived from the previous scanned **Session Key**, since `BK` is not yet known by the extension --> `TKrs = SHA256(SK + OTKrs)`
-1. Now the app responds to the extension as described in "Common communication" but with a differently derived **Transport Key**:
-    * by using `PrivKext` to encrypt `OTKrs` (common behaviour)
+1. Now the app responds to the extension as described in "Common communication" but with a different **Transport Key**:
+    * by using `PKext` to encrypt `OTKrs` (common behaviour)
     * using derived `TKrs` to encrypt the payload (common behaviour)
     * Payload contains:
         * `PKapp`
