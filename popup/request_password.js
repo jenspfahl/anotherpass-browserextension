@@ -144,6 +144,9 @@ getLocalValue("linked").then(async (linked) => {
     else if (requestData.command === "create_credential_for_url") {
       document.getElementById("instruction").innerText = "Requesting to create a new credential in the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
     }
+    else if (requestData.command === "download_vault_backup") {
+      document.getElementById("instruction").innerText = "Requesting to download the vault backup file from the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+    }
 
     console.debug("requestData", requestData);
     const targetUrl = requestData.website;
@@ -378,6 +381,18 @@ getLocalValue("linked").then(async (linked) => {
               bsAlert("Success!", count + " credentials synchronised.").then(_ => {
                 window.close();
               });
+            }
+            else if (requestData.command === "download_vault_backup") {
+              const downloadKey = response.downloadKey;
+              const filename = response.filename;
+
+              await unlockVault(clientKeyBase64);
+              
+              const url = "http://" + await getAddress() + "/" + downloadKey;
+              console.debug("file download url", url);
+              chrome.downloads.download({ filename: filename, url: url, saveAs: true});
+              window.close();
+              
             }
           }
         }).catch(function (e) {

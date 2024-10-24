@@ -228,6 +228,11 @@ getLocalValue("linked").then(async (linked) => {
         action: "start_all_passwords_request_flow"
       });
     }
+    else if (e.target.id === "download_vault_backup") {
+      chrome.runtime.sendMessage({
+        action: "start_download_vault_backup_flow"
+      });
+    }
     else if (e.target.id === "delete_all_credentials") {
       bsConfirm("Delete all local credentials", 
       "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
