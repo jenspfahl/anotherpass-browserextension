@@ -83,8 +83,6 @@
                 <ul class="dropdown-menu">
                   <button id="fetch_multiple_credentials" class="btn dropdown-item" title="Fetch a selection of credentials from the app">Fetch multiple credentials</button>
                   <button id="fetch_all_credentials" class="btn dropdown-item" title="Fetch all credential from the app, except vailed">Fetch all credentials</button>
-                  <li id="delete_all_credentials_divider" ><hr class="dropdown-divider"></li>
-                  <button id="delete_all_credentials" class="btn dropdown-item" title="Delete all local credentials from the local vault">Delete all local credentials</button>
                   <li id="download_vault_backup_divider" ><hr class="dropdown-divider"></li>
                   <button id="download_vault_backup" class="btn dropdown-item" title="Download the vault backup file from the app">Download vault backup file</button>
                 </ul>
@@ -96,13 +94,22 @@
 
               <div id="search_group" class="input-group mt-1 mb-1">
                 <input id="search_input" type="text" class="form-control rounded-0" placeholder="Search credentials" title="Search credentials in local vault" aria-label="Search" aria-describedby="search">
-                <div class="input-group-append">
-                  <button class="btn" type="button" id="clear_search">
+                <div class="input-group-append px-0">
+                  <button class="btn pt-2" type="button" id="clear_search">
                     <span id="clear_search_icon" class="material-symbols-outlined size-24">
                       clear
                     </span>
                   </button>
                 </div>
+
+
+                <button type="button" id="credential_vault_options" class="btn dropdown-toggle rounded-0 dropdown-toggle-split mt-0 mb-3 pt-2 px-1" data-bs-toggle="dropdown" aria-expanded="false">
+                </button>
+                <ul class="dropdown-menu">
+                  <button id="reverse_sort" class="btn dropdown-item" title="Change the sorting of the local credentials">Sort descending</button>
+                  <li><hr class="dropdown-divider"></li>
+                  <button id="delete_all_credentials" class="btn dropdown-item" title="Delete all local credentials from the local vault">Delete all local credentials</button>
+                </ul>
               </div>
 
               <h7 id="vaultStatus"></h7>

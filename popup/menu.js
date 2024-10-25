@@ -229,9 +229,30 @@ getLocalValue("linked").then(async (linked) => {
       });
     }
     else if (e.target.id === "download_vault_backup") {
-      chrome.runtime.sendMessage({
-        action: "start_download_vault_backup_flow"
+
+      bsConfirm("Warning", 
+      "Although the vault backup file is encrypted, it contains metadata about your vault. You should only download the vault backup file within a thrusted local network. Continue?")
+      .then(async (decision) => {
+        if (decision === true) {
+          chrome.runtime.sendMessage({
+            action: "start_download_vault_backup_flow"
+          });
+        }
       });
+
+    }
+    else if (e.target.id === "reverse_sort") {
+      let order = await getLocalValue("credential_order");
+      if (order === null || order === "asc") {
+        order = "desc";
+        e.target.innerText = "Sort ascending";
+      }
+      else if (order ===  "desc") {
+        order = "asc";
+        e.target.innerText = "Sort descending";
+      }
+      await setLocalValue("credential_order", order);
+      reverseCredentialList();
     }
     else if (e.target.id === "delete_all_credentials") {
       bsConfirm("Delete all local credentials", 
@@ -476,7 +497,7 @@ function updateVaultUi(unlocked) {
     document.getElementById("lock").title = "Lock local vault";
     document.getElementById("sync_credentials").classList.remove("d-none");
     document.getElementById("credential_list").classList.remove("d-none");
-    document.getElementById("delete_all_credentials_divider").classList.remove("d-none");
+    document.getElementById("credential_vault_options").classList.remove("d-none");
     document.getElementById("delete_all_credentials").classList.remove("d-none");
     document.getElementById("search_group").classList.remove("d-none");
 
@@ -489,7 +510,7 @@ function updateVaultUi(unlocked) {
     document.getElementById("vaultStatus").innerText = "- local vault locked -";
     document.getElementById("sync_credentials").classList.add("d-none");
     document.getElementById("credential_list").classList.add("d-none");
-    document.getElementById("delete_all_credentials_divider").classList.add("d-none");
+    document.getElementById("credential_vault_options").classList.add("d-none");
     document.getElementById("delete_all_credentials").classList.add("d-none");
     document.getElementById("search_group").classList.add("d-none");
 
@@ -565,7 +586,17 @@ function updateMenuUi(webClientId, linked) {
     let credentialCount = credentials.length;
     updateCredentialCountUi(credentialCount);
 
-    credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    let order = await getLocalValue("credential_order");
+    if (order === null || order === "asc") {
+      // sort ascending
+      credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)); 
+    }
+    else if (order ===  "desc") {
+      // sort descending
+      credentials.sort((a,b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0)); 
+
+    }
+
     
     credentials.forEach(credential => {
       let uuid = credential.uid;
@@ -745,6 +776,15 @@ function updateCredentialList(searchFor) {
   updateCredentialCountUi(count);
 }
 
+function reverseCredentialList() {
+
+
+  const list = document.getElementById("credential_list");
+  let i = list.childNodes.length;
+  while (i--) {
+    list.appendChild(list.childNodes[i]);
+  }
+}
 
 function updateCredentialCountUi(credentialCount) {
   document.getElementById("vaultStatus").innerText = credentialCount + " credentials";
