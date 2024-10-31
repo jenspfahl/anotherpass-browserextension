@@ -280,7 +280,7 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Error", "Failed to communicate to the app.<br><code>Error: " + response.error + "</code>").then(_ => {
+            bsAlert("Error", "Failed to communicate to the app. Updating the app could solve this problem. <br><code>Error: " + response.error + "</code>").then(_ => {
               window.close();
             });
             return STOP_POLLING;
