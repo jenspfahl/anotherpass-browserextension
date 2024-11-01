@@ -242,7 +242,7 @@ getLocalValue("linked").then(async (linked) => {
 
     }
     else if (e.target.id === "reverse_sort") {
-      let order = await getLocalValue("credential_order");
+      let order = await getLocalValue("vault_credential_order");
       if (order === null || order === "asc") {
         order = "desc";
         e.target.innerText = "Sort ascending";
@@ -251,7 +251,7 @@ getLocalValue("linked").then(async (linked) => {
         order = "asc";
         e.target.innerText = "Sort descending";
       }
-      await setLocalValue("credential_order", order);
+      await setLocalValue("vault_credential_order", order);
       reverseCredentialList();
     }
     else if (e.target.id === "delete_all_credentials") {
@@ -586,7 +586,7 @@ function updateMenuUi(webClientId, linked) {
     let credentialCount = credentials.length;
     updateCredentialCountUi(credentialCount);
 
-    let order = await getLocalValue("credential_order");
+    let order = await getLocalValue("vault_credential_order");
     if (order === null || order === "asc") {
       // sort ascending
       credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)); 
