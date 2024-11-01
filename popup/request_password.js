@@ -158,7 +158,11 @@ getLocalValue("linked").then(async (linked) => {
       document.getElementById("credentialOptions").classList.add("d-none");
     }
     else {
-      document.getElementById("websiteTargetUrl").innerText = targetUrl;
+      const parsedTargetUrl = new URL(targetUrl);
+      parsedTargetUrl.pathname = '';
+      parsedTargetUrl.search = '';
+      const website = parsedTargetUrl.toString();
+      document.getElementById("websiteTargetUrl").innerText = website;
     }
     
 
