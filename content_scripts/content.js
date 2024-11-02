@@ -29,17 +29,17 @@ getTemporaryKey("linked").then(async (linked) => {
               const addedNode = mutation.addedNodes[i];
               //console.debug("got added node", addedNode);
 
-              if (addedNode instanceof Document) {
-              const inputs = addedNode.querySelectorAll("input");
-              //console.debug("got password type", inputs);
+              if (typeof addedNode.querySelectorAll !== "undefined") { 
+                const inputs = addedNode.querySelectorAll("input");
+                //console.debug("got password type", inputs);
 
-              for (var l = 0; l < inputs.length; l++) {
-                const input = inputs[l];
+                for (var l = 0; l < inputs.length; l++) {
+                  const input = inputs[l];
 
-                console.debug("found password field");
-                addButton(input, opacityOfContentIcon);
+                  console.debug("found password field");
+                  addButton(input, opacityOfContentIcon);
+                }
               }
-            }
 
           }
         }
@@ -140,15 +140,38 @@ getTemporaryKey("linked").then(async (linked) => {
     }
 
 
+    function setNativeValue(element, value) {
+      const descriptor = Object.getOwnPropertyDescriptor(element, 'value');
+      if (descriptor) {
+        const valueSetter = descriptor.set;
+        const prototype = Object.getPrototypeOf(element);
+        const protoDescriptor = Object.getOwnPropertyDescriptor(prototype, 'value');
+        let prototypeValueSetter;
+        if (protoDescriptor) {
+          prototypeValueSetter = protoDescriptor.set;
+        }
+
+        if (valueSetter && valueSetter !== prototypeValueSetter) {
+          prototypeValueSetter.call(element, value);
+        } else {
+          valueSetter.call(element, value);
+        }
+      }
+    }
+
     function pasteCredential(password, user) {
 
       passwordFields.forEach(field => {
         field.value = password;
+        setNativeValue(field, password);
+        field.dispatchEvent(new Event('input', { bubbles: true }));
       });
 
       if (user && user.trim().length > 0) {
         usernameFields.forEach(field => {
           field.value = user;
+          setNativeValue(field, user);
+          field.dispatchEvent(new Event('input', { bubbles: true }));
         });
       }
 
@@ -321,5 +344,4 @@ async function openPopup(posX, posY, input) {
   showCredentialModal(x, y, window.location.href);
 
 }
-
 

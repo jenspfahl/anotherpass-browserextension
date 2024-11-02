@@ -87,6 +87,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       return true;  
     }
     
+    case "start_download_vault_backup_flow": {
+      openPasswordRequestDialog("download_vault_backup");
+
+      return true;  
+    }
+
     case "start_sync_password_request_flow": {
       openPasswordRequestDialog("fetch_credential_for_uid", undefined, undefined, message.uid);
 
