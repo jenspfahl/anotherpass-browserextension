@@ -117,6 +117,98 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
 
 
 
+async function bsSetPassword(title, message, okLabel, cancelLabel) {
+  const modalElem = document.createElement('div')
+  modalElem.id = "modal-confirm"
+  modalElem.className = "modal"
+  modalElem.innerHTML = `
+    <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">${title}</h1>
+          <button id="modal-btn-cancel" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+        </div>             
+        <div class="modal-body fs-7">
+          ${message}
+          <hr>
+          <div class="form-group mx-sm-3 mb-2">
+            <label for="inputPassword1" class="sr-only">Password:</label>
+            <input type="password" class="form-control" id="inputPassword1" placeholder="Password">
+          </div>
+          <div class="form-group mx-sm-3 mb-2">
+            <label for="inputPassword2" class="sr-only">Repeat password:</label>
+            <input type="password" class="form-control" id="inputPassword2" placeholder="Password">
+          </div>
+        </div>    
+        
+        <div class="modal-footer">             
+          <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${cancelLabel||"Cancel"}</button>
+          <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${okLabel||"Ok"}</button>
+        </div>
+      </div>
+    </div>
+  `
+  const myModal = new bootstrap.Modal(modalElem, {
+    keyboard: false,
+    backdrop: 'static'
+  });
+  myModal.show();
+
+  const passwd1 = document.getElementById("inputPassword1");
+  const passwd2 = document.getElementById("inputPassword2");
+
+  const okButton = document.getElementById("modal-btn-ok");
+
+  passwd1.focus();
+  okButton.disabled = true;
+
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "inputPassword1" || e.target.id === "inputPassword2") {
+        passwd1.classList.remove("invalid-state");
+        passwd1.title = "Remember to select a hard to guess password";
+        passwd2.classList.remove("invalid-state");
+        passwd2.title = "Remember to select a hard to guess password";
+        okButton.disabled = false;
+
+      if (passwd1.value.length < 8) {
+        passwd1.classList.add("invalid-state");
+        passwd1.title = "Password too short!";
+        okButton.disabled = true;
+      }
+      if (passwd2.value.length < 8) {
+        passwd2.classList.add("invalid-state");
+        passwd2.title = "Password too short!";
+        okButton.disabled = true;
+      }
+      if (passwd1.value.length >= 8 && passwd2.value.length >= 8 && passwd1.value !== passwd2.value) {
+        passwd2.classList.add("invalid-state");
+        passwd2.title = "Repeated password differs!";
+        okButton.disabled = true;
+      }
+      
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    document.body.addEventListener('click', response)
+
+    function response(e) {
+      let bool = false;
+      if (e.target.id == 'modal-btn-cancel') bool = false;
+      else if (e.target.id == 'modal-btn-ok') bool = true;
+      else return;
+
+      document.body.removeEventListener('click', response);
+      const backdrop = document.body.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove()      
+      modalElem.remove()
+      resolve({doSave: bool, password: passwd1.value});
+    }
+  });
+}
+
+
+
 
 /*!
  * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)

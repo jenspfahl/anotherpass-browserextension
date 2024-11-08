@@ -26,6 +26,8 @@ getLocalValue("linked").then(async (linked) => {
   document.addEventListener("input", (e) => {
     if (e.target.id === "server-settings-host") {
       e.target.title = "";
+      document.getElementById("btn-save-settings").disabled = false;
+
 
       if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
         e.target.classList.remove("invalid-state");
@@ -37,6 +39,7 @@ getLocalValue("linked").then(async (linked) => {
       else {
         e.target.classList.add("invalid-state");
         e.target.title = "Server address invalid! Won't be stored.";
+        document.getElementById("btn-save-settings").disabled = true;
       }
     }
   });
@@ -254,6 +257,28 @@ getLocalValue("linked").then(async (linked) => {
       await setLocalValue("vault_credential_order", order);
       reverseCredentialList();
     }
+    else if (e.target.id === "setup_vault_password") {
+      bsSetPassword("Configure local vault password", "For more convinience you can configure a local vault password to unlock the local vault without the need of using the ANOTHERpass app. You may still use the app to unlock at any time.")
+      .then(async (data) => {
+        if (data.doSave === true) {
+
+          //TODO encrypt clientKey with derived pasword key
+          // 200000 iterations, webClientId as salt
+          
+          chrome.runtime.sendMessage({
+            action: "setup_vault_password",
+            password: data.password
+          }).then(() => {
+            bsAlert("Success", "Local vault password configured.").then(_ => {
+              window.close();
+            });
+
+          });
+          
+        }
+      });
+      
+    }
     else if (e.target.id === "delete_all_credentials") {
       bsConfirm("Delete all local credentials", 
       "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
@@ -369,9 +394,14 @@ getLocalValue("linked").then(async (linked) => {
           if (e.target.id === "server_host_" + server.host) {
             e.target.title = "";
 
+
             if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
               changedHosts.set(server.host, e.target.value);
               e.target.classList.remove("invalid-state");
+              const okButton = document.getElementById("modal-btn-ok");
+              if (okButton) { 
+                okButton.disabled = false;
+              }
               const ipFromHandle = handleToIpAddress(e.target.value);
               if (ipFromHandle) {
                 e.target.title = "The handle will be translated to " + ipFromHandle;
@@ -381,6 +411,10 @@ getLocalValue("linked").then(async (linked) => {
               console.log("host invald", e.target.value);
               e.target.classList.add("invalid-state");
               e.target.title = "Server address invalid! Won't be stored.";
+              const okButton = document.getElementById("modal-btn-ok");
+              if (okButton) { 
+                okButton.disabled = true;
+              }
             }
       
             
@@ -419,13 +453,21 @@ getLocalValue("linked").then(async (linked) => {
 
       document.addEventListener("input", (e) => {
         if (e.target.id === "new_server_host") {
-          if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
+          if (e.target.value === "" || isValidIPAdressOrHostnameOrHandle(e.target.value)) {
             addedHost = e.target.value;
             e.target.classList.remove("invalid-state");
+            const okButton = document.getElementById("modal-btn-ok");
+            if (okButton) {
+              okButton.disabled = false;
+            }
           }
           else {
             console.log("host invald", e.target.value);
             e.target.classList.add("invalid-state");
+            const okButton = document.getElementById("modal-btn-ok");
+            if (okButton) { 
+              okButton.disabled = true;
+            }
           }
         }
         else if (e.target.id === "new_server_description") {
@@ -845,3 +887,5 @@ async function addNewAlternativeServer(newServer) {
   await setLocalValue(PREFIX_ALT_SERVER + currentServer, currentServerDesc);
   await setLocalValue(PREFIX_ALT_SERVER + newServer, newServerDesc);
 }
+
+

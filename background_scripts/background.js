@@ -46,6 +46,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       });
 
       return true;  
+    }   
+
+    case "setup_vault_password": {
+      setupVaultPassword(message.password).then(() => {
+        sendResponse();
+      });
+
+      return true;  
     }
     
     case "update_extension_icon": {
@@ -489,6 +497,13 @@ async function unlinkApp() {
   await destroyAllKeys(); 
   console.log("do unlink done");
 
+}
+
+async function setupVaultPassword(password) {
+  const clientKey = await getClientKey();
+  if (clientKey) {
+    //TODO
+  }
 }
 
 

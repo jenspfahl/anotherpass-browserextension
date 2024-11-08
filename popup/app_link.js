@@ -49,6 +49,7 @@ getLocalValue("linked").then((linked) => {
         document.addEventListener("input", (e) => {
           if (e.target.id === "host") {
             e.target.title = "";
+            document.getElementById("next").disabled = false;
       
             if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
               e.target.classList.remove("invalid-state");
@@ -60,6 +61,7 @@ getLocalValue("linked").then((linked) => {
             else {
               e.target.classList.add("invalid-state");
               e.target.title = "Server address invalid! Won't be stored.";
+              document.getElementById("next").disabled = true;
             }
           }
         });
@@ -146,6 +148,8 @@ async function linkApp(relink, webClientId) {
 
         // update UI
         document.getElementById("next").disabled = true; 
+        document.getElementById("host").disabled = true;
+        document.getElementById("port").disabled = true;
         document.querySelector("#loading_pad").style.display = '';
         document.querySelector("#qr_code_pad").style.display = 'none';
 
@@ -175,6 +179,8 @@ async function linkApp(relink, webClientId) {
               
             }
             document.getElementById("next").disabled = false;
+            document.getElementById("host").disabled = false;
+            document.getElementById("port").disabled = false;
             document.querySelector("#loading_pad").style.display = 'none';
             document.querySelector("#qr_code_pad").style.display = '';
           }
@@ -264,6 +270,8 @@ async function linkApp(relink, webClientId) {
           console.error("unknown linking error from server: ", error);
           bsAlert("Error", "Cannot link with the app due to an unknown problem. Open the app and try again. <br><code>Error: " + response.error + "</code>");
           document.getElementById("next").disabled = false;
+          document.getElementById("host").disabled = false;
+          document.getElementById("port").disabled = false;
           document.querySelector("#loading_pad").style.display = 'none';
           document.querySelector("#qr_code_pad").style.display = '';
         });

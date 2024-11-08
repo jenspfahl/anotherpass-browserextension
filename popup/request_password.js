@@ -85,9 +85,14 @@ getLocalValue("linked").then(async (linked) => {
       hostField.title = "";
     }
 
+    const updateButton = document.getElementById("update_server");
+
+
     document.addEventListener("input", (e) => {
       if (e.target.id === "host") {
         e.target.title = "";
+
+        updateButton.disabled = false;
 
         if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
           e.target.classList.remove("invalid-state");
@@ -98,7 +103,8 @@ getLocalValue("linked").then(async (linked) => {
         }
         else {
           e.target.classList.add("invalid-state");
-          e.target.title = "Server address invalid! Won't be stored.";
+          e.target.title = "Server address invalid!";
+          updateButton.disabled = true;
         }
       }
     });
