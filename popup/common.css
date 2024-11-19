@@ -101,3 +101,7 @@
   color: red !important;
   border-color: red !important;
 }
+
+.translatedExtensionWord::before {
+  content: "__MSG_extensionCap__";
+}

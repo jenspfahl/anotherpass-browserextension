@@ -1,0 +1,14 @@
+{
+    "extName": {
+        "message": "ANOTHERpass Browser Extension",
+        "description" : "Name of the extension"
+    },
+    "extDescription": {
+        "message": "Use ANOTHERpass in the browser",
+        "description" : "Description of the extension"
+    },
+    "extensionCap": {
+        "message": "Extension",
+        "description" : "Single woring of extension, Capitalised"
+    }
+}
