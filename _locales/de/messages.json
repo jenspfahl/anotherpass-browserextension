@@ -10,5 +10,45 @@
     "extensionCap": {
         "message": "Erweiterung",
         "description" : "Single woring of extension, Capitalised"
+    },
+    "lblOk": {
+        "message": "Ok",
+        "description" : "Button label for confirming something"
+    },
+    "lblCancel": {
+        "message": "Abbrechen",
+        "description" : "Button label for canelling something"
+    },
+    "lblClose": {
+        "message": "Schließen",
+        "description" : "Button label for closing something"
+    },
+    "vaultUnlocked": {
+        "message": "Tresor entsperrt",
+        "description" : "Lock status about the local vault"
+    },
+    "vaultLocked": {
+        "message": "Tresor gesperrt",
+        "description" : "Lock status about the local vault"
+    },
+    "lblPassword": {
+        "message": "Passwort",
+        "description" : "A label for a password input field"
+    },
+    "lblRepeatPassword": {
+        "message": "Passwort wiederholen",
+        "description" : "A label for a repeat-password input field"
+    },
+    "hintInputPassword": {
+        "message": "Verwende ein schwer zu erratenes Passwort",
+        "description" : "A hint as tooltip on password input fields"
+    },
+    "errorPasswordTooShort": {
+        "message": "Passwort zu kurz!",
+        "description" : "Error shown if a password entered in a password field is too short"
+    },
+    "errorPasswordDiffers": {
+        "message": "Passwortwiederholung ist unterschiedlich!",
+        "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
     }
 }

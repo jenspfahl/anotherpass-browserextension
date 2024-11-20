@@ -24,7 +24,6 @@ function poll(fn, timeout, interval) {
       setTimeout(checkCondition, interval, resolve, reject);
     }
     else {
-      console.error(`Error: ${arguments}`);
       reject(new Error('timed out'));
     }
   };

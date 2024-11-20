@@ -8,7 +8,7 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-open-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault unlocked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultUnlocked") +")" });
   }
   else {
     chrome.action.setIcon({
@@ -19,14 +19,16 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault locked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultLocked") +")" });
   }
 }
 
 async function bsAlert(title, message, closeLabel) {
-    const modalElem = document.createElement('div')
-    modalElem.id = "modal-confirm"
-    modalElem.className = "modal"
+    const modalElem = document.createElement('div');
+    const lblClose = closeLabel || chrome.i18n.getMessage("lblClose");
+
+    modalElem.id = "modal-confirm";
+    modalElem.className = "modal";
     modalElem.innerHTML = `
       <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
         <div class="modal-content">
@@ -38,16 +40,16 @@ async function bsAlert(title, message, closeLabel) {
             ${message}
         </div>    
         <div class="modal-footer">             
-        <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${closeLabel||"Close"}</button>
+        <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${lblClose}</button>
         </div>
       </div>
     </div>
-    `
+    `;
     const myModal = new bootstrap.Modal(modalElem, {
       keyboard: false,
       backdrop: 'static'
-    })
-    myModal.show()
+    });
+    myModal.show();
   
     return new Promise((resolve, reject) => {
       document.body.addEventListener('click', response)
@@ -71,9 +73,11 @@ async function bsAlert(title, message, closeLabel) {
 
 
 async function bsConfirm(title, message, okLabel, cancelLabel) {
-  const modalElem = document.createElement('div')
-  modalElem.id = "modal-confirm"
-  modalElem.className = "modal"
+  const modalElem = document.createElement('div');
+  const lblOk = okLabel || chrome.i18n.getMessage("lblOk");
+  const lblCancel = cancelLabel || chrome.i18n.getMessage("lblCancel");
+  modalElem.id = "modal-confirm";
+  modalElem.className = "modal";
   modalElem.innerHTML = `
     <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
       <div class="modal-content">
@@ -85,17 +89,17 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
           ${message}
       </div>    
       <div class="modal-footer">             
-      <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${cancelLabel||"Cancel"}</button>
-      <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${okLabel||"Ok"}</button>
+      <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${lblCancel}</button>
+      <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${lblOk}</button>
       </div>
     </div>
   </div>
-  `
+  `;
   const myModal = new bootstrap.Modal(modalElem, {
     keyboard: false,
     backdrop: 'static'
-  })
-  myModal.show()
+  });
+  myModal.show();
 
   return new Promise((resolve, reject) => {
     document.body.addEventListener('click', response)
@@ -118,9 +122,14 @@ async function bsConfirm(title, message, okLabel, cancelLabel) {
 
 
 async function bsSetPassword(title, message, okLabel, cancelLabel) {
-  const modalElem = document.createElement('div')
-  modalElem.id = "modal-confirm"
-  modalElem.className = "modal"
+  const modalElem = document.createElement('div');
+  const lblOk = okLabel || chrome.i18n.getMessage("lblOk");
+  const lblCancel = cancelLabel || chrome.i18n.getMessage("lblCancel");
+  const lblPassword = chrome.i18n.getMessage("lblPassword");
+  const lblRepeatPassword = chrome.i18n.getMessage("lblRepeatPassword");
+
+  modalElem.id = "modal-confirm";
+  modalElem.className = "modal";
   modalElem.innerHTML = `
     <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
       <div class="modal-content">
@@ -132,22 +141,22 @@ async function bsSetPassword(title, message, okLabel, cancelLabel) {
           ${message}
           <hr>
           <div class="form-group mx-sm-3 mb-2">
-            <label for="inputPassword1" class="sr-only">Password:</label>
-            <input type="password" class="form-control" id="inputPassword1" placeholder="Password">
+            <label for="inputPassword1" class="sr-only">${lblPassword}:</label>
+            <input type="password" class="form-control" id="inputPassword1" placeholder="${lblPassword}">
           </div>
           <div class="form-group mx-sm-3 mb-2">
-            <label for="inputPassword2" class="sr-only">Repeat password:</label>
-            <input type="password" class="form-control" id="inputPassword2" placeholder="Password">
+            <label for="inputPassword2" class="sr-only">${lblRepeatPassword}:</label>
+            <input type="password" class="form-control" id="inputPassword2" placeholder="${lblPassword}">
           </div>
         </div>    
         
         <div class="modal-footer">             
-          <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${cancelLabel||"Cancel"}</button>
-          <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${okLabel||"Ok"}</button>
+          <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${lblCancel}</button>
+          <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${lblOk}</button>
         </div>
       </div>
     </div>
-  `
+  `;
   const myModal = new bootstrap.Modal(modalElem, {
     keyboard: false,
     backdrop: 'static'
@@ -165,24 +174,24 @@ async function bsSetPassword(title, message, okLabel, cancelLabel) {
   document.addEventListener("input", (e) => {
     if (e.target.id === "inputPassword1" || e.target.id === "inputPassword2") {
         passwd1.classList.remove("invalid-state");
-        passwd1.title = "Remember to select a hard to guess password";
+        passwd1.title = chrome.i18n.getMessage("hintInputPassword");
         passwd2.classList.remove("invalid-state");
-        passwd2.title = "Remember to select a hard to guess password";
+        passwd2.title = chrome.i18n.getMessage("hintInputPassword");
         okButton.disabled = false;
 
       if (passwd1.value.length < 8) {
         passwd1.classList.add("invalid-state");
-        passwd1.title = "Password too short!";
+        passwd1.title = chrome.i18n.getMessage("errorPasswordTooShort");
         okButton.disabled = true;
       }
       if (passwd2.value.length < 8) {
         passwd2.classList.add("invalid-state");
-        passwd2.title = "Password too short!";
+        passwd2.title = chrome.i18n.getMessage("errorPasswordTooShort");
         okButton.disabled = true;
       }
       if (passwd1.value.length >= 8 && passwd2.value.length >= 8 && passwd1.value !== passwd2.value) {
         passwd2.classList.add("invalid-state");
-        passwd2.title = "Repeated password differs!";
+        passwd2.title = chrome.i18n.getMessage("errorPasswordDiffers");
         okButton.disabled = true;
       }
       

@@ -10,5 +10,45 @@
     "extensionCap": {
         "message": "Extension",
         "description" : "Single woring of extension, Capitalised"
+    },
+    "lblOk": {
+        "message": "Ok",
+        "description" : "Button label for confirming something"
+    },
+    "lblCancel": {
+        "message": "Cancel",
+        "description" : "Button label for canelling something"
+    },
+    "lblClose": {
+        "message": "Close",
+        "description" : "Button label for closing something"
+    },
+    "vaultUnlocked": {
+        "message": "Vault unlocked",
+        "description" : "Lock status about the local vault"
+    },
+    "vaultLocked": {
+        "message": "Vault locked",
+        "description" : "Lock status about the local vault"
+    },
+    "lblPassword": {
+        "message": "Password",
+        "description" : "A label for a password input field"
+    },
+    "lblRepeatPassword": {
+        "message": "Repeat password",
+        "description" : "A label for a repeat-password input field"
+    },
+    "hintInputPassword": {
+        "message": "Remember to select a hard to guess password",
+        "description" : "A hint as tooltip on password input fields"
+    },
+    "errorPasswordTooShort": {
+        "message": "Password too short!",
+        "description" : "Error shown if a password entered in a password field is too short"
+    },
+    "errorPasswordDiffers": {
+        "message": "Repeated password differs!",
+        "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
     }
 }
