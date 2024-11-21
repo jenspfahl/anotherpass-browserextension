@@ -261,9 +261,6 @@ getLocalValue("linked").then(async (linked) => {
       bsSetPassword("Configure local vault password", "For more convinience you can configure a local vault password to unlock the local vault without the need of using the ANOTHERpass app. You may still use the app to unlock at any time.")
       .then(async (data) => {
         if (data.doSave === true) {
-
-          //TODO encrypt clientKey with derived pasword key
-          // 200000 iterations, webClientId as salt
           
           chrome.runtime.sendMessage({
             action: "setup_vault_password",

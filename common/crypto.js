@@ -155,6 +155,10 @@ async function arrayToAesKey(array) {
   ]);
 }
 
+function createRandomValues(length) {
+  return crypto.getRandomValues(new Uint8Array(length));
+}
+
 async function encryptMessage(key, message) {
   const enc = new TextEncoder();
   const encoded = enc.encode(message); 
@@ -541,4 +545,27 @@ async function createIndex(targetUrl) {
   const index = bytesToBase64(hash);
   console.debug("index for " + hostname, index);
   return index;
+}
+
+async function deriveKeyFromPassword(password, salt) {
+  const enc = new TextEncoder();
+  const passwordKey = await window.crypto.subtle.importKey(
+    "raw",
+    enc.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits", "deriveKey"],
+  );
+  return await window.crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: salt,
+      iterations: 200361,
+      hash: "SHA-256",
+    },
+    passwordKey,
+    { name: "AES-GCM", length: 256 },
+    true,
+    ["encrypt", "decrypt"],
+  );
 }
