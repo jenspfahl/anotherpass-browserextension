@@ -44,6 +44,7 @@ getLocalValue("linked").then(async (linked) => {
     }
   });
 
+  updateLocalVaultPasswordMenuItem();
 
   // load all known servers
   await loadAlternativeServersToUi();
@@ -258,22 +259,49 @@ getLocalValue("linked").then(async (linked) => {
       reverseCredentialList();
     }
     else if (e.target.id === "setup_vault_password") {
-      bsSetPassword("Configure local vault password", "For more convinience you can configure a local vault password to unlock the local vault without the need of using the ANOTHERpass app. You may still use the app to unlock at any time.")
-      .then(async (data) => {
-        if (data.doSave === true) {
+      const aesEncryptedClientKey = await getLocalValue("local_v_key");
+      if (aesEncryptedClientKey) {
+        bsConfirm(
+          chrome.i18n.getMessage("titleRemoveLocalVaultPassword"), 
+          chrome.i18n.getMessage("messageRemoveLocalVaultPassword"))
+        .then(async (decision) => {
+          if (decision === true) {
+            console.log("erasing local vault password");
           
-          chrome.runtime.sendMessage({
-            action: "setup_vault_password",
-            password: data.password
-          }).then(() => {
-            bsAlert("Success", "Local vault password configured.").then(_ => {
-              window.close();
+            await removeLocalValue("local_v_salt");
+            await removeLocalValue("local_v_key");
+  
+            
+            updateLocalVaultPasswordMenuItem();
+            bsAlert(
+              chrome.i18n.getMessage("titleSuccess"), 
+              chrome.i18n.getMessage("successMessageRemoveLocalVaultPassword"));
+          }
+        });
+      }
+      else {
+        bsSetPassword(
+          chrome.i18n.getMessage("titleConfigureLocalVaultPassword"), 
+          chrome.i18n.getMessage("messageConfigureLocalVaultPassword"))
+        .then(async (data) => {
+          if (data.doSave === true) {
+            
+            chrome.runtime.sendMessage({
+              action: "setup_vault_password",
+              password: data.password
+            }).then(() => {
+              updateLocalVaultPasswordMenuItem();
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                chrome.i18n.getMessage("successMessageConfigureLocalVaultPassword")).then(_ => {
+              });
+  
             });
-
-          });
-          
-        }
-      });
+            
+          }
+        });
+      }
+  
       
     }
     else if (e.target.id === "delete_all_credentials") {
@@ -528,6 +556,19 @@ getLocalValue("linked").then(async (linked) => {
 
 
 });
+
+function updateLocalVaultPasswordMenuItem() {
+  getLocalValue("local_v_key").then((value) => {
+
+    if (value) {
+      document.getElementById("setup_vault_password").innerText = chrome.i18n.getMessage("titleRemoveLocalVaultPassword");
+    }
+    else {
+      document.getElementById("setup_vault_password").innerText = chrome.i18n.getMessage("titleConfigureLocalVaultPassword");
+    }
+  });
+  
+}
 
 
 function updateVaultUi(unlocked) {

@@ -50,5 +50,41 @@
     "errorPasswordDiffers": {
         "message": "Repeated password differs!",
         "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
+    },
+    "titleSuccess": {
+        "message": "Success",
+        "description" : "Success-Title of alert dialogs"
+    },
+    "titleWarning": {
+        "message": "Warning",
+        "description" : "Warning-Title of alert dialogs"
+    },
+    "titleError": {
+        "message": "Error",
+        "description" : "Error-Title of alert dialogs"
+    },
+    "titleConfigureLocalVaultPassword": {
+        "message": "Configure local vault password",
+        "description" : "Title of a dialog to configure a local vault password"
+    },
+    "messageConfigureLocalVaultPassword": {
+        "message": "For more convinience you can configure a local vault password to unlock the local vault without the need of using the ANOTHERpass app. You may still use the app to unlock at any time.",
+        "description" : "Message of a dialog to configure a local vault password"
+    },
+    "successMessageConfigureLocalVaultPassword": {
+        "message": "Local vault password configured.",
+        "description" : "Success-Message of a dialog after configuring a local vault password"
+    },
+    "titleRemoveLocalVaultPassword": {
+        "message": "Remove local vault password",
+        "description" : "Title of a dialog to remove the configured local vault password"
+    },
+    "messageRemoveLocalVaultPassword": {
+        "message": "You are about to delete the local vault password. That means you will only be able to unlock the local vault with the ANOTHERpass app. Continue?",
+        "description" : "Message of a dialog to remove the configured local vault password"
+    },
+    "successMessageRemoveLocalVaultPassword": {
+        "message": "Local vault password removed.",
+        "description" : "Success-Message of a dialog after removing the local vault password"
     }
 }

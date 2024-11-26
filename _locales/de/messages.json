@@ -50,5 +50,41 @@
     "errorPasswordDiffers": {
         "message": "Passwortwiederholung ist unterschiedlich!",
         "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
+    },
+    "titleSuccess": {
+        "message": "Erfolg",
+        "description" : "Success-Title of alert dialogs"
+    },
+    "titleWarning": {
+        "message": "Warnung",
+        "description" : "Warning-Title of alert dialogs"
+    },
+    "titleError": {
+        "message": "Fehler",
+        "description" : "Error-Title of alert dialogs"
+    },
+    "titleConfigureLocalVaultPassword": {
+        "message": "Setze ein Passwort für den lokalen Tresor",
+        "description" : "Title of a dialog to configure a local vault password"
+    },
+    "messageConfigureLocalVaultPassword": {
+        "message": "Für mehr Komfort kann ein Passwort für den lokalen Tresor erstellt werden, um den lokalen Tresor zu entsperren, ohne die ANOTHERpass-App verwenden zu müssen. Du kannst weiterhin die App jederzeit zum Entsperren verwenden.",
+        "description" : "Message of a dialog to configure a local vault password"
+    },
+    "successMessageConfigureLocalVaultPassword": {
+        "message": "Passwort für lokalen Tresor erstellt.",
+        "description" : "Success-Message of a dialog after configuring a local vault password"
+    },
+    "titleRemoveLocalVaultPassword": {
+        "message": "Entferne Passwort für den lokalen Tresor",
+        "description" : "Title of a dialog to remove the configured local vault password"
+    },
+    "messageRemoveLocalVaultPassword": {
+        "message": "Möchtest du wirklich das Passwort für den lokalen Tresor entfernen? Das bedeutet, dass du den lokalen Tresor nur mit der ANOTHERpass-App entsperren kannst.",
+        "description" : "Message of a dialog to remove the configured local vault password"
+    },
+    "successMessageRemoveLocalVaultPassword": {
+        "message": "Passwort für lokalen Tresor entfernt.",
+        "description" : "Success-Message of a dialog after removing the local vault password"
     }
 }
