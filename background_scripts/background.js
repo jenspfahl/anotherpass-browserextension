@@ -55,6 +55,14 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
       return true;  
     }
+
+    case "unlock_with_password": {
+      loadClientKeyFromStorage(message.password).then((result) => {
+        sendResponse({result: result});
+      });
+
+      return true;  
+    }
     
     case "update_extension_icon": {
       isLocalVaultUnlocked(true).then(isUnlocked => {
@@ -506,44 +514,54 @@ async function setupVaultPassword(password) {
     const exportedClientKey = await aesKeyToArray(clientKey);
     console.debug("clientKeyAsBytes", exportedClientKey);
 
-    const keyPair = await getKey("client_keypair");
-    const appPublicKey = keyPair.publicKey;
-    const rsaEncryptedClientKey = await encryptWithPublicKey(appPublicKey, exportedClientKey);
-
 
     const salt = createRandomValues(16);
     await setLocalValue("local_v_salt", salt);
 
     const aesKey = await deriveKeyFromPassword(password, salt);
-    const aesEncryptedClientKey = await encryptMessage(aesKey, bytesToBase64(rsaEncryptedClientKey));
+    const aesEncryptedClientKey = await encryptMessage(aesKey, bytesToBase64(exportedClientKey));
 
-    await setLocalValue("local_v_key", aesEncryptedClientKey);
+
+    const keyPair = await getKey("client_keypair");
+    const appPublicKey = keyPair.publicKey;
+    const rsaEncryptedClientKey = await encryptWithPublicKey(appPublicKey, new TextEncoder().encode(aesEncryptedClientKey));
+
+    await setLocalValue("local_v_key", bytesToBase64(rsaEncryptedClientKey));
   }
 }
 
 async function loadClientKeyFromStorage(password) {
   const salt = await getLocalValue("local_v_salt");
-  const aesEncryptedClientKey = await getLocalValue("local_v_key");
+  const encryptedClientKey = await getLocalValue("local_v_key");
   
-  if (salt && aesEncryptedClientKey) {
+  if (salt && encryptedClientKey) {
 
-    const aesKey = await deriveKeyFromPassword(password, salt);
-    const rsaEncryptedClientKey = await decryptMessage(aesKey, aesEncryptedClientKey);
+    try {
 
-    const keyPair = await getKey("client_keypair");
-    const clientKeyAsBytes = await decryptWithPrivateKey(keyPair.privateKey, base64ToBytes(rsaEncryptedClientKey));
-   
-    if (clientKeyAsBytes) {
-      await setTemporaryKey("clientKey", {
-        clientKey: bytesToBase64(clientKeyAsBytes),
-        timestamp: Date.now(),
-      }, true);
-      return await arrayToAesKey(clientKeyAsBytes);
-    }
-    else {
-      console.warn("Cannot decrypt local clientKey");
+      const keyPair = await getKey("client_keypair");
+      const aesEncryptedClientKey = await decryptWithPrivateKey(keyPair.privateKey, base64ToBytes(encryptedClientKey));
+    
+      const aesKey = await deriveKeyFromPassword(password, salt);
+      const decryptedClientKey = await decryptMessage(aesKey, new TextDecoder().decode(aesEncryptedClientKey));
+
+      console.debug("clientKeyAsBytes", decryptedClientKey);
+
+      if (decryptedClientKey) {
+        await setTemporaryKey("clientKey", {
+          clientKey: decryptedClientKey,
+          timestamp: Date.now(),
+        }, true);
+        return true;
+      }
+      else {
+        console.warn("Cannot decrypt local clientKey");
+      }
+    } catch(e) {
+      console.error("cannot decrypt password", e);
     }
   }
+
+  return false;
 }
 
 

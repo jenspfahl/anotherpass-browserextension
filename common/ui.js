@@ -218,6 +218,93 @@ async function bsSetPassword(title, message, okLabel, cancelLabel) {
 
 
 
+async function bsAskForPassword(title, message, okLabel, cancelLabel) {
+  const modalElem = document.createElement('div');
+  const lblOk = okLabel || chrome.i18n.getMessage("lblOk");
+  const lblCancel = cancelLabel || chrome.i18n.getMessage("lblCancel");
+  const lblPassword = chrome.i18n.getMessage("lblPassword");
+  const lblRepeatPassword = chrome.i18n.getMessage("lblRepeatPassword");
+
+  modalElem.id = "modal-confirm";
+  modalElem.className = "modal";
+  modalElem.innerHTML = `
+    <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5">${title}</h1>
+          <button id="modal-btn-cancel" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancel"></button>
+        </div>     
+         
+        <div class="modal-body fs-7">
+          ${message}
+          <p>
+          <div class="form-group mx-sm-3 mb-2">
+            <input type="password" class="form-control" id="inputPassword1" placeholder="${lblPassword}">
+          </div>
+          <button id="useAppToUnlock" type="button" class="btn btn-outline-primary rounded-0">Use the app</button>
+        </div>    
+        
+        <div class="modal-footer">             
+          <button id="modal-btn-cancel" type="button" class="btn btn-secondary rounded-0">${lblCancel}</button>
+          <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${lblOk}</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const myModal = new bootstrap.Modal(modalElem, {
+    keyboard: false,
+    backdrop: 'static'
+  });
+  myModal.show();
+
+  const passwd = document.getElementById("inputPassword1");
+
+  const okButton = document.getElementById("modal-btn-ok");
+
+  passwd.focus();
+  okButton.disabled = true;
+
+  document.addEventListener("input", (e) => {
+    if (e.target.id === "inputPassword1") {
+        passwd.classList.remove("invalid-state");
+        passwd.title = chrome.i18n.getMessage("hintInputPassword");
+        okButton.disabled = false;
+
+      if (passwd.value.length < 8) {
+        passwd.classList.add("invalid-state");
+        passwd.title = chrome.i18n.getMessage("errorPasswordTooShort");
+        okButton.disabled = true;
+      }
+      
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    document.body.addEventListener('click', response);
+
+    function response(e) {
+      let bool = false;
+      if (e.target.id == 'modal-btn-cancel') bool = false;
+      else if (e.target.id == 'modal-btn-ok') bool = true;
+      else if (e.target.id == 'useAppToUnlock') bool = null;
+      else return;
+
+      document.body.removeEventListener('click', response);
+      const backdrop = document.body.querySelector('.modal-backdrop');
+      if (backdrop) backdrop.remove()      
+      modalElem.remove()
+      if (bool === null) {
+        resolve({doUnlock: true});
+      }
+      else {
+        resolve({doUnlock: bool, password: passwd.value});
+      }
+    }
+  });
+}
+
+
+
 
 /*!
  * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)

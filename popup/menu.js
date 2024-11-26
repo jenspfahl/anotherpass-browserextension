@@ -202,14 +202,63 @@ getLocalValue("linked").then(async (linked) => {
         // lock local vault
         deleteTemporaryKey("clientKey");
         updateVaultUi();
-        document.getElementById("credential_list").remove();
+        document.getElementById("credential_list").innerHTML = "";
         updateExtensionIcon();
       }
       else {
-        //request clientKey from app
-        chrome.runtime.sendMessage({
-          action: "start_client_key_request_flow"
-        });
+        const encryptedClientKey = await getLocalValue("local_v_key");
+        if (encryptedClientKey) {
+          bsAskForPassword("Unlock local vault", 
+            "Enter the password to unlock the local vault or use the ANOTHERpass app.")
+            .then(async (data) => {
+              if (data.doUnlock === true) {
+                if (data.password) {
+                  chrome.runtime.sendMessage({
+                    password: data.password,
+                    action: "unlock_with_password"
+                  }).then(async (result) => {
+                    console.debug("login result", result);
+
+                    if (result.result === true) {
+                      // refresh ui
+                      updateVaultUi();
+                      const clientKey = await getClientKey();
+                      updateVaultUi(clientKey);
+
+                      if (!clientKey) {
+                        console.debug("Local vault locked, nothing to display");
+                        return;
+                      }
+                      else {
+                        loadCredentials(clientKey);
+                      }
+                    }
+                    else {
+                      bsAlert(
+                        "Error", 
+                        "Cannot unlock the local vault with this password.");
+
+                    }
+                  });
+                }
+                else {
+                  //request clientKey from app
+                  chrome.runtime.sendMessage({
+                    action: "start_client_key_request_flow"
+                  });
+                }
+                  
+              }
+            });
+        }
+        else {
+          //request clientKey from app
+          chrome.runtime.sendMessage({
+            action: "start_client_key_request_flow"
+          });
+
+        }
+        
       }
     }
     else if (e.target.id === "sync_credentials") {
@@ -259,8 +308,8 @@ getLocalValue("linked").then(async (linked) => {
       reverseCredentialList();
     }
     else if (e.target.id === "setup_vault_password") {
-      const aesEncryptedClientKey = await getLocalValue("local_v_key");
-      if (aesEncryptedClientKey) {
+      const encryptedClientKey = await getLocalValue("local_v_key");
+      if (encryptedClientKey) {
         bsConfirm(
           chrome.i18n.getMessage("titleRemoveLocalVaultPassword"), 
           chrome.i18n.getMessage("messageRemoveLocalVaultPassword"))
@@ -645,51 +694,60 @@ function updateMenuUi(webClientId, linked) {
   }
   else {
 
-    const list = document.getElementById("credential_list");
-    
-    const credentials = [];
+    await loadCredentials(clientKey);
+   
+  }
 
-    const all = await getAllLocalValues();
-    for (const [key, value] of all) {
 
-      if (key.startsWith(PREFIX_CREDENTIAL)) {
-        try {
-          const credential = JSON.parse(await decryptMessage(clientKey, value));
-          //console.debug("credential", credential);
-          credentials.push(credential);
-        } catch(e) {
-          console.error("cannot decrypt credential with key " + key + ". Ignored.", e);
-        }
+ 
+})()
+
+async function loadCredentials(clientKey) {
+  const list = document.getElementById("credential_list");
+
+  const credentials = [];
+
+  const all = await getAllLocalValues();
+  for (const [key, value] of all) {
+
+    if (key.startsWith(PREFIX_CREDENTIAL)) {
+      try {
+        const credential = JSON.parse(await decryptMessage(clientKey, value));
+        //console.debug("credential", credential);
+        credentials.push(credential);
+      } catch (e) {
+        console.error("cannot decrypt credential with key " + key + ". Ignored.", e);
       }
     }
+  }
 
-    let credentialCount = credentials.length;
-    updateCredentialCountUi(credentialCount);
+  let credentialCount = credentials.length;
+  updateCredentialCountUi(credentialCount);
 
-    let order = await getLocalValue("vault_credential_order");
-    if (order === null || order === "asc") {
-      // sort ascending
-      credentials.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0)); 
+  let order = await getLocalValue("vault_credential_order");
+  if (order === null || order === "asc") {
+    // sort ascending
+    credentials.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+  }
+  else if (order === "desc") {
+    // sort descending
+    credentials.sort((a, b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0));
+
+  }
+
+
+  credentials.forEach(credential => {
+    let uuid = credential.uid;
+
+    const li = document.createElement("li");
+
+    let searchable = credential.name.trim().toLowerCase();
+    if (credential.website) {
+      searchable = searchable + " " + credential.website.trim().toLowerCase();
     }
-    else if (order ===  "desc") {
-      // sort descending
-      credentials.sort((a,b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0)); 
-
-    }
-
-    
-    credentials.forEach(credential => {
-      let uuid = credential.uid;
-
-      const li = document.createElement("li");
-
-      let searchable = credential.name.trim().toLowerCase();
-      if (credential.website) {
-        searchable = searchable + " " + credential.website.trim().toLowerCase();
-      }
-      li.setAttribute("searchable", searchable);
-      li.classList.add("no-bullets");
-      li.innerHTML = `
+    li.setAttribute("searchable", searchable);
+    li.classList.add("no-bullets");
+    li.innerHTML = `
         <div class="nav-link my-1 mr-3">
           <button id="credential_dropdown_${uuid}" class="btn">
           ${credential.name.substring(0, 35)}
@@ -706,20 +764,20 @@ function updateMenuUi(webClientId, linked) {
           </div>
         </div>
       `;
-      list.appendChild(li);
+    list.appendChild(li);
 
-      document.addEventListener("click", async (e) => {
-        if (e.target.id === "copy_" + uuid) {
-          navigator.clipboard.writeText(credential.password);
-          document.getElementById("copy_" + uuid).innerText = "Copied!";
-        }
-        if (e.target.id === "password_field_" + uuid) {
-          document.getElementById("password_field_" + uuid).innerText = credential.password;
-        }
-        if (e.target.id === "credential_dropdown_" + uuid) {
-          bsAlert(
-            "Credential '" + credential.name + "'", 
-            `
+    document.addEventListener("click", async (e) => {
+      if (e.target.id === "copy_" + uuid) {
+        navigator.clipboard.writeText(credential.password);
+        document.getElementById("copy_" + uuid).innerText = "Copied!";
+      }
+      if (e.target.id === "password_field_" + uuid) {
+        document.getElementById("password_field_" + uuid).innerText = credential.password;
+      }
+      if (e.target.id === "credential_dropdown_" + uuid) {
+        bsAlert(
+          "Credential '" + credential.name + "'",
+          `
             <div class="container text-left">
 
               <div class="row">
@@ -794,25 +852,25 @@ function updateMenuUi(webClientId, linked) {
             </div>
   
             `
-          );
-        }
-        if (e.target.id === "apply_" + uuid) {
-          chrome.runtime.sendMessage({
-            action: "apply_credential",
-            uid: uuid
-          });
-        }
-        if (e.target.id === "syncWithApp_" + uuid) {
-          chrome.runtime.sendMessage({
-            action: "start_sync_password_request_flow",
-            uid: uuid
-          });
-        }
-        if (e.target.id === "delete_" + uuid) {
-          bsConfirm(
-            "Delete '" + credential.name + "'",
-            "Are you sure to delete this credential from the local vault?"
-          )
+        );
+      }
+      if (e.target.id === "apply_" + uuid) {
+        chrome.runtime.sendMessage({
+          action: "apply_credential",
+          uid: uuid
+        });
+      }
+      if (e.target.id === "syncWithApp_" + uuid) {
+        chrome.runtime.sendMessage({
+          action: "start_sync_password_request_flow",
+          uid: uuid
+        });
+      }
+      if (e.target.id === "delete_" + uuid) {
+        bsConfirm(
+          "Delete '" + credential.name + "'",
+          "Are you sure to delete this credential from the local vault?"
+        )
           .then(async (decision) => {
             console.log("decision:" + decision);
             if (decision === true) {
@@ -822,18 +880,12 @@ function updateMenuUi(webClientId, linked) {
               updateCredentialCountUi(credentialCount);
             }
           });
-        }
+      }
 
-      }); 
-    
     });
-   
 
-  }
-
-
- 
-})()
+  });
+}
 
 function updateCredentialList(searchFor) {
 
