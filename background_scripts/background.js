@@ -512,7 +512,6 @@ async function setupVaultPassword(password) {
   if (clientKey) {
 
     const exportedClientKey = await aesKeyToArray(clientKey);
-    console.debug("clientKeyAsBytes", exportedClientKey);
 
 
     const salt = createRandomValues(16);
@@ -544,7 +543,6 @@ async function loadClientKeyFromStorage(password) {
       const aesKey = await deriveKeyFromPassword(password, salt);
       const decryptedClientKey = await decryptMessage(aesKey, new TextDecoder().decode(aesEncryptedClientKey));
 
-      console.debug("clientKeyAsBytes", decryptedClientKey);
 
       if (decryptedClientKey) {
         await setTemporaryKey("clientKey", {

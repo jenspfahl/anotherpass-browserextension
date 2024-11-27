@@ -86,5 +86,21 @@
     "successMessageRemoveLocalVaultPassword": {
         "message": "Local vault password removed.",
         "description" : "Success-Message of a dialog after removing the local vault password"
+    },
+    "titleUnlockLocalVault": {
+        "message": "Unlock local vault",
+        "description" : "Title of a dialog to unlock the local vault with a password or the app"
+    },
+    "messageUnlockLocalVault": {
+        "message": "Enter the password to unlock the local vault or use the ANOTHERpass app.",
+        "description" : "Message of a dialog to unlock the local vault with a password or the app"
+    },
+    "errorMessageUnlockLocalVault": {
+        "message": "Cannot unlock the local vault with provided password. Wrong password?",
+        "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
+    },
+    "lblUseTheApp": {
+        "message": "Use the app",
+        "description" : "Button label to initiate the app flow to unlock the local vault"
     }
 }

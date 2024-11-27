@@ -86,5 +86,21 @@
     "successMessageRemoveLocalVaultPassword": {
         "message": "Passwort für lokalen Tresor entfernt.",
         "description" : "Success-Message of a dialog after removing the local vault password"
+    },
+    "titleUnlockLocalVault": {
+        "message": "Lokalen Tresor entsperren",
+        "description" : "Title of a dialog to unlock the local vault with a password or the app"
+    },
+    "messageUnlockLocalVault": {
+        "message": "Gib das Passwort ein um den lokalen Tresor zu entsperren oder verwende die ANOTHERpass App.",
+        "description" : "Message of a dialog to unlock the local vault with a password or the app"
+    },
+    "errorMessageUnlockLocalVault": {
+        "message": "Lokaler Tresor konnte nicht mit dem angegebenen Passwort entsperrt werden. Falsches Passwort?",
+        "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
+    },
+    "lblUseTheApp": {
+        "message": "Verwende die App",
+        "description" : "Button label to initiate the app flow to unlock the local vault"
     }
 }

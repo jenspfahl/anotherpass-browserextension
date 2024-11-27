@@ -223,7 +223,7 @@ async function bsAskForPassword(title, message, okLabel, cancelLabel) {
   const lblOk = okLabel || chrome.i18n.getMessage("lblOk");
   const lblCancel = cancelLabel || chrome.i18n.getMessage("lblCancel");
   const lblPassword = chrome.i18n.getMessage("lblPassword");
-  const lblRepeatPassword = chrome.i18n.getMessage("lblRepeatPassword");
+  const lblUseTheApp = chrome.i18n.getMessage("lblUseTheApp");
 
   modalElem.id = "modal-confirm";
   modalElem.className = "modal";
@@ -241,7 +241,7 @@ async function bsAskForPassword(title, message, okLabel, cancelLabel) {
           <div class="form-group mx-sm-3 mb-2">
             <input type="password" class="form-control" id="inputPassword1" placeholder="${lblPassword}">
           </div>
-          <button id="useAppToUnlock" type="button" class="btn btn-outline-primary rounded-0">Use the app</button>
+          <button id="useAppToUnlock" type="button" class="btn btn-outline-primary rounded-0">${lblUseTheApp}</button>
         </div>    
         
         <div class="modal-footer">             

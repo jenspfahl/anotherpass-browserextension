@@ -208,8 +208,9 @@ getLocalValue("linked").then(async (linked) => {
       else {
         const encryptedClientKey = await getLocalValue("local_v_key");
         if (encryptedClientKey) {
-          bsAskForPassword("Unlock local vault", 
-            "Enter the password to unlock the local vault or use the ANOTHERpass app.")
+          bsAskForPassword(
+            chrome.i18n.getMessage("titleUnlockLocalVault"), 
+            chrome.i18n.getMessage("messageUnlockLocalVault"))
             .then(async (data) => {
               if (data.doUnlock === true) {
                 if (data.password) {
@@ -235,8 +236,8 @@ getLocalValue("linked").then(async (linked) => {
                     }
                     else {
                       bsAlert(
-                        "Error", 
-                        "Cannot unlock the local vault with this password.");
+                        chrome.i18n.getMessage("titleError"), 
+                        chrome.i18n.getMessage("errorMessageUnlockLocalVault"));
 
                     }
                   });
