@@ -9,7 +9,23 @@
     },
     "extensionCap": {
         "message": "Extension",
-        "description" : "Single woring of extension, Capitalised"
+        "description" : "Single wording of extension, Capitalised"
+    },
+    "extensionInfo": {
+        "message": "ANOTHERpass Extension is licensed under GPLv3. License and source code can be found <a href=\"https://github.com/jenspfahl/anotherpass-webext\" target=\"_blank\">here</a>.",
+        "description" : "Info text"
+    },
+    "extensionHelp1": {
+        "message": "This is an browser extension to access a linked <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a> vault.",
+        "description" : "1. Help chapter"
+    },
+    "extensionHelp2": {
+        "message": "To use this extension you need the <a href=\"https://anotherpass.jepfa.de/download\" target=\"_blank\">ANOTHERpass Android app</a> on your mobile device. More details about this extension can be found <a href=\"https://anotherpass.jepfa.de/extension\" target=\"_blank\">here</a>.",
+        "description" : "2. Help chapter"
+    },
+    "extensionHelp3": {
+        "message": "To get it working, you have to link the extension with your ANOTHERpass app by clicking on the link icon &#128279; displayed above :-)",
+        "description" : "3. Help chapter"
     },
     "lblOk": {
         "message": "Ok",
@@ -95,6 +111,16 @@
         "message": "Enter the password to unlock the local vault or use the ANOTHERpass app.",
         "description" : "Message of a dialog to unlock the local vault with a password or the app"
     },
+    "successMessageUnlockLocalVault": {
+        "message": "Extension successfully un-linked from the app! You can now remove the linked device $linkId$ from your app.",
+        "description" : "Success message of a dialog if unlocking the local vault with a password was successful",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
     "errorMessageUnlockLocalVault": {
         "message": "Cannot unlock the local vault with provided password. Wrong password?",
         "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
@@ -102,5 +128,35 @@
     "lblUseTheApp": {
         "message": "Use the app",
         "description" : "Button label to initiate the app flow to unlock the local vault"
+    },
+    "lblLinkedState": {
+        "message": "Linked (as $linkId$)",
+        "description" : "Label to indicate a linked extension (with the app) and the link id",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblNotLinkedState": {
+        "message": "Not linked",
+        "description" : "Label to indicate an unlinked extension (with the app)"
+    },
+    "titleUnlinkFromApp": {
+        "message": "Unlink from the app"
+    },
+    "messageUnlinkFromApp": {
+        "message": "Are you sure to unlink $linkId$ from the app? This will also wipe the local vault with all local credentials.",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblUnlink": {
+        "message": "Unlink",
+        "description" : "Label on a buton to unlink the extension"
     }
 }

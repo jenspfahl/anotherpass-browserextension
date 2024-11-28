@@ -86,6 +86,12 @@
   font-weight: 900;
 }
 
+.fingerprint_medium{
+  font-family: 'Roboto Mono Bold',monospace;
+  font-size: 19px;
+  font-weight: 900;
+}
+
 .menuSize {
   width: 400px;
   height: 600px;
@@ -105,3 +111,4 @@
 .translatedExtensionWord::before {
   content: "__MSG_extensionCap__";
 }
+

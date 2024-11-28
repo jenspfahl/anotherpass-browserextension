@@ -1,3 +1,7 @@
+document.getElementById("extensionInfo").innerHTML = chrome.i18n.getMessage("extensionInfo");
+document.getElementById("extensionHelp1").innerHTML = chrome.i18n.getMessage("extensionHelp1");
+document.getElementById("extensionHelp2").innerHTML = chrome.i18n.getMessage("extensionHelp2");
+
 
 chrome.runtime.sendMessage({
   action: "close_all_credential_dialogs",
@@ -173,9 +177,9 @@ getLocalValue("linked").then(async (linked) => {
     } else if (e.target.id === "unlink") {
 
       bsConfirm(
-        "Unlink from app", 
-        "Are you sure to unlink <b class=\"fingerprint_small\">" + webClientId + "</b> from the app? This will also wipe the local vault with all local credentials.",
-        "Unlink"
+        chrome.i18n.getMessage("titleUnlinkFromApp"), 
+        chrome.i18n.getMessage("messageUnlinkFromApp", "<b class=\"fingerprint_medium\">" + webClientId + "</b>"),
+        chrome.i18n.getMessage("lblUnlink")
       )
       .then((decision) => {
         if (decision === true) {
@@ -187,7 +191,9 @@ getLocalValue("linked").then(async (linked) => {
             await loadAlternativeServersToUi()
 
 
-            bsAlert("Success", "App successfully un-linked! You can remove the linked device <b class=\"fingerprint_small\">" + webClientId + "</b> from your app.").then(_ => {
+            bsAlert(
+              chrome.i18n.getMessage("titleSuccess"), 
+              chrome.i18n.getMessage("successMessageUnlockLocalVault", "<b class=\"fingerprint_medium\">" + webClientId + "</b>")).then(_ => {
               window.close();
             });
 
@@ -387,7 +393,7 @@ getLocalValue("linked").then(async (linked) => {
       const baseKeyAsArray = await aesKeyToArray(baseKey);
       const baseKeyFingerprint = await sha256(baseKeyAsArray);
 
-      bsAlert("Info for " + webClientId, `
+      bsAlert("Info about " + webClientId, `
       <div class="container">
         App Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${appKeyFingerprint}</b>&nbsp;&nbsp;<br>
         Device Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${clientPublicKeyFingerprint}</b>&nbsp;&nbsp;<br>
@@ -649,19 +655,21 @@ function updateVaultUi(unlocked) {
 function updateMenuUi(webClientId, linked) {
   if (webClientId && linked) {
     console.debug("menu linked mode");
-    document.getElementById("state").innerText = "Linked (as " + webClientId + ")";
+    document.getElementById("state").innerText = chrome.i18n.getMessage("lblLinkedState", webClientId);
     document.getElementById("link").classList.add("d-none");
 
     document.getElementById("navCredentialsTab").classList.add("active");
     document.getElementById("navCredentials").classList.add("show");
     document.getElementById("navCredentials").classList.add("active");
 
+    document.getElementById("extensionHelp3").innerHTML = "";
+
 
   }
   else {
     console.debug("menu unlinked mode");
 
-    document.getElementById("state").innerText = "Not linked";
+    document.getElementById("state").innerText = chrome.i18n.getMessage("lblNotLinkedState");
     document.getElementById("unlink").classList.add("d-none");
     document.getElementById("navCredentialsTab").classList.add("d-none");
     document.getElementById("nav-settings-tab").classList.add("d-none");
@@ -671,9 +679,10 @@ function updateMenuUi(webClientId, linked) {
     document.getElementById("nav-help").classList.add("show");
     document.getElementById("nav-help").classList.add("active");
 
-    const hint = document.createElement('small');
-    hint.innerText = "To get it working, you have to link the extension with your ANOTHERpass app by clicking on the link icon displayed above :-)";
-    document.getElementById("nav-help").appendChild(hint);
+   
+    document.getElementById("extensionHelp3").innerHTML = chrome.i18n.getMessage("extensionHelp3");
+
+
 
   }
 

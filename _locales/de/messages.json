@@ -9,7 +9,23 @@
     },
     "extensionCap": {
         "message": "Erweiterung",
-        "description" : "Single woring of extension, Capitalised"
+        "description" : "Single wording of extension, Capitalised"
+    },
+    "extensionInfo": {
+        "message": "Die ANOTHERpass Erweiterung ist unter GPLv3 lizensiert. Lizenz und Quellcode kann <a href=\"https://github.com/jenspfahl/anotherpass-webext\" target=\"_blank\">hier</a> eingesehen werden.",
+        "description" : "Info text"
+    },
+    "extensionHelp1": {
+        "message": "Mit dieser Browsererweiterung kann auf einen verbundenen <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a>-Tresor zugegriffen werden.",
+        "description" : "1. Help chapter"
+    },
+    "extensionHelp2": {
+        "message": "Um die Erweiterung benutzen zu können, benötigst du die <a href=\"https://anotherpass.jepfa.de/download\" target=\"_blank\">ANOTHERpass Android-App</a> auf deinem Mobilgerät. Mehr Informationen über die Erweiterung findest du <a href=\"https://anotherpass.jepfa.de/extension\" target=\"_blank\">hier</a>.",
+        "description" : "2. Help chapter"
+    },
+    "extensionHelp3": {
+        "message": "Als Erstes musst du die Erweiterug mit der ANOTHERpass App verbinden. Klicke dafür auf das Verbinden-Symbol &#128279; oben :-)",
+        "description" : "3. Help chapter"
     },
     "lblOk": {
         "message": "Ok",
@@ -91,6 +107,16 @@
         "message": "Lokalen Tresor entsperren",
         "description" : "Title of a dialog to unlock the local vault with a password or the app"
     },
+    "successMessageUnlockLocalVault": {
+        "message": "Erweiterung erfolgreich von der App getrennt! Nun kannst du das verknüpfte Gerät $linkId$ von der App entfernen.",
+        "description" : "Success message of a dialog if unlocking the local vault with a password was successful",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
     "messageUnlockLocalVault": {
         "message": "Gib das Passwort ein um den lokalen Tresor zu entsperren oder verwende die ANOTHERpass App.",
         "description" : "Message of a dialog to unlock the local vault with a password or the app"
@@ -102,5 +128,35 @@
     "lblUseTheApp": {
         "message": "Verwende die App",
         "description" : "Button label to initiate the app flow to unlock the local vault"
+    },
+    "lblLinkedState": {
+        "message": "Verbunden (als $linkId$)",
+        "description" : "Label to indicate a linked extension (with the app) and the link id",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblNotLinkedState": {
+        "message": "Nicht verbunden",
+        "description" : "Label to indicate an unlinked extension (with the app)"
+    },
+    "titleUnlinkFromApp": {
+        "message": "Von der App trennen"
+    },
+    "messageUnlinkFromApp": {
+        "message": "Soll wirklich die Verbindung zur App mit der Link-ID $linkId$ getrennt werden? Es wird auch der lokale Tresor komplett gelöscht werden.",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblUnlink": {
+        "message": "Trennen",
+        "description" : "Label on a buton to unlink the extension"
     }
 }
