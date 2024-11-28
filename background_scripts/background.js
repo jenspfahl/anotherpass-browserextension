@@ -361,6 +361,9 @@ async function listLocalCredentials(url, sendResponse) {
   const clientKey = await getClientKey(true);
 
   if (clientKey) {
+
+    updateExtensionIcon(true);
+
     
     const allCredentialNames = [];
     const suggestedCredentialNames = [];

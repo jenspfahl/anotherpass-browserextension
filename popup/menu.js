@@ -222,13 +222,11 @@ getLocalValue("linked").then(async (linked) => {
 
                     if (result.result === true) {
                       // refresh ui
-                      updateVaultUi();
                       const clientKey = await getClientKey();
                       updateVaultUi(clientKey);
-
+                      updateExtensionIcon(clientKey);
                       if (!clientKey) {
                         console.debug("Local vault locked, nothing to display");
-                        return;
                       }
                       else {
                         loadCredentials(clientKey);

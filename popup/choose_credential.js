@@ -73,13 +73,65 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
         });
       }
       else {
-        //request clientKey from app
-        await chrome.runtime.sendMessage({
-          action: "start_client_key_request_flow",
-          tabId: requestData.tabId
-        });
-        const isUnlocked = await isLocalVaultUnlocked();
-        updateVaultUi(isUnlocked);
+        const encryptedClientKey = await getLocalValue("local_v_key");
+        if (encryptedClientKey) {
+          bsAskForPassword(
+            chrome.i18n.getMessage("titleUnlockLocalVault"), 
+            chrome.i18n.getMessage("messageUnlockLocalVault"))
+            .then(async (data) => {
+              if (data.doUnlock === true) {
+                if (data.password) {
+                  chrome.runtime.sendMessage({
+                    password: data.password,
+                    action: "unlock_with_password"
+                  }).then(async (result) => {
+                    console.debug("login result", result);
+
+                    if (result.result === true) {
+                      // refresh ui
+                      const clientKey = await getClientKey();
+
+                      if (!clientKey) {
+                        console.debug("Local vault locked, nothing to display");
+                        return;
+                      }
+                      else {
+                        updateVaultUi(true);
+                        const list = document.getElementById("credential_list");
+                        await loadCredentials(url, list);
+                      }
+                    }
+                    else {
+                      bsAlert(
+                        chrome.i18n.getMessage("titleError"), 
+                        chrome.i18n.getMessage("errorMessageUnlockLocalVault"));
+
+                    }
+                  });
+                }
+                else {
+                  //request clientKey from app
+                  await chrome.runtime.sendMessage({
+                    action: "start_client_key_request_flow",
+                    tabId: requestData.tabId
+                  });
+                  const isUnlocked = await isLocalVaultUnlocked();
+                  updateVaultUi(isUnlocked);
+                }
+                  
+              }
+            });
+          }
+          else {
+            //request clientKey from app
+            await chrome.runtime.sendMessage({
+              action: "start_client_key_request_flow",
+              tabId: requestData.tabId
+            });
+            const isUnlocked = await isLocalVaultUnlocked();
+            updateVaultUi(isUnlocked);
+          }
+        
       }
     }
     else if (e.target.id === "clear_search" || e.target.id === "clear_search_icon") {
