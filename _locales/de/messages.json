@@ -47,6 +47,10 @@
         "message": "Tresor gesperrt",
         "description" : "Lock status about the local vault"
     },
+    "localVaultLocked": {
+        "message": "lokaler Tresor gesperrt",
+        "description" : "states that the local vault is explicitly locked"
+    },
     "lblPassword": {
         "message": "Passwort",
         "description" : "A label for a password input field"
@@ -103,6 +107,10 @@
         "message": "Passwort für lokalen Tresor entfernt.",
         "description" : "Success-Message of a dialog after removing the local vault password"
     },
+    "titleLockLocalVault": {
+        "message": "Lokalen Tresor sperren",
+        "description" : "Title of a dialog to lock the local vault"
+    },
     "titleUnlockLocalVault": {
         "message": "Lokalen Tresor entsperren",
         "description" : "Title of a dialog to unlock the local vault with a password or the app"
@@ -158,5 +166,54 @@
     "lblUnlink": {
         "message": "Trennen",
         "description" : "Label on a buton to unlink the extension"
+    },
+    "linkedVaultId": {
+        "message": "mit App-Tresor ID",
+        "description" : "To what ANOTHERpass vault id the extension is linked to"
+    },
+    "titleLinkDetails": {
+        "message": "Verknüpfungsdetails für $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblLocalVault": {
+        "message": "Lokaler Tresor"
+    },
+    "lblSettings": {
+        "message": "Einstellungen"
+    },
+    "lblHelp": {
+        "message": "Hilfe"
+    },
+    "lblAbout": {
+        "message": "Über die Erweiterung"
+    },
+    "tooltipFetchSingleCredential": {
+        "message": "Rufe einzelne Zugangsdaten aus der App ab"
+    },
+    "lblFetchMultipleCredentials": {
+        "message": "Mehrere Zugangsdaten abrufen"
+    },
+    "tooltipFetchMultipleCredentials": {
+        "message": "Rufe mehrere Zugangsdaten aus der App ab"
+    },
+    "lblFetchAllCredentials": {
+        "message": "Alle Zugangsdaten abrufen"
+    },
+    "tooltipFetchAllCredentials": {
+        "message": "Rufe alle, außer verschleierte, Zugangsdaten aus der App ab"
+    },
+    "lblDownloadBackupFile": {
+        "message": "Tresor-Backupdatei herunterladen"
+    },
+    "tooltipDownloadBackupFile": {
+        "message": "Lade eine verschlüsselte Backup-Datei des App-Tresors herunter"
+    },
+    "tooltipSynchronizeAll": {
+        "message": "Synchronisiere alle lokalen Zugangsdaten mit der App"
     }
 }

@@ -1,3 +1,19 @@
+
+document.getElementById("navCredentialsTab").title = chrome.i18n.getMessage("lblLocalVault");
+document.getElementById("nav-settings-tab").title = chrome.i18n.getMessage("lblSettings");
+document.getElementById("nav-help-tab").title = chrome.i18n.getMessage("lblHelp");
+document.getElementById("nav-about-tab").title = chrome.i18n.getMessage("lblAbout");
+
+document.getElementById("fetch_credential").title = chrome.i18n.getMessage("tooltipFetchSingleCredential");
+document.getElementById("fetch_multiple_credentials").innerHTML = chrome.i18n.getMessage("lblFetchMultipleCredentials");
+document.getElementById("fetch_multiple_credentials").title = chrome.i18n.getMessage("tooltipFetchMultipleCredentials");
+document.getElementById("fetch_all_credentials").innerHTML = chrome.i18n.getMessage("lblFetchAllCredentials");
+document.getElementById("fetch_all_credentials").title = chrome.i18n.getMessage("tooltipFetchAllCredentials");
+document.getElementById("download_vault_backup").innerHTML = chrome.i18n.getMessage("lblDownloadBackupFile");
+document.getElementById("download_vault_backup").title = chrome.i18n.getMessage("tooltipDownloadBackupFile");
+document.getElementById("sync_credentials").title = chrome.i18n.getMessage("tooltipSynchronizeAll");
+
+
 document.getElementById("extensionInfo").innerHTML = chrome.i18n.getMessage("extensionInfo");
 document.getElementById("extensionHelp1").innerHTML = chrome.i18n.getMessage("extensionHelp1");
 document.getElementById("extensionHelp2").innerHTML = chrome.i18n.getMessage("extensionHelp2");
@@ -393,7 +409,7 @@ getLocalValue("linked").then(async (linked) => {
       const baseKeyAsArray = await aesKeyToArray(baseKey);
       const baseKeyFingerprint = await sha256(baseKeyAsArray);
 
-      bsAlert("Info about " + webClientId, `
+      bsAlert(chrome.i18n.getMessage("titleLinkDetails", "<b class=\"fingerprint_medium\">" + webClientId + "</b>"), `
       <div class="container">
         App Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${appKeyFingerprint}</b>&nbsp;&nbsp;<br>
         Device Public Key Fingerprint: <b class=\"fingerprint_small font-monospace\">${clientPublicKeyFingerprint}</b>&nbsp;&nbsp;<br>
@@ -628,7 +644,7 @@ function updateLocalVaultPasswordMenuItem() {
 function updateVaultUi(unlocked) {
   if (unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
-    document.getElementById("lock").title = "Lock local vault";
+    document.getElementById("lock").title = chrome.i18n.getMessage("titleLockLocalVault");
     document.getElementById("sync_credentials").classList.remove("d-none");
     document.getElementById("credential_list").classList.remove("d-none");
     document.getElementById("credential_vault_options").classList.remove("d-none");
@@ -640,8 +656,8 @@ function updateVaultUi(unlocked) {
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
-    document.getElementById("lock").title = "Unlock local vault";
-    document.getElementById("vaultStatus").innerText = "- local vault locked -";
+    document.getElementById("lock").title = chrome.i18n.getMessage("titleUnlockLocalVault");
+    document.getElementById("vaultStatus").innerText = "- " + chrome.i18n.getMessage("localVaultLocked") + " -";
     document.getElementById("sync_credentials").classList.add("d-none");
     document.getElementById("credential_list").classList.add("d-none");
     document.getElementById("credential_vault_options").classList.add("d-none");

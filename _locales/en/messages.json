@@ -47,6 +47,10 @@
         "message": "Vault locked",
         "description" : "Lock status about the local vault"
     },
+    "localVaultLocked": {
+        "message": "local vault locked",
+        "description" : "states that the local vault is explicitly locked"
+    },
     "lblPassword": {
         "message": "Password",
         "description" : "A label for a password input field"
@@ -103,6 +107,10 @@
         "message": "Local vault password removed.",
         "description" : "Success-Message of a dialog after removing the local vault password"
     },
+    "titleLockLocalVault": {
+        "message": "Lock local vault",
+        "description" : "Title of a dialog to lock the local vault"
+    },
     "titleUnlockLocalVault": {
         "message": "Unlock local vault",
         "description" : "Title of a dialog to unlock the local vault with a password or the app"
@@ -158,5 +166,54 @@
     "lblUnlink": {
         "message": "Unlink",
         "description" : "Label on a buton to unlink the extension"
+    },
+    "linkedVaultId": {
+        "message": "with app vault Id",
+        "description" : "To what ANOTHERpass vault id the extension is linked to"
+    },
+    "titleLinkDetails": {
+        "message": "Link details of $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblLocalVault": {
+        "message": "Local vault"
+    },
+    "lblSettings": {
+        "message": "Settings"
+    },
+    "lblHelp": {
+        "message": "Help"
+    },
+    "lblAbout": {
+        "message": "About this extension"
+    },
+    "tooltipFetchSingleCredential": {
+        "message": "Fetch single credential from the app"
+    },
+    "lblFetchMultipleCredentials": {
+        "message": "Fetch multiple credentials"
+    },
+    "tooltipFetchMultipleCredentials": {
+        "message": "Fetch a selection of credentials from the app"
+    },
+    "lblFetchAllCredentials": {
+        "message": "Fetch all credentials"
+    },
+    "tooltipFetchAllCredentials": {
+        "message": "Fetch all credential from the app, except veiled"
+    },
+    "lblDownloadBackupFile": {
+        "message": "Download vault backup file"
+    },
+    "tooltipDownloadBackupFile": {
+        "message": "Download the encrypted vault backup file from the app"
+    },
+    "tooltipSynchronizeAll": {
+        "message": "Synchronize all local credentials with the app"
     }
 }

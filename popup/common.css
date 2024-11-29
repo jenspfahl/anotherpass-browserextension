@@ -112,3 +112,7 @@
   content: "__MSG_extensionCap__";
 }
 
+.translatedLinkedVaultId::before {
+  content: "__MSG_linkedVaultId__";
+}
+
