@@ -51,6 +51,10 @@
         "message": "local vault locked",
         "description" : "states that the local vault is explicitly locked"
     },
+    "wordCredentials": {
+        "message": "credentials",
+        "description" : "Plural for credential"
+    },
     "lblPassword": {
         "message": "Password",
         "description" : "A label for a password input field"
@@ -215,5 +219,32 @@
     },
     "tooltipSynchronizeAll": {
         "message": "Synchronize all local credentials with the app"
+    },
+    "lblSearchCredentials": {
+        "message": "Search credentials"
+    },
+    "tooltipSearchCredentials": {
+        "message": "Search credentials in local vault"
+    },
+    "lblSortOrderDesc": {
+        "message": "Sort descending"
+    },
+    "lblSortOrderAsc": {
+        "message": "Sort ascending"
+    },
+    "tooltipSortOrder": {
+        "message": "Change the sort order of the local credentials"
+    },
+    "titleDeleteAllLocalCredentials": {
+        "message": "Delete all local credentials"
+    },
+    "messageDeleteAllLocalCredentials": {
+        "message": "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device."
+    },
+    "successMessageDeleteAllLocalCredentials": {
+        "message": "Local vault cleared."
+    },
+    "tooltipDeleteAllLocalCredentials": {
+        "message": "Delete all local credentials from the local vault"
     }
 }

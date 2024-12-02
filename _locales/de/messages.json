@@ -51,6 +51,10 @@
         "message": "lokaler Tresor gesperrt",
         "description" : "states that the local vault is explicitly locked"
     },
+    "wordCredentials": {
+        "message": "Zugangsdaten",
+        "description" : "Plural for credential"
+    },
     "lblPassword": {
         "message": "Passwort",
         "description" : "A label for a password input field"
@@ -215,5 +219,32 @@
     },
     "tooltipSynchronizeAll": {
         "message": "Synchronisiere alle lokalen Zugangsdaten mit der App"
+    },
+    "lblSearchCredentials": {
+        "message": "Durchsuche Zugangsdaten"
+    },
+    "tooltipSearchCredentials": {
+        "message": "Suche nach Zugangsdaten im lokelen Tresor"
+    },
+    "lblSortOrderDesc": {
+        "message": "Absteigend sortieren"
+    },
+    "lblSortOrderAsc": {
+        "message": "Aufsteigend sortieren"
+    },
+    "tooltipSortOrder": {
+        "message": "Die Sortierreihenfolge der loken Zugangsdaten ändern"
+    },
+    "titleDeleteAllLocalCredentials": {
+        "message": "Lösche alle lokalen Zugangsdaten"
+    },
+    "messageDeleteAllLocalCredentials": {
+        "message": "Sollen wirklich alle Zugangsdaten des lokalen Tresors gelöscht werden? Es werden keine Zugangsdaten in der App gelöscht."
+    },
+    "successMessageDeleteAllLocalCredentials": {
+        "message": "Der lokale Tresor ist jetzt leer."
+    },
+    "tooltipDeleteAllLocalCredentials": {
+        "message": "Lösche alle lokalen Zugangsdaten vom lokalen Tresor"
     }
 }

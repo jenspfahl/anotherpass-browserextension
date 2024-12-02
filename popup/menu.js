@@ -18,6 +18,15 @@ document.getElementById("extensionInfo").innerHTML = chrome.i18n.getMessage("ext
 document.getElementById("extensionHelp1").innerHTML = chrome.i18n.getMessage("extensionHelp1");
 document.getElementById("extensionHelp2").innerHTML = chrome.i18n.getMessage("extensionHelp2");
 
+document.getElementById("search_input").placeholder = chrome.i18n.getMessage("lblSearchCredentials");
+document.getElementById("search_input").title = chrome.i18n.getMessage("tooltipSearchCredentials");
+
+document.getElementById("reverse_sort").title = chrome.i18n.getMessage("tooltipSortOrder");
+updateSortOrderLabel();
+
+document.getElementById("delete_all_credentials").title = chrome.i18n.getMessage("tooltipDeleteAllLocalCredentials");
+document.getElementById("delete_all_credentials").innerHTML = chrome.i18n.getMessage("titleDeleteAllLocalCredentials");
+
 
 chrome.runtime.sendMessage({
   action: "close_all_credential_dialogs",
@@ -319,13 +328,12 @@ getLocalValue("linked").then(async (linked) => {
       let order = await getLocalValue("vault_credential_order");
       if (order === null || order === "asc") {
         order = "desc";
-        e.target.innerText = "Sort ascending";
       }
       else if (order ===  "desc") {
         order = "asc";
-        e.target.innerText = "Sort descending";
       }
       await setLocalValue("vault_credential_order", order);
+      updateSortOrderLabel();
       reverseCredentialList();
     }
     else if (e.target.id === "setup_vault_password") {
@@ -375,8 +383,9 @@ getLocalValue("linked").then(async (linked) => {
       
     }
     else if (e.target.id === "delete_all_credentials") {
-      bsConfirm("Delete all local credentials", 
-      "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device.")
+      bsConfirm(
+        chrome.i18n.getMessage("titleDeleteAllLocalCredentials"), 
+        chrome.i18n.getMessage("messageDeleteAllLocalCredentials"))
       .then(async (decision) => {
         if (decision === true) {
           console.log("clearing local vault");
@@ -391,7 +400,9 @@ getLocalValue("linked").then(async (linked) => {
           
           document.getElementById("credential_list").innerHTML = "";
           updateCredentialCountUi(0);
-          bsAlert("Success", "Local vault cleared.");
+          bsAlert(
+            chrome.i18n.getMessage("titleSuccess"), 
+            chrome.i18n.getMessage("successMessageDeleteAllLocalCredentials"));
         }
       });
       
@@ -751,11 +762,15 @@ async function loadCredentials(clientKey) {
   let order = await getLocalValue("vault_credential_order");
   if (order === null || order === "asc") {
     // sort ascending
-    credentials.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
+    credentials.sort((a, b) => (a.name.trim().toLowerCase() > b.name.trim().toLowerCase()) 
+        ? 1 : ((b.name.trim().toLowerCase() > a.name.trim().toLowerCase()) 
+        ? -1 : 0));
   }
   else if (order === "desc") {
     // sort descending
-    credentials.sort((a, b) => (a.name > b.name) ? -1 : ((b.name > a.name) ? 1 : 0));
+    credentials.sort((a, b) => (a.name.trim().toLowerCase() > b.name.trim().toLowerCase()) 
+        ? -1 : ((b.name.trim().toLowerCase() > a.name.trim().toLowerCase()) 
+        ? 1 : 0));
 
   }
 
@@ -934,7 +949,6 @@ function updateCredentialList(searchFor) {
 
 function reverseCredentialList() {
 
-
   const list = document.getElementById("credential_list");
   let i = list.childNodes.length;
   while (i--) {
@@ -943,7 +957,7 @@ function reverseCredentialList() {
 }
 
 function updateCredentialCountUi(credentialCount) {
-  document.getElementById("vaultStatus").innerText = credentialCount + " credentials";
+  document.getElementById("vaultStatus").innerText = credentialCount + " " + chrome.i18n.getMessage("wordCredentials");
 }
 
 
@@ -1002,4 +1016,14 @@ async function addNewAlternativeServer(newServer) {
   await setLocalValue(PREFIX_ALT_SERVER + newServer, newServerDesc);
 }
 
+async function updateSortOrderLabel() {
+  let lbl, order = await getLocalValue("vault_credential_order");
+  if (order === null || order === "asc") {
+    lbl = "lblSortOrderDesc";
+  }
+  else if (order === "desc") {
+    lbl = "lblSortOrderAsc";
+  }
+  document.getElementById("reverse_sort").innerHTML = chrome.i18n.getMessage(lbl);
 
+}

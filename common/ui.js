@@ -264,6 +264,14 @@ async function bsAskForPassword(title, message, okLabel, cancelLabel) {
   passwd.focus();
   okButton.disabled = true;
 
+  passwd.onkeydown = (e) => {
+    if (e.key == 'Enter') {
+      if (passwd.value.length >= 8) {
+        okButton.dispatchEvent(new Event('click', { bubbles: true }));
+      }
+    }
+ };
+
   document.addEventListener("input", (e) => {
     if (e.target.id === "inputPassword1") {
         passwd.classList.remove("invalid-state");
