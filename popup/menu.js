@@ -808,14 +808,20 @@ async function loadCredentials(clientKey) {
     document.addEventListener("click", async (e) => {
       if (e.target.id === "copy_" + uuid) {
         navigator.clipboard.writeText(credential.password);
-        document.getElementById("copy_" + uuid).innerText = "Copied!";
+        document.getElementById("copy_" + uuid).title = chrome.i18n.getMessage("successMessagePasswordCopied");
+        document.getElementById("copy_" + uuid).innerHTML = `
+        <span id="copy_${uuid}" class="material-symbols-outlined size-24">
+        check
+        </span>
+        `;
+       
       }
       if (e.target.id === "password_field_" + uuid) {
         document.getElementById("password_field_" + uuid).innerText = credential.password;
       }
       if (e.target.id === "credential_dropdown_" + uuid) {
         bsAlert(
-          "Credential '" + credential.name + "'",
+          chrome.i18n.getMessage("lblCredential")+ " '" + credential.name + "'",
           `
             <div class="container text-left">
 
@@ -835,7 +841,7 @@ async function loadCredentials(clientKey) {
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
-                    <small>Imported at:</small>
+                    <small>${chrome.i18n.getMessage("lblImportedAt")}:</small>
                   </div>
                 </div>
                 <div class="col-8">
@@ -849,7 +855,7 @@ async function loadCredentials(clientKey) {
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
-                    Website:
+                  ${chrome.i18n.getMessage("lblWebsite")}:
                   </div>
                 </div>
                 <div class="col-8">
@@ -862,7 +868,7 @@ async function loadCredentials(clientKey) {
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
-                    User:
+                  ${chrome.i18n.getMessage("lblUser")}:
                   </div>
                 </div>
                 <div class="col-8">
@@ -875,13 +881,18 @@ async function loadCredentials(clientKey) {
               <div class="row">
                 <div class="col">
                   <div class="mb-3">
-                    Password:
+                  ${chrome.i18n.getMessage("lblPassword")}:
                   </div>
                 </div>
                 <div class="col-8">
                   <div class="mb-1">
                     <b id="password_field_${uuid}" class="fingerprint_small cursor-pointer">**************  </b>
-                    <button type="button" id="copy_${uuid}" title="Copy password to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+              
+                    <button class="btn pt-0 px-0 mt-0" type="button" id="copy_${uuid}" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                      <span id="copy_${uuid}" class="material-symbols-outlined size-24">
+                      content_copy
+                      </span>
+                    </button>
                   </div>
                 </div>
               </div>

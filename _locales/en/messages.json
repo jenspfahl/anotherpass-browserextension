@@ -57,11 +57,11 @@
     },
     "lblPassword": {
         "message": "Password",
-        "description" : "A label for a password input field"
+        "description" : "A label for a password field"
     },
     "lblRepeatPassword": {
         "message": "Repeat password",
-        "description" : "A label for a repeat-password input field"
+        "description" : "A label for a repeat-password field"
     },
     "hintInputPassword": {
         "message": "Remember to select a hard to guess password",
@@ -246,5 +246,25 @@
     },
     "tooltipDeleteAllLocalCredentials": {
         "message": "Delete all local credentials from the local vault"
+    },
+    "lblCredential": {
+        "message": "Credential",
+        "description": "A lable used to combine with a credential name"
+    },
+    "tooltipCopyPassword": {
+        "message": "Copy password to clipboard"
+    },
+    "successMessagePasswordCopied": {
+        "message": "Password copied to the clipboard."
+    },
+    "lblImportedAt": {
+        "message": "Imported at"
+    },
+    "lblWebsite": {
+        "message": "Website"
+    },
+    "lblUser": {
+        "message": "Benutzer"
     }
+    
 }

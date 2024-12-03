@@ -246,5 +246,24 @@
     },
     "tooltipDeleteAllLocalCredentials": {
         "message": "Lösche alle lokalen Zugangsdaten vom lokalen Tresor"
+    },
+    "lblCredential": {
+        "message": "Zugangsdaten",
+        "description": "A lable used to combine with a credential name"
+    },
+    "tooltipCopyPassword": {
+        "message": "Kopiere Passwort in die Zwischenablage"
+    },
+    "successMessagePasswordCopied": {
+        "message": "Passwort in die Zwischenablage kopiert."
+    },
+    "lblImportedAt": {
+        "message": "Importiert am"
+    },
+    "lblWebsite": {
+        "message": "Webseite"
+    },
+    "lblUser": {
+        "message": "Nutzer"
     }
 }
