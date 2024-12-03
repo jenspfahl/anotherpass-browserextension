@@ -249,7 +249,7 @@
     },
     "lblCredential": {
         "message": "Zugangsdaten",
-        "description": "A lable used to combine with a credential name"
+        "description": "A label used to combine with a credential name"
     },
     "tooltipCopyPassword": {
         "message": "Kopiere Passwort in die Zwischenablage"
@@ -265,5 +265,35 @@
     },
     "lblUser": {
         "message": "Nutzer"
+    },
+    "lblApplyCredentialToWebsite": {
+        "message": "Auf Webseite anwenden"
+    },
+    "tooltipApplyCredentialToWebsite": {
+        "message": "Wende diese Zugangsdaten auf der aktuellen Webseite an"
+    },
+    "lblSyncCredentialWithApp": {
+        "message": "Synchronisieren"
+    },
+    "tooltipSyncCredentialWithApp": {
+        "message": "Synchronisiere diese Zugangsdaten mit der App"
+    },
+    "lblDeleteCredential": {
+        "message": "Löschen"
+    },
+    "tooltipDeleteCredential": {
+        "message": "Lösche diese Zugangsdaten vom lokalen Tresor"
+    },
+    "titleDeleteCredential": {
+        "message": "Lösche '$credentialName$'",
+        "placeholders": {
+            "credentialName": {
+              "content": "$1",
+              "example": "Wikipedia"
+            }
+          }
+    },
+    "messageDeleteCredential": {
+        "message": "Sollen diese Zugangsdaten wirklich vom lokalen Tresor entfernt werden?"
     }
 }

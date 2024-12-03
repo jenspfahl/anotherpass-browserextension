@@ -249,7 +249,7 @@
     },
     "lblCredential": {
         "message": "Credential",
-        "description": "A lable used to combine with a credential name"
+        "description": "A label used to combine with a credential name"
     },
     "tooltipCopyPassword": {
         "message": "Copy password to clipboard"
@@ -265,6 +265,36 @@
     },
     "lblUser": {
         "message": "Benutzer"
+    },
+    "lblApplyCredentialToWebsite": {
+        "message": "Apply on website"
+    },
+    "tooltipApplyCredentialToWebsite": {
+        "message": "Apply this credential on current website"
+    },
+    "lblSyncCredentialWithApp": {
+        "message": "Sync with app"
+    },
+    "tooltipSyncCredentialWithApp": {
+        "message": "Synchronise this credential with the app"
+    },
+    "lblDeleteCredential": {
+        "message": "Delete"
+    },
+    "tooltipDeleteCredential": {
+        "message": "Delete this credential from the local vault"
+    },
+    "titleDeleteCredential": {
+        "message": "Delete '$credentialName$'",
+        "placeholders": {
+            "credentialName": {
+              "content": "$1",
+              "example": "Wikipedia"
+            }
+          }
+    },
+    "messageDeleteCredential": {
+        "message": "Are you sure to delete this credential from the local vault?"
     }
     
 }

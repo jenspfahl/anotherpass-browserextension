@@ -795,10 +795,10 @@ async function loadCredentials(clientKey) {
             <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
             </button>
             <ul class="dropdown-menu">
-              <button id="apply_${uuid}" class="btn dropdown-item" title="Apply this credential on current website">Apply to website</button>
-              <button id="syncWithApp_${uuid}" class="btn dropdown-item" title="Synchronise this credential with the app">Sync with app</button>
+              <button id="apply_${uuid}" class="btn dropdown-item" title="${chrome.i18n.getMessage("tooltipApplyCredentialToWebsite")}">${chrome.i18n.getMessage("lblApplyCredentialToWebsite")}</button>
+              <button id="syncWithApp_${uuid}" class="btn dropdown-item" title="${chrome.i18n.getMessage("tooltipSyncCredentialWithApp")}">${chrome.i18n.getMessage("lblSyncCredentialWithApp")}</button>
               <li><hr class="dropdown-divider"></li>
-              <button id="delete_${uuid}" class="btn dropdown-item" title="Delete this credential from the local vault">Delete</button>
+              <button id="delete_${uuid}" class="btn dropdown-item" title="${chrome.i18n.getMessage("tooltipDeleteCredential")}">${chrome.i18n.getMessage("lblDeleteCredential")}</button>
             </ul>
           </div>
         </div>
@@ -918,8 +918,8 @@ async function loadCredentials(clientKey) {
       }
       if (e.target.id === "delete_" + uuid) {
         bsConfirm(
-          "Delete '" + credential.name + "'",
-          "Are you sure to delete this credential from the local vault?"
+          chrome.i18n.getMessage("titleDeleteCredential", credential.name),
+          chrome.i18n.getMessage("messageDeleteCredential")
         )
           .then(async (decision) => {
             console.log("decision:" + decision);
