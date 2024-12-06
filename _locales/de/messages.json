@@ -155,6 +155,9 @@
         "message": "Nicht verbunden",
         "description" : "Label to indicate an unlinked extension (with the app)"
     },
+    "titleLinkTheApp": {
+        "message": "Mit der ANOTHERpass-App verbinden"
+    },
     "titleUnlinkFromApp": {
         "message": "Von der App trennen"
     },
@@ -295,5 +298,83 @@
     },
     "messageDeleteCredential": {
         "message": "Sollen diese Zugangsdaten wirklich vom lokalen Tresor entfernt werden?"
+    },
+    "lblSettingsColorTheme": {
+        "message": "Farbgebung",
+        "description": "Means dark or light theme"
+    },
+    "lblSettingsColorThemeDark": {
+        "message": "Dunkel",
+        "description": "Means dark theme"
+    },
+    "lblSettingsColorThemeLight": {
+        "message": "Hell",
+        "description": "Means light theme"
+    },
+    "lblSettingsColorThemeAuto": {
+        "message": "Automatisch",
+        "description": "Means automatically light or dark theme, controlled by the OS"
+    },
+    "lblSettingsAutoLock": {
+        "message": "Minuten der Inaktivität nachdem der entsperrte lokale Tresor gesperrt wird"
+    },
+    "lblSettingsRenderIcon": {
+        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Icon (Aktualisierung der Webseite erforderlich, wenn dies geändert wurde)."
+    },
+    "lblSettingsIconOpacity": {
+        "message": "Deckkraft dieses Icons"
+    },
+    "lblSettingsHost": {
+        "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass App"
+    },
+    "lblSettingsPort": {
+        "message": "und der Port",
+        "description": "hostname and port kind of belongs together"
+    },
+    "lblSettingsPollingTimeout": {
+        "message": "Die Erweiterung fragt Zugangsdaten mit diesem Zeitlimit in Sekunden ab",
+        "description": "How long shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsPollingIntervall": {
+        "message": "und fragt aller X Sekunden",
+        "description": "In which intervall shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsManageHostAlternatives": {
+        "message": "Alternativen verwalten",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblChooseHostAlternative": {
+        "message": "wähle einen alternative Adresse",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblSave": {
+        "message": "Speichern"
+    },
+    "lblReset": {
+        "message": "Zurücks."
+    },
+    "lblRelink": {
+        "message": "Erneut verbinden"
+    },
+    "errorMessageMissingAppServer": {
+        "message": "Ein Handle, ein Hostname oder eine IP-Adresse muss angegeben werden."
+    },
+    "errorMessageInvalidAppServer": {
+        "message": "Angegebenes Handle, Hostname oder IP-Adresse ist ungültig."
+    },
+    "errorMessageInvalidAppPort": {
+        "message": "Ein nummerischer Port-Wert ist erforderlich, welcher zwischen 1024 und 49151 sein muss."
+    },
+    "errorMessageInvalidPollingTimeout": {
+        "message": "Ungültiges Anfrage-Zeitlimit, muss zwischen 1 und 300 Sekunden sein."
+    },
+    "errorMessageInvalidPollingInterval": {
+        "message": "Ungültiger Polling-Wert, muss zwischen 1 und 60 Sekunden sein."
+    },
+    "errorMessageInvalidLockTimeout": {
+        "message": "Ungültige Zeitangabe zum Sperren des Tresors, muss zwischen 1 und 10080 Minuten sein."
+    },
+    "errorMessageInvalidOpacityValue": {
+        "message": "Ungültiger Icon-Deckkraft-Wert, muss zwischen 1 und 100 sein."
     }
 }

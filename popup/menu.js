@@ -27,6 +27,14 @@ updateSortOrderLabel();
 document.getElementById("delete_all_credentials").title = chrome.i18n.getMessage("tooltipDeleteAllLocalCredentials");
 document.getElementById("delete_all_credentials").innerHTML = chrome.i18n.getMessage("titleDeleteAllLocalCredentials");
 
+document.getElementById("link").title = chrome.i18n.getMessage("titleLinkTheApp");
+document.getElementById("unlink").title = chrome.i18n.getMessage("titleUnlinkFromApp");
+
+document.getElementById("manage_servers").innerHTML = chrome.i18n.getMessage("lblSettingsManageHostAlternatives");
+document.getElementById("btn-save-settings").innerHTML = chrome.i18n.getMessage("lblSave");
+document.getElementById("btn-reset-settings").innerHTML = chrome.i18n.getMessage("lblReset");
+document.getElementById("relink").innerHTML = chrome.i18n.getMessage("lblRelink");
+
 
 chrome.runtime.sendMessage({
   action: "close_all_credential_dialogs",
@@ -133,25 +141,39 @@ getLocalValue("linked").then(async (linked) => {
 
 
       if (!server || server == "") {
-        bsAlert("Error", "A handle, hostname or IP address is required");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageMissingAppServer"));
       }
       else if (!isValidIPAdressOrHostnameOrHandle(server)) {
-        bsAlert("Error", "Invalid handle, hostname or IP address");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidAppServer"));
       }
       else if (isNaN(port) || port < 1024 || port > 49151) {
-        bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidAppPort"));
       }
       else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
-        bsAlert("Error", "Invalid polling timeout, should be a number between 1 and 300.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidPollingTimeout"));
       }
       else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
-        bsAlert("Error", "Invalid polling interval, should be a number between 1 and 60.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidPollingInterval"));
       }
       else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
-        bsAlert("Error", "Invalid lock timeout, should be a number between 1 and 10080.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidLockTimeout"));
       }
       else if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
-        bsAlert("Error", "Invalid icon opacity, should be a number between 1 and 100.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidOpacityValue"));
       }
       else {
         await addNewAlternativeServer(server);
@@ -975,7 +997,7 @@ function updateCredentialCountUi(credentialCount) {
 async function loadAlternativeServersToUi() {
   const alternativeServers = await loadAllServers();
   const hostSelector = document.getElementById("host_selector");
-  hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
+  hostSelector.innerHTML = "<option selected> - " + chrome.i18n.getMessage("lblChooseHostAlternative") + " - </option>";
 
   alternativeServers
     .map((altServer) => {

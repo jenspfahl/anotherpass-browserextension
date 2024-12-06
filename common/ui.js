@@ -363,7 +363,7 @@ async function bsAskForPassword(title, message, okLabel, cancelLabel) {
     btnToActive.classList.add('active')
     btnToActive.setAttribute('aria-pressed', 'true')
 
-    const themeSwitcherLabel = capitalizeFirstLetter(btnToActive.dataset.bsThemeValue);
+    const themeSwitcherLabel = translateThemeValue(btnToActive.dataset.bsThemeValue);
 
     themeSwitcher.setAttribute('aria-label', themeSwitcherLabel)
 
@@ -397,6 +397,13 @@ async function bsAskForPassword(title, message, okLabel, cancelLabel) {
 })()
 
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+function translateThemeValue(string) {
+  if (string === 'light') {
+    return chrome.i18n.getMessage("lblSettingsColorThemeLight");
+  } else if (string === 'dark') {
+    return chrome.i18n.getMessage("lblSettingsColorThemeDark");
+  }
+  else {
+    return chrome.i18n.getMessage("lblSettingsColorThemeAuto");
+  }
 }

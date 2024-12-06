@@ -116,3 +116,46 @@
   content: "__MSG_linkedVaultId__";
 }
 
+.translatedSettingsColorTheme::before {
+  content: "__MSG_lblSettingsColorTheme__";
+}
+
+.translatedSettingsColorThemeLight::before {
+  content: "__MSG_lblSettingsColorThemeLight__";
+}
+
+.translatedSettingsColorThemeDark::before {
+  content: "__MSG_lblSettingsColorThemeDark__";
+}
+
+.translatedSettingsColorThemeAuto::before {
+  content: "__MSG_lblSettingsColorThemeAuto__";
+}
+
+.translatedSettingsAutolockAuto::before {
+  content: "__MSG_lblSettingsAutoLock__";
+}
+
+.translatedSettingsRenderIcon::before {
+  content: "__MSG_lblSettingsRenderIcon__";
+}
+
+.translatedSettingsIconOpacity::before {
+  content: "__MSG_lblSettingsIconOpacity__";
+}
+
+.translatedSettingsHost::before {
+  content: "__MSG_lblSettingsHost__";
+}
+
+.translatedSettingsPort::before {
+  content: "__MSG_lblSettingsPort__";
+}
+
+.translatedSettingsPollingTimeout::before {
+  content: "__MSG_lblSettingsPollingTimeout__";
+}
+
+.translatedSettingsPollingIntervall::before {
+  content: "__MSG_lblSettingsPollingIntervall__";
+}

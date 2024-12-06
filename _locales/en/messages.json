@@ -155,6 +155,9 @@
         "message": "Not linked",
         "description" : "Label to indicate an unlinked extension (with the app)"
     },
+    "titleLinkTheApp": {
+        "message": "Link with ANOTHERpass app"
+    },
     "titleUnlinkFromApp": {
         "message": "Unlink from the app"
     },
@@ -295,6 +298,85 @@
     },
     "messageDeleteCredential": {
         "message": "Are you sure to delete this credential from the local vault?"
+    },
+    "lblSettingsColorTheme": {
+        "message": "Color theme",
+        "description": "Means dark or light theme"
+    },
+    "lblSettingsColorThemeDark": {
+        "message": "Dark",
+        "description": "Means dark theme"
+    },
+    "lblSettingsColorThemeLight": {
+        "message": "Light",
+        "description": "Means light theme"
+    },
+    "lblSettingsColorThemeAuto": {
+        "message": "Auto",
+        "description": "Means automatically light or dark theme, controlled by the OS"
+    },
+    "lblSettingsAutoLock": {
+        "message": "Minutes of inactivity after the unlocked local vault is locked"
+    },
+    "lblSettingsRenderIcon": {
+        "message": "Display a credential-icon in each username and password input field (website-reload is needed if this has been changed)"
+    },
+    "lblSettingsIconOpacity": {
+        "message": "Opacity of this icon"
+    },
+    "lblSettingsHost": {
+        "message": "ANOTHERpass app hostname, handle or IP address"
+    },
+    "lblSettingsPort": {
+        "message": "and its port",
+        "description": "hostname and port kind of belongs together"
+    },
+    "lblSettingsPollingTimeout": {
+        "message": "The extension polls for credentials with this timeout in seconds",
+        "description": "How long shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsPollingIntervall": {
+        "message": "and polls every X seconds",
+        "description": "In which intervall shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsManageHostAlternatives": {
+        "message": "Manage alternatives",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblChooseHostAlternative": {
+        "message": "choose an alternative server",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblSave": {
+        "message": "Save"
+    },
+    "lblReset": {
+        "message": "Reset"
+    },
+    "lblRelink": {
+        "message": "Relink"
+    },
+    "errorMessageMissingAppServer": {
+        "message": "A handle, hostname or IP address is required."
+    },
+    "errorMessageInvalidAppServer": {
+        "message": "Invalid handle, hostname or IP address."
+    },
+    "errorMessageInvalidAppPort": {
+        "message": "A nummeric port number is required, which should be between 1024 and 49151."
+    },
+    "errorMessageInvalidPollingTimeout": {
+        "message": "Invalid polling timeout, should be a number between 1 and 300."
+    },
+    "errorMessageInvalidPollingInterval": {
+        "message": "Invalid polling interval, should be a number between 1 and 60."
+    },
+    "errorMessageInvalidLockTimeout": {
+        "message": "Invalid lock timeout, should be a number between 1 and 10080."
+    },
+    "errorMessageInvalidOpacityValue": {
+        "message": "Invalid icon opacity, should be a number between 1 and 100."
     }
+
     
 }
