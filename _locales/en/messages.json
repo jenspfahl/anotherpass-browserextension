@@ -55,6 +55,10 @@
         "message": "credentials",
         "description" : "Plural for credential"
     },
+    "lblNoLocalCredentials": {
+        "message": "no stored credentials",
+        "description" : "Indicates no stored local credentials in the local vault"
+    },
     "lblPassword": {
         "message": "Password",
         "description" : "A label for a password field"
@@ -137,6 +141,10 @@
         "message": "Cannot unlock the local vault with provided password. Wrong password?",
         "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
     },
+    "messageLocalVaultIsLocked": {
+        "message": "Local vault is locked, unlock first or fetch credential from the app.",
+        "description" : "More comprehensive message displayed if the local vault is locked"
+    },
     "lblUseTheApp": {
         "message": "Use the app",
         "description" : "Button label to initiate the app flow to unlock the local vault"
@@ -201,6 +209,9 @@
     },
     "tooltipFetchSingleCredential": {
         "message": "Fetch single credential from the app"
+    },
+    "tooltipCreateNewCredential": {
+        "message": "Create new credential in the app"
     },
     "lblFetchMultipleCredentials": {
         "message": "Fetch multiple credentials"
@@ -344,7 +355,7 @@
         "description": "Means app host or handle or ip alternatives"
     },
     "lblChooseHostAlternative": {
-        "message": "choose an alternative server",
+        "message": "choose an alternative address",
         "description": "Means app host or handle or ip alternatives"
     },
     "lblSave": {
@@ -355,6 +366,9 @@
     },
     "lblRelink": {
         "message": "Relink"
+    },
+    "lblUpdate": {
+        "message": "Update"
     },
     "errorMessageMissingAppServer": {
         "message": "A handle, hostname or IP address is required."
@@ -376,7 +390,86 @@
     },
     "errorMessageInvalidOpacityValue": {
         "message": "Invalid icon opacity, should be a number between 1 and 100."
+    },
+    "titleManageServers": {
+        "message": "Manage alternative app hosts"
+    },
+    "messageManageServers": {
+        "message": "All app host addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in a different network, the address of the phone to connect can differ. Changing anything here doesn't effect the current configured host address."
+    },
+    "tooltipResolvedHandle": {
+        "message": "This handle will be translated to $ip$",
+        "description" : "Explains which IP address is encoded in this handle",
+        "placeholders": {
+            "ip": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblAppHost": {
+        "message": "IP, handle or hostname",
+        "description": "Indicates the app host as hostname, IP address or handle"
+    },
+    "lblNotes": {
+        "message": "Notes",
+        "description": "Indicates general notes"
+    },
+    "lblNewHostAddress": {
+        "message": "New host address"
+    },
+    "lblCurrentHostAddress": {
+        "message": "Current host address"
+    },
+    "errorMessageInvalidAppHost": {
+        "message": "IP, handle or hostname is invalid"
+    },
+    "lblAddressMarkedForDeletion": {
+        "message": "$address$ marked for deletion",
+        "description" : "Explains that the given app host address is going to be removed once saved.",
+        "placeholders": {
+            "address": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblOpenCredentialChooser": {
+        "message": "Open chooser dialog"
+    },
+    "lblRequestCredential": {
+        "message": "Request credential"
+    },
+    "lblCreateCredential": {
+        "message": "Create new credential"
+    },
+    "lblSuggestedCredentialSection": {
+        "message": "Suggested"
+    },
+    "lblAllCredentialSection": {
+        "message": "All"
+    },
+    "titleRequestApproval" : {
+        "message": "Request approval via the ANOTHERpass app",
+        "description": "Title of any app-interative dialog"
+    },
+    "lblAppRequestAs": {
+        "message": "Requesting as"
+    },
+    "lblAppRequestFingerprint": {
+        "message": "With fingerprint"
+    },
+    "lblAppRequestTo": {
+        "message": "To app address"
+    },
+    "lblAppRequestForWebsite": {
+        "message": "For website"
+    },
+    "lblAppRequestRememberSelection": {
+        "message": "Remember my selection for this website"
+    },
+    "lblAppRequestSaveSelection": {
+        "message": "Save my selection in the local vault"
     }
-
     
 }

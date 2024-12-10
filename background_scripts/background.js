@@ -233,7 +233,8 @@ getLocalValue("linked").then(async (linked) => {
 
 
 function closeAllCredentialDialogs() {
-  chrome.tabs.query({ currentWindow: false }, function (tabs) {
+
+  chrome.tabs.query({ }, function (tabs) {
 
     for (var i = 0; i < tabs.length; i++) {
       chrome.tabs.sendMessage(tabs[i].id, { action: "close_credential_dialog" });
@@ -244,7 +245,7 @@ function closeAllCredentialDialogs() {
 function createContextMenu() {
   chrome.contextMenus.create({
     id: "anotherpass-open-dialog",
-    title: "Open ANOTHERpass dialog",
+    title: chrome.i18n.getMessage("lblOpenCredentialChooser"),
     contexts: ["editable"],
   },
     () => void chrome.runtime.lastError
@@ -252,7 +253,7 @@ function createContextMenu() {
 
   chrome.contextMenus.create({
     id: "anotherpass-credential-request",
-    title: "Request credential from ANOTHERpass",
+    title: chrome.i18n.getMessage("lblRequestCredential"),
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
@@ -262,7 +263,7 @@ function createContextMenu() {
 
   chrome.contextMenus.create({
     id: "anotherpass-credential-create-request",
-    title: "Create new credential in ANOTHERpass",
+    title: chrome.i18n.getMessage("lblCreateCredential"),
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
@@ -456,10 +457,10 @@ async function linkToApp(sendResponse) {
 
 
 function openPasswordRequestDialog(command, tabId, website, credentialUid, user) {
-  var width = 660;
+  var width = 640;
   var height = 570;
   if (website) {
-    width = 680;
+    width = 660;
     height = 680;
   }
 
@@ -577,7 +578,7 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-open-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault unlocked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultUnlocked") + ")" });
   }
   else {
     chrome.action.setIcon({
@@ -588,6 +589,6 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault locked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultLocked") + ")" });
   }
 }

@@ -55,7 +55,7 @@ getLocalValue("linked").then((linked) => {
               e.target.classList.remove("invalid-state");
               const ipFromHandle = handleToIpAddress(e.target.value);
               if (ipFromHandle) {
-                e.target.title = "The handle will be translated to " + ipFromHandle;
+                e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);;
               }
             }
             else {

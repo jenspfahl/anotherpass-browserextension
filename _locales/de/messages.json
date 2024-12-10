@@ -55,6 +55,10 @@
         "message": "Zugangsdaten",
         "description" : "Plural for credential"
     },
+    "lblNoLocalCredentials": {
+        "message": "keine gespeicherten Zugangsdaten",
+        "description" : "Indicates no stored local credentials in the local vault"
+    },
     "lblPassword": {
         "message": "Passwort",
         "description" : "A label for a password input field"
@@ -137,6 +141,10 @@
         "message": "Lokaler Tresor konnte nicht mit dem angegebenen Passwort entsperrt werden. Falsches Passwort?",
         "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
     },
+    "messageLocalVaultIsLocked": {
+        "message": "Lokaler Tresor muss erst entsperrt oder Zugangsdaten von der App abgefragt werden.",
+        "description" : "More comprehensive message displayed if the local vault is locked"
+    },
     "lblUseTheApp": {
         "message": "Verwende die App",
         "description" : "Button label to initiate the app flow to unlock the local vault"
@@ -202,6 +210,9 @@
     "tooltipFetchSingleCredential": {
         "message": "Rufe einzelne Zugangsdaten aus der App ab"
     },
+    "tooltipCreateNewCredential": {
+        "message": "Neue Zugangsdaten in der App erstellen"
+    },
     "lblFetchMultipleCredentials": {
         "message": "Mehrere Zugangsdaten abrufen"
     },
@@ -227,7 +238,7 @@
         "message": "Durchsuche Zugangsdaten"
     },
     "tooltipSearchCredentials": {
-        "message": "Suche nach Zugangsdaten im lokelen Tresor"
+        "message": "Suche nach Zugangsdaten im lokalen Tresor"
     },
     "lblSortOrderDesc": {
         "message": "Absteigend sortieren"
@@ -356,6 +367,9 @@
     "lblRelink": {
         "message": "Erneut verbinden"
     },
+    "lblUpdate": {
+        "message": "Aktualisieren"
+    },
     "errorMessageMissingAppServer": {
         "message": "Ein Handle, ein Hostname oder eine IP-Adresse muss angegeben werden."
     },
@@ -376,5 +390,89 @@
     },
     "errorMessageInvalidOpacityValue": {
         "message": "Ungültiger Icon-Deckkraft-Wert, muss zwischen 1 und 100 sein."
+    },
+    "titleManageServers": {
+        "message": "Alternative App-Adressen verwalten"
+    },
+    "messageManageServers": {
+        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein. Änderungen an dieser Liste wirken sich nicht auf die aktuell konfigurierte Hostadresse aus."
     }
+    ,
+    "tooltipResolvedHandle": {
+        "message": "Dieses Handle entspricht der IP $ip$",
+        "description" : "Explains which IP address is encoded in this handle",
+        "placeholders": {
+            "ip": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+
+    },
+    "lblAppHost": {
+        "message": "IP, Handle oder Hostname",
+        "description": "Indicates the app host as hostname, IP address or handle"
+    },
+    "lblNotes": {
+        "message": "Hinweis",
+        "description": "Indicates general notes"
+    },
+    "lblNewHostAddress": {
+        "message": "Neue Host-Adresse"
+    },
+    "lblCurrentHostAddress": {
+        "message": "Aktuelle Host-Addresse"
+    },
+    "errorMessageInvalidAppHost": {
+        "message": "IP, Handle oder Hostname ist ungültig"
+    },
+    "lblAddressMarkedForDeletion": {
+        "message": "$address$ zum Löschen vorgesehen",
+        "description" : "Explains that the given app host address is going to be removed once saved.",
+        "placeholders": {
+            "address": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblOpenCredentialChooser": {
+        "message": "Öffne Auswahldialog"
+    }
+    ,
+    "lblRequestCredential": {
+        "message": "Zugangsdaten abfragen"
+    },
+    "lblCreateCredential": {
+        "message": "Neue Zugangsdaten erstellen"
+    },
+    "lblSuggestedCredentialSection": {
+        "message": "Vorschläge"
+    },
+    "lblAllCredentialSection": {
+        "message": "Alle"
+    },
+    "titleRequestApproval" : {
+        "message": "Genehmigung über die ANOTHERpass-App",
+        "description": "Title of any app-interative dialog"
+    },
+    "lblAppRequestAs": {
+        "message": "Anfragen als"
+    },
+    "lblAppRequestFingerprint": {
+        "message": "Mit Fingerprint"
+    },
+    "lblAppRequestTo": {
+        "message": "An App-Adresse"
+    },
+    "lblAppRequestForWebsite": {
+        "message": "Für Webseite"
+    },
+    "lblAppRequestRememberSelection": {
+        "message": "Auswahl für diese Webseite merken"
+    },
+    "lblAppRequestSaveSelection": {
+        "message": "Auswahl im lokalen Tresor speichern"
+    }
+
 }

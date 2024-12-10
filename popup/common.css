@@ -159,3 +159,31 @@
 .translatedSettingsPollingIntervall::before {
   content: "__MSG_lblSettingsPollingIntervall__";
 }
+
+.translatedTitleRequestApproval::before {
+  content: "__MSG_titleRequestApproval__";
+}
+
+.translatedAppRequestAs::before {
+  content: "__MSG_lblAppRequestAs__";
+}
+
+.translatedAppRequestFingerprint::before {
+  content: "__MSG_lblAppRequestFingerprint__";
+}
+
+.translatedAppRequestTo::before {
+  content: "__MSG_lblAppRequestTo__";
+}
+
+.translatedAppRequestForWebsite::before {
+  content: "__MSG_lblAppRequestForWebsite__";
+}
+
+.translatedAppRequestRememberSelection::before {
+  content: "__MSG_lblAppRequestRememberSelection__";
+}
+
+.translatedAppRequestSaveSelection::before {
+  content: "__MSG_lblAppRequestSaveSelection__";
+}

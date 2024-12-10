@@ -57,7 +57,7 @@ getLocalValue("linked").then(async (linked) => {
   hostField.value = server;
   const ipFromHandle = handleToIpAddress(hostField);
   if (ipFromHandle) {
-    hostField.title = "The handle will be translated to " + ipFromHandle;
+    hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
   }
 
   document.addEventListener("input", (e) => {
@@ -70,12 +70,12 @@ getLocalValue("linked").then(async (linked) => {
         e.target.classList.remove("invalid-state");
         const ipFromHandle = handleToIpAddress(e.target.value);
         if (ipFromHandle) {
-          e.target.title = "The handle will be translated to " + ipFromHandle;
+          e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
         }
       }
       else {
         e.target.classList.add("invalid-state");
-        e.target.title = "Server address invalid! Won't be stored.";
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
         document.getElementById("btn-save-settings").disabled = true;
       }
     }
@@ -91,7 +91,7 @@ getLocalValue("linked").then(async (linked) => {
       hostField.value = hostSelector.value;
       const ipFromHandle = handleToIpAddress(hostField.value);
       if (ipFromHandle) {
-        hostField.title = "The handle will be translated to " + ipFromHandle;
+        hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
       }
       else {
         hostField.title = "";
@@ -468,7 +468,7 @@ getLocalValue("linked").then(async (linked) => {
       const changedDescriptions = new Map();
       let addedHost, addedDescription;
 
-      html.push("<h6>All server addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in different networks, server addresses of the phone to connect can differ. Changing anything here doesn'r effect the current configured server address.</h6>");
+      html.push("<h6>" + chrome.i18n.getMessage("messageManageServers") + "</h6>");
     
 
       allServers.map((server) => {
@@ -476,19 +476,19 @@ getLocalValue("linked").then(async (linked) => {
         const ipFromHandle = handleToIpAddress(server.host);
         let hostTooltip = "";
         if (ipFromHandle) {
-          hostTooltip = "The handle will be translated to " + ipFromHandle;
+          hostTooltip = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
         }
               
         let htmlLine;
         if (server.host === currentServer) {
           htmlLine = `
-          <h8> - Current server -</h8>
+          <h8> - ${chrome.i18n.getMessage("lblCurrentHostAddress")} -</h8>
           <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
-              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
             </div>
             <div class="col-4">
-              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblNotes")}" aria-label="server notes">
             </div>
           </div>
 
@@ -498,10 +498,10 @@ getLocalValue("linked").then(async (linked) => {
           htmlLine = `
           <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
-              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
             </div>
             <div class="col-4">
-              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblNotes")}" aria-label="server notes">
             </div>
             <div class="col-1">
               <button id="delete_server_${server.host}" class="btn">
@@ -532,13 +532,13 @@ getLocalValue("linked").then(async (linked) => {
               }
               const ipFromHandle = handleToIpAddress(e.target.value);
               if (ipFromHandle) {
-                e.target.title = "The handle will be translated to " + ipFromHandle;
+                e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
               }
             }
             else {
               console.log("host invald", e.target.value);
               e.target.classList.add("invalid-state");
-              e.target.title = "Server address invalid! Won't be stored.";
+              e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
               const okButton = document.getElementById("modal-btn-ok");
               if (okButton) { 
                 okButton.disabled = true;
@@ -558,7 +558,7 @@ getLocalValue("linked").then(async (linked) => {
             e.target.innerText = "";
             const row = document.getElementById("server_row_" + server.host);
             if (row) {
-              row.innerHTML = "<i> - " + server.host + " marked for deletion - </i>";
+              row.innerHTML = "<i> - " + chrome.i18n.getMessage("lblAddressMarkedForDeletion", server.host) + " - </i>";
               serversToBeDeleted.push(server.host);
             }
           }
@@ -568,13 +568,13 @@ getLocalValue("linked").then(async (linked) => {
       });
 
       html.push(`
-        <h8> - New server -</h8>
+        <h8> - ${chrome.i18n.getMessage("lblNewHostAddress")} -</h8>
           <div id="new_server_row" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
-              <input id="new_server_host" class="form-control input-sm" type="text" placeholder="IP or hostname" aria-label="IP address or hostame">
+              <input id="new_server_host" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
             </div>
             <div class="col-4">
-              <input id="new_server_description" class="form-control input-sm" type="text" placeholder="Notes" aria-label="server notes">
+              <input id="new_server_description" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblNotes")}" aria-label="server notes">
             </div>
           </div>
         `);
@@ -603,11 +603,11 @@ getLocalValue("linked").then(async (linked) => {
         }
       });
 
-      bsConfirm("Manage alternative servers", `
+      bsConfirm(chrome.i18n.getMessage("titleManageServers"), `
       <div class="container">
         ${html.join("")}
       </div>
-      `, "Save", "Cancel")
+      `, chrome.i18n.getMessage("lblSave"), chrome.i18n.getMessage("lblCancel"))
       .then(async (decision) => {
         if (decision === true) {
           // delete all altServers and insert all from UI
@@ -990,7 +990,12 @@ function reverseCredentialList() {
 }
 
 function updateCredentialCountUi(credentialCount) {
-  document.getElementById("vaultStatus").innerText = credentialCount + " " + chrome.i18n.getMessage("wordCredentials");
+  if (credentialCount == 0) {
+    document.getElementById("vaultStatus").innerText = " - " + chrome.i18n.getMessage("lblNoLocalCredentials") + " - ";
+  }
+  else {
+    document.getElementById("vaultStatus").innerText = credentialCount + " " + chrome.i18n.getMessage("wordCredentials");
+  }
 }
 
 

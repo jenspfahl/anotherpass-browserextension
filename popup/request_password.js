@@ -1,3 +1,9 @@
+document.getElementById("update_server").innerHTML = chrome.i18n.getMessage("lblUpdate");
+document.getElementById("close").innerHTML = chrome.i18n.getMessage("lblCancel");
+document.getElementById("host").placeholder = chrome.i18n.getMessage("lblAppHost");
+
+
+
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const targetTabId = requestData.tabId;
 
@@ -34,17 +40,21 @@ document.addEventListener("click", async (e) => {
     const newServer = hostField.value;
 
     if (!newServer || newServer == "") {
-      bsAlert("Error", "A handle, hostname or IP address is required");
+      bsAlert(
+        chrome.i18n.getMessage("titleError"), 
+        "A handle, hostname or IP address is required");
     }
     else if (!isValidIPAdressOrHostnameOrHandle(newServer)) {
-      bsAlert("Error", "Invalid handle, hostname or IP address");
+      bsAlert(
+        chrome.i18n.getMessage("titleError"), 
+        "Invalid handle, hostname or IP address");
     }
     else {
       await addNewAlternativeServer(newServer);
       await loadAlternativeServersToUi(newServer);
       const ipFromHandle = handleToIpAddress(newServer);
       if (ipFromHandle) {
-        hostField.title = "The handle will be translated to " + ipFromHandle;
+        hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
       }
       else {
         hostField.title = "";
@@ -67,7 +77,9 @@ getLocalValue("linked").then(async (linked) => {
   const webClientId = await getLocalValue("web_client_id");
 
   if (!linked) {
-    bsAlert("Error", "Extension not linked with an app! Please link it first.").then(_ => {
+    bsAlert(
+      chrome.i18n.getMessage("titleError"), 
+      "Extension not linked with an app! Please link it first.").then(_ => {
       window.close();
     });
   } 
@@ -79,7 +91,7 @@ getLocalValue("linked").then(async (linked) => {
     hostField.value = server;
     const ipFromHandle = handleToIpAddress(hostField.value);
     if (ipFromHandle) {
-      hostField.title = "The handle will be translated to " + ipFromHandle;
+      hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
     }
     else {
       hostField.title = "";
@@ -98,12 +110,12 @@ getLocalValue("linked").then(async (linked) => {
           e.target.classList.remove("invalid-state");
           const ipFromHandle = handleToIpAddress(e.target.value);
           if (ipFromHandle) {
-            e.target.title = "The handle will be translated to " + ipFromHandle;
+            e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
           }
         }
         else {
           e.target.classList.add("invalid-state");
-          e.target.title = "Server address invalid!";
+          e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
           updateButton.disabled = true;
         }
       }
@@ -126,7 +138,7 @@ getLocalValue("linked").then(async (linked) => {
         await loadAlternativeServersToUi(newServer);
         const ipFromHandle = handleToIpAddress(newServer);
         if (ipFromHandle) {
-          hostField.title = "The handle will be translated to " + ipFromHandle;
+          hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
         }
         else {
           hostField.title = "";
@@ -152,6 +164,9 @@ getLocalValue("linked").then(async (linked) => {
     }
     else if (requestData.command === "download_vault_backup") {
       document.getElementById("instruction").innerText = "Requesting to download the vault backup file from the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+    }
+    else {
+      document.getElementById("instruction").innerText = "Requesting a credential .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
     }
 
     console.debug("requestData", requestData);
@@ -277,7 +292,9 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Warning", "The request has been rejected in the app or the vault was locked.").then(_ => {
+            bsAlert(
+              chrome.i18n.getMessage("titleWarning"), 
+              "The request has been rejected in the app or the vault was locked.").then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -290,7 +307,9 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Error", "Failed to communicate to the app. Updating the app could solve this problem. <br><code>Error: " + response.error + "</code>").then(_ => {
+            bsAlert(
+              chrome.i18n.getMessage("titleError"), 
+              "Failed to communicate to the app. Updating the app could solve this problem. <br><code>Error: " + response.error + "</code>").then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -337,7 +356,9 @@ getLocalValue("linked").then(async (linked) => {
               }
               else {
                 console.error("No target tabId but expected");
-                bsAlert("Error", "Something went wrong.").then(_ => {
+                bsAlert(
+                  chrome.i18n.getMessage("titleError"), 
+                  "Something went wrong.").then(_ => {
                   window.close();
                 });
               }
@@ -352,7 +373,9 @@ getLocalValue("linked").then(async (linked) => {
               }
 
               //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", "Local vault unlocked.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                "Local vault unlocked.").then(_ => {
                 window.close();
               });
             }
@@ -363,7 +386,9 @@ getLocalValue("linked").then(async (linked) => {
               const count = await saveAllCredentials(credentials, clientKey);
 
               //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", count + " credentials imported.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                count + " credentials imported.").then(_ => {
                 window.close();
               });
             }
@@ -378,7 +403,9 @@ getLocalValue("linked").then(async (linked) => {
 
               saveCredential(credential, clientKey);
               //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", "Credential synchronised.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                "Credential synchronised.").then(_ => {
                 window.close();
               });
             } 
@@ -388,7 +415,9 @@ getLocalValue("linked").then(async (linked) => {
 
               const count = await saveAllCredentials(credentials, clientKey);
               //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", count + " credentials synchronised.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                count + " credentials synchronised.").then(_ => {
                 window.close();
               });
             }
@@ -413,7 +442,9 @@ getLocalValue("linked").then(async (linked) => {
 
           destroySessionKey();
 
-          bsAlert("Error", "You haven't opened the app in reasonable time or the host or port is wrong.").then(_ => {
+          bsAlert(
+            chrome.i18n.getMessage("titleError"), 
+            "You haven't opened the app in reasonable time or the host or port is wrong.").then(_ => {
             window.close();
           });
         });
@@ -517,7 +548,9 @@ getLocalValue("linked").then(async (linked) => {
           });
         }
       } catch(e) {
-        bsAlert("Error", "Something went wrong! Re-link the app to solve this problem.").then(_ => {
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          "Something went wrong! Re-link the app to solve this problem.").then(_ => {
           window.close();
         });
         console.error("cannot fetch credential", e)
@@ -552,7 +585,7 @@ async function loadAlternativeServersToUi(currentServer) {
   }
   alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
   const hostSelector = document.getElementById("host_selector");
-  hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
+  hostSelector.innerHTML = "<option selected> - " + chrome.i18n.getMessage("lblChooseHostAlternative") + " - </option>";
   
   if (alternativeServers.length > 0) {
     hostSelector.classList.remove("d-none");

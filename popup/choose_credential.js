@@ -1,3 +1,11 @@
+
+document.getElementById("search_input").placeholder = chrome.i18n.getMessage("lblSearchCredentials");
+document.getElementById("search_input").title = chrome.i18n.getMessage("tooltipSearchCredentials");
+document.getElementById("subtitle").innerText = chrome.i18n.getMessage("lblLocalVault");
+document.getElementById("fetch_credential").title = chrome.i18n.getMessage("tooltipFetchSingleCredential");
+document.getElementById("create_credential").title = chrome.i18n.getMessage("tooltipCreateNewCredential");
+
+
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 
 
@@ -168,7 +176,7 @@ async function loadCredentials(url, list) {
   console.debug("matches", matches);
 
   if (matches.length > 0) {
-    renderSection("Suggested", list);
+    renderSection(chrome.i18n.getMessage("lblSuggestedCredentialSection"), list);
 
     matches.forEach(credential => {
       renderCredential(credential, list);
@@ -177,17 +185,23 @@ async function loadCredentials(url, list) {
     renderLine(list);
   }
 
-  renderSection("All", list);
+  if (credentials.length > 0) {
+    renderSection(chrome.i18n.getMessage("lblAllCredentialSection"), list);
+    credentials.forEach(credential => {
+      renderCredential(credential, list);
+    });
+  }
+  else {
+    document.getElementById("vault_status").innerText = " - " + chrome.i18n.getMessage("lblNoLocalCredentials") + " - ";
+  }
 
-  credentials.forEach(credential => {
-    renderCredential(credential, list);
-  });
+  
 }
 
 function updateVaultUi(unlocked) {
   if (unlocked) {
     document.getElementById("lock_icon").innerText = "lock_open";
-    document.getElementById("lock").title = "Lock local vault";
+    document.getElementById("lock").title = chrome.i18n.getMessage("titleLockLocalVault");
     document.getElementById("hint").classList.add("d-none");
     document.getElementById("search_group").classList.remove("d-none");
 
@@ -196,9 +210,9 @@ function updateVaultUi(unlocked) {
   }
   else {
     document.getElementById("lock_icon").innerText = "lock";
-    document.getElementById("lock").title = "Unlock local vault";
+    document.getElementById("lock").title = chrome.i18n.getMessage("titleUnlockLocalVault");
     document.getElementById("hint").classList.remove("d-none");
-    document.getElementById("hint").innerText = "Local vault is locked, unlock first or fetch credential from the app.";
+    document.getElementById("hint").innerText = chrome.i18n.getMessage("messageLocalVaultIsLocked");
     const list = document.getElementById("credential_list");
     list.innerHTML = "";
     document.getElementById("search_group").classList.add("d-none");
