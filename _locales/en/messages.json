@@ -493,6 +493,36 @@
     },
     "errorMessageRequestTimedOut": {
         "message": "You didn't open the app in reasonable time or the app address or port is incorrect."
+    },
+    "successMessageCredentialsImported": {
+        "message": "$count$ credentials imported.",
+        "description" : "Success message of fetching many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialsSynchronised": {
+        "message": "$count$ credentials synchronised.",
+        "description" : "Success message of synchronising many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialSynchronised": {
+        "message": "Credential '$name$' synchronised.",
+        "description" : "Success message of synchronising one particular credential",
+        "placeholders": {
+            "name": {
+              "content": "$1",
+              "example": "Github"
+            }
+          }
     }
     
 }

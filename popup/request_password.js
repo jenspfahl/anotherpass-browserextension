@@ -392,7 +392,7 @@ getLocalValue("linked").then(async (linked) => {
               //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
-                count + " credentials imported.").then(_ => {
+                chrome.i18n.getMessage("successMessageCredentialsImported", count)).then(_ => {
                 window.close();
               });
             }
@@ -409,7 +409,7 @@ getLocalValue("linked").then(async (linked) => {
               //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
-                "Credential synchronised.").then(_ => {
+                chrome.i18n.getMessage("successMessageCredentialSynchronised", credential.name)).then(_ => {
                 window.close();
               });
             } 
@@ -421,7 +421,7 @@ getLocalValue("linked").then(async (linked) => {
               //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
-                count + " credentials synchronised.").then(_ => {
+                chrome.i18n.getMessage("successMessageCredentialsSynchronised", count)).then(_ => {
                 window.close();
               });
             }

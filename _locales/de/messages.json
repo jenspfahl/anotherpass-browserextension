@@ -496,6 +496,36 @@
     },
     "errorMessageRequestTimedOut": {
         "message": "Die App wurde nicht innerhalb einer angemessenen Zeit geöffnet oder die App-Adresse oder der Port stimmt nicht überein."
+    },
+    "successMessageCredentialsImported": {
+        "message": "$count$ Zugangsdaten importiert.",
+        "description" : "Success message of fetching many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialsSynchronised": {
+        "message": "$count$ Zugangsdaten synchronisiert.",
+        "description" : "Success message of synchronising many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialSynchronised": {
+        "message": "Zugangsdaten '$name$' synchronisiert.",
+        "description" : "Success message of synchronising one particular credential",
+        "placeholders": {
+            "name": {
+              "content": "$1",
+              "example": "Github"
+            }
+          }
     }
 
 }
