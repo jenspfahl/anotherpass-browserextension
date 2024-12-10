@@ -39,6 +39,10 @@
         "message": "Close",
         "description" : "Button label for closing something"
     },
+    "lblImportAndClose": {
+        "message": "Import and Close",
+        "description" : "Button label for importing a credential and closing something"
+    },
     "vaultUnlocked": {
         "message": "Vault unlocked",
         "description" : "Lock status about the local vault"
@@ -50,6 +54,10 @@
     "localVaultLocked": {
         "message": "local vault locked",
         "description" : "states that the local vault is explicitly locked"
+    },
+    "messageLocalVaultUnlocked": {
+        "message": "Local vault has been unlocked.",
+        "description" : "states that the local vault is explicitly unlocked"
     },
     "wordCredentials": {
         "message": "credentials",
@@ -470,6 +478,21 @@
     },
     "lblAppRequestSaveSelection": {
         "message": "Save my selection in the local vault"
+    },
+    "errorMessageExtensionNotLinked": {
+        "message": "The extension is not linked with an ANOTHERpass app! Please link it first."
+    },
+    "errorMessageRequestRejected": {
+        "message": "The request has been rejected in the app or the app vault was locked."
+    },
+    "errorMessageCommunicationFailure": {
+        "message": "Failed to communicate with the app. Updating the app could solve this problem."
+    },
+    "errorMessageSomethingWentWrong": {
+        "message": "Something went wrong. Make sure you have the latest version installed. If this error persists, please report it."
+    },
+    "errorMessageRequestTimedOut": {
+        "message": "You didn't open the app in reasonable time or the app address or port is incorrect."
     }
     
 }

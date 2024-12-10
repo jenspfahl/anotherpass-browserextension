@@ -42,12 +42,12 @@ document.addEventListener("click", async (e) => {
     if (!newServer || newServer == "") {
       bsAlert(
         chrome.i18n.getMessage("titleError"), 
-        "A handle, hostname or IP address is required");
+        chrome.i18n.getMessage("errorMessageMissingAppServer"));
     }
     else if (!isValidIPAdressOrHostnameOrHandle(newServer)) {
       bsAlert(
         chrome.i18n.getMessage("titleError"), 
-        "Invalid handle, hostname or IP address");
+        chrome.i18n.getMessage("errorMessageInvalidAppServer"));
     }
     else {
       await addNewAlternativeServer(newServer);
@@ -64,7 +64,11 @@ document.addEventListener("click", async (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
-    document.getElementById("copy").innerText = "Copied!";
+    document.getElementById("copy").innerHTML = `
+    <span id="copy" class="material-symbols-outlined size-24">
+    check
+    </span>
+    `;
   }
   else if (e.target.id === "password_field") {
     document.getElementById("password_field").innerText = _credential.password;
@@ -79,7 +83,7 @@ getLocalValue("linked").then(async (linked) => {
   if (!linked) {
     bsAlert(
       chrome.i18n.getMessage("titleError"), 
-      "Extension not linked with an app! Please link it first.").then(_ => {
+      chrome.i18n.getMessage("errorMessageExtensionNotLinked")).then(_ => {
       window.close();
     });
   } 
@@ -294,7 +298,7 @@ getLocalValue("linked").then(async (linked) => {
 
             bsAlert(
               chrome.i18n.getMessage("titleWarning"), 
-              "The request has been rejected in the app or the vault was locked.").then(_ => {
+              chrome.i18n.getMessage("errorMessageRequestRejected")).then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -309,7 +313,7 @@ getLocalValue("linked").then(async (linked) => {
 
             bsAlert(
               chrome.i18n.getMessage("titleError"), 
-              "Failed to communicate to the app. Updating the app could solve this problem. <br><code>Error: " + response.error + "</code>").then(_ => {
+              chrome.i18n.getMessage("errorMessageCommunicationFailure") + "<br><code>Error: " + response.error + "</code>").then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -358,7 +362,7 @@ getLocalValue("linked").then(async (linked) => {
                 console.error("No target tabId but expected");
                 bsAlert(
                   chrome.i18n.getMessage("titleError"), 
-                  "Something went wrong.").then(_ => {
+                  chrome.i18n.getMessage("errorMessageSomethingWentWrong")).then(_ => {
                   window.close();
                 });
               }
@@ -375,7 +379,7 @@ getLocalValue("linked").then(async (linked) => {
               //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
-                "Local vault unlocked.").then(_ => {
+                chrome.i18n.getMessage("messageLocalVaultUnlocked")).then(_ => {
                 window.close();
               });
             }
@@ -444,7 +448,7 @@ getLocalValue("linked").then(async (linked) => {
 
           bsAlert(
             chrome.i18n.getMessage("titleError"), 
-            "You haven't opened the app in reasonable time or the host or port is wrong.").then(_ => {
+            chrome.i18n.getMessage("errorMessageRequestTimedOut")).then(_ => {
             window.close();
           });
         });
@@ -478,13 +482,13 @@ getLocalValue("linked").then(async (linked) => {
 
 
           bsConfirm(
-            "Credential '" + credential.name + "'", 
+            chrome.i18n.getMessage("lblCredential") + " '" + credential.name + "'", 
             `
             <div class="container text-left">
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      Website:
+                    ${chrome.i18n.getMessage("lblWebsite")}:
                     </div>
                   </div>
                   <div class="col-8">
@@ -499,7 +503,7 @@ getLocalValue("linked").then(async (linked) => {
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      User:
+                    ${chrome.i18n.getMessage("lblUser")}:
                     </div>
                   </div>
                   <div class="col-8">
@@ -509,28 +513,33 @@ getLocalValue("linked").then(async (linked) => {
                   </div>
                 
                 </div>
-            
+        
+
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      Password:
+                    ${chrome.i18n.getMessage("lblPassword")}:
                     </div>
                   </div>
                   <div class="col-8">
                     <div class="mb-1">
                       <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
-                      <button type="button" id="copy" title="Copy password to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+                
+                      <button class="btn pt-0 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                        <span id="copy" class="material-symbols-outlined size-24">
+                        content_copy
+                        </span>
+                      </button>
                     </div>
                   </div>
-                
                 </div>
 
 
               </div>
 
             `,
-            "Import and Close",
-            "Close"
+            chrome.i18n.getMessage("lblImportAndClose"),
+            chrome.i18n.getMessage("lblClose")
           )
           .then(async (decision) => {
             console.log("decision:" + decision);
@@ -550,7 +559,7 @@ getLocalValue("linked").then(async (linked) => {
       } catch(e) {
         bsAlert(
           chrome.i18n.getMessage("titleError"), 
-          "Something went wrong! Re-link the app to solve this problem.").then(_ => {
+          chrome.i18n.getMessage("errorMessageSomethingWentWrong")).then(_ => {
           window.close();
         });
         console.error("cannot fetch credential", e)

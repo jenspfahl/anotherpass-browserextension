@@ -39,6 +39,10 @@
         "message": "Schließen",
         "description" : "Button label for closing something"
     },
+    "lblImportAndClose": {
+        "message": "Importiern und Schließen",
+        "description" : "Button label for importing a credential and closing something"
+    },
     "vaultUnlocked": {
         "message": "Tresor entsperrt",
         "description" : "Lock status about the local vault"
@@ -50,6 +54,10 @@
     "localVaultLocked": {
         "message": "lokaler Tresor gesperrt",
         "description" : "states that the local vault is explicitly locked"
+    },
+    "messageLocalVaultUnlocked": {
+        "message": "Lokaler Tresor wurde entsperrt",
+        "description" : "states that the local vault is explicitly unlocked"
     },
     "wordCredentials": {
         "message": "Zugangsdaten",
@@ -473,6 +481,21 @@
     },
     "lblAppRequestSaveSelection": {
         "message": "Auswahl im lokalen Tresor speichern"
+    },
+    "errorMessageExtensionNotLinked": {
+        "message": "Die Erweiterung ist nicht mit einer ANOTHERpass-App verknüpft! Bitte verknüfen sie erst."
+    },
+    "errorMessageRequestRejected": {
+        "message": "Die Anfrage wurde in der App abgelehnt oder der App-Tresor war gesperrt."
+    },
+    "errorMessageCommunicationFailure": {
+        "message": "Kommunikation mit der App fehlgeschlagen. Ein Update der App könnte dieses Problem lösen."
+    },
+    "errorMessageSomethingWentWrong": {
+        "message": "Etwas ist schief gelaufen. Stelle sicher, dass die neueste Version installiert wurde. Sollte dieser Fehler weiterhin bestehen, melde ihn bitte."
+    },
+    "errorMessageRequestTimedOut": {
+        "message": "Die App wurde nicht innerhalb einer angemessenen Zeit geöffnet oder die App-Adresse oder der Port stimmt nicht überein."
     }
 
 }
