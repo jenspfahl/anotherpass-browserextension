@@ -144,6 +144,10 @@
   content: "__MSG_lblSettingsIconOpacity__";
 }
 
+.translatedSettingsHostWithAppName::before {
+  content: "__MSG_lblSettingsHostWithAppName__";
+}
+
 .translatedSettingsHost::before {
   content: "__MSG_lblSettingsHost__";
 }

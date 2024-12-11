@@ -151,27 +151,30 @@ getLocalValue("linked").then(async (linked) => {
     });
 
 
+    let requestText;
     if (requestData.command === "get_client_key") {
-      document.getElementById("instruction").innerText = "Requesting to unlock local vault .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageUnlockLocalVault";
     }
     else if (requestData.command === "fetch_multiple_credentials") {
-      document.getElementById("instruction").innerText = "Requesting to fetch multiple credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageFetchCredentials";
     }  
     else if (requestData.command === "fetch_all_credentials") {
-      document.getElementById("instruction").innerText = "Requesting to fetch ALL credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageFetchAllCredentials";
     }
     else if (requestData.command === "fetch_credentials_for_uids") {
-      document.getElementById("instruction").innerText = "Requesting to synchronize local vault.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageSyncLocalVault";
     }
     else if (requestData.command === "create_credential_for_url") {
-      document.getElementById("instruction").innerText = "Requesting to create a new credential in the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageCreateNewCredential";
     }
     else if (requestData.command === "download_vault_backup") {
-      document.getElementById("instruction").innerText = "Requesting to download the vault backup file from the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageDownloadVaultFile";
     }
     else {
-      document.getElementById("instruction").innerText = "Requesting a credential .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageFetchAnyCredential";
     }
+
+    document.getElementById("instruction").innerHTML = "<strong>" + chrome.i18n.getMessage(requestText) + " .. </strong><p><small>" + chrome.i18n.getMessage("textAppRequestHint") + "</small>";
 
     console.debug("requestData", requestData);
     const targetUrl = requestData.website;

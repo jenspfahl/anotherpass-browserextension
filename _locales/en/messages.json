@@ -39,6 +39,10 @@
         "message": "Close",
         "description" : "Button label for closing something"
     },
+    "lblNext": {
+        "message": "Next",
+        "description" : "Button label for moving to the next step"
+    },
     "lblImportAndClose": {
         "message": "Import and Close",
         "description" : "Button label for importing a credential and closing something"
@@ -343,8 +347,11 @@
     "lblSettingsIconOpacity": {
         "message": "Opacity of this icon"
     },
-    "lblSettingsHost": {
+    "lblSettingsHostWithAppName": {
         "message": "ANOTHERpass app hostname, handle or IP address"
+    },
+    "lblSettingsHost": {
+        "message": "Hostname, handle or IP address"
     },
     "lblSettingsPort": {
         "message": "and its port",
@@ -521,6 +528,94 @@
             "name": {
               "content": "$1",
               "example": "Github"
+            }
+          }
+    },
+    "textAppRequestHint": {
+        "message": "Take your mobile device, open the ANOTHERpass app, start the server and follow the instructions."
+    },
+    "lblAppRequestMessageUnlockLocalVault": {
+        "message": "Request to unlock local vault"
+    },
+    "lblAppRequestMessageFetchCredentials": {
+        "message": "Request to fetch multiple credentials"
+    },
+    "lblAppRequestMessageFetchAllCredentials": {
+        "message": "Request to fetch ALL credentials"
+    },
+    "lblAppRequestMessageSyncLocalVault": {
+        "message": "Request to synchronize local vault"
+    },
+    "lblAppRequestMessageCreateNewCredential": {
+        "message": "Request to create a new credential in the app"
+    },
+    "lblAppRequestMessageDownloadVaultFile": {
+        "message": "Request to download the vault backup file from the app"
+    },
+    "lblAppRequestMessageFetchAnyCredential": {
+        "message": "Request to fetch a credential"
+    },
+    "messageAppVaultFileDownload": {
+        "message": "Although the vault backup file is encrypted, it contains metadata about your vault. You should only download the vault backup file in a trusted local network. Continue?"
+    },
+    "messageSettingsSaved": {
+        "message": "Settings sucessfully updated."
+    },
+    "titleAppLinking": {
+        "message": "Link with the ANOTHERpass app"
+    },
+    "titleAppReLinking": {
+        "message": "Relink with the ANOTHERpass app"
+    },
+    "messageAppLinking": {
+        "message": "Scan this QR code with the ANOTHERpass app, enter the provided app address and click Next. The linking-process may take a few minutes."
+    },
+    "messageAppReLinking": {
+        "message": "Open the ANOTHERpass app with vault id $vaultId$, scan the QR code below, enter the provided app address and click Next. The re-linking-process may take a few minutes.",
+        "placeholders": {
+            "vaultId": {
+              "content": "$1",
+              "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAlreadyLinked": {
+        "message": "This extension is already linked with the app!"
+    },
+    "titleConfirmAppLink": {
+        "message": "Confirm app link $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "messageConfirmAppLink": {
+        "message": "Ensure that the fingerprint $fingerprint$ matches the one shown in the app and don't forget to accept there too.",
+        "placeholders": {
+            "fingerprint": {
+              "content": "$1",
+              "example": "AB-CDE-FG"
+            }
+          }
+    },
+    "lblConfirmAppLinkYesSame": {
+        "message": "Yes, same"
+    },
+    "lblConfirmAppLinkNoDifferent": {
+        "message": "No, different!"
+    },
+    "successMessageAppLink": {
+        "message": "The extension was successfully linked to the vault $vaultId$ with the link identifier $linkId$.",
+        "placeholders": {
+            "vaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "linkId": {
+                "content": "$2",
+                "example": "ABC-DEF"
             }
           }
     }

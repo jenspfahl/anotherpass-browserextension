@@ -16,7 +16,7 @@
         "description" : "Info text"
     },
     "extensionHelp1": {
-        "message": "Mit dieser Browsererweiterung kann auf einen verbundenen <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a>-Tresor zugegriffen werden.",
+        "message": "Mit dieser Browsererweiterung kann auf einen verknüpften <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a>-Tresor zugegriffen werden.",
         "description" : "1. Help chapter"
     },
     "extensionHelp2": {
@@ -24,7 +24,7 @@
         "description" : "2. Help chapter"
     },
     "extensionHelp3": {
-        "message": "Als Erstes musst du die Erweiterug mit der ANOTHERpass App verbinden. Klicke dafür auf das Verbinden-Symbol &#128279; oben :-)",
+        "message": "Als Erstes musst du die Erweiterug mit der ANOTHERpass App verknüpfen. Klicke dafür auf das Verbinden-Symbol &#128279; oben :-)",
         "description" : "3. Help chapter"
     },
     "lblOk": {
@@ -38,6 +38,10 @@
     "lblClose": {
         "message": "Schließen",
         "description" : "Button label for closing something"
+    },
+    "lblNext": {
+        "message": "Weiter",
+        "description" : "Button label for moving to the next step"
     },
     "lblImportAndClose": {
         "message": "Importiern und Schließen",
@@ -158,7 +162,7 @@
         "description" : "Button label to initiate the app flow to unlock the local vault"
     },
     "lblLinkedState": {
-        "message": "Verbunden (als $linkId$)",
+        "message": "Verknüpft (als $linkId$)",
         "description" : "Label to indicate a linked extension (with the app) and the link id",
         "placeholders": {
             "linkId": {
@@ -168,17 +172,17 @@
           }
     },
     "lblNotLinkedState": {
-        "message": "Nicht verbunden",
+        "message": "Nicht verknüpft",
         "description" : "Label to indicate an unlinked extension (with the app)"
     },
     "titleLinkTheApp": {
-        "message": "Mit der ANOTHERpass-App verbinden"
+        "message": "Mit der ANOTHERpass-App verknüpfen"
     },
     "titleUnlinkFromApp": {
         "message": "Von der App trennen"
     },
     "messageUnlinkFromApp": {
-        "message": "Soll wirklich die Verbindung zur App mit der Link-ID $linkId$ getrennt werden? Es wird auch der lokale Tresor komplett gelöscht werden.",
+        "message": "Soll wirklich die Verknüpfung zur App mit der Link-ID $linkId$ getrennt werden? Es wird auch der lokale Tresor komplett gelöscht werden.",
         "placeholders": {
             "linkId": {
               "content": "$1",
@@ -234,10 +238,10 @@
         "message": "Rufe alle, außer verschleierte, Zugangsdaten aus der App ab"
     },
     "lblDownloadBackupFile": {
-        "message": "Tresor-Backupdatei herunterladen"
+        "message": "Tresor-Sicherungsdatei herunterladen"
     },
     "tooltipDownloadBackupFile": {
-        "message": "Lade eine verschlüsselte Backup-Datei des App-Tresors herunter"
+        "message": "Lade eine verschlüsselte Sicherungsdatei des App-Tresors herunter"
     },
     "tooltipSynchronizeAll": {
         "message": "Synchronisiere alle lokalen Zugangsdaten mit der App"
@@ -343,8 +347,11 @@
     "lblSettingsIconOpacity": {
         "message": "Deckkraft dieses Icons"
     },
+    "lblSettingsHostWithAppName": {
+        "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass-App"
+    },
     "lblSettingsHost": {
-        "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass App"
+        "message": "Hostname, Handle oder IP-Addresse"
     },
     "lblSettingsPort": {
         "message": "und der Port",
@@ -373,7 +380,7 @@
         "message": "Zurücks."
     },
     "lblRelink": {
-        "message": "Erneut verbinden"
+        "message": "Erneut verknüpfen"
     },
     "lblUpdate": {
         "message": "Aktualisieren"
@@ -483,7 +490,7 @@
         "message": "Auswahl im lokalen Tresor speichern"
     },
     "errorMessageExtensionNotLinked": {
-        "message": "Die Erweiterung ist nicht mit einer ANOTHERpass-App verknüpft! Bitte verknüfen sie erst."
+        "message": "Die Erweiterung ist nicht mit einer ANOTHERpass-App verknüpft!"
     },
     "errorMessageRequestRejected": {
         "message": "Die Anfrage wurde in der App abgelehnt oder der App-Tresor war gesperrt."
@@ -524,6 +531,95 @@
             "name": {
               "content": "$1",
               "example": "Github"
+            }
+          }
+    },
+    "textAppRequestHint": {
+        "message": "Nimm dein Mobilgerät, öffne die ANOTHERpass-App, starte den Server und folge den Anweisungen."
+    },
+    "lblAppRequestMessageUnlockLocalVault": {
+        "message": "Anfrage zum Entsperren des lokalen Tresors"
+    },
+    "lblAppRequestMessageFetchCredentials": {
+        "message": "Anfrage zum Abrufen mehrerer Zugangsdaten"
+    },
+    "lblAppRequestMessageFetchAllCredentials": {
+        "message": "Anfrage zum Abrufen ALLER Zugangsdaten"
+    },
+    "lblAppRequestMessageSyncLocalVault": {
+        "message": "Anfrage zum Synchronisieren des lokalen Tresors"
+    },
+    "lblAppRequestMessageCreateNewCredential": {
+        "message": "Anfrage zum Erstellen von Zugangsdaten in der App"
+    },
+    "lblAppRequestMessageDownloadVaultFile": {
+        "message": "Anfrage zum Herunterladen der Tresor-Sicherungsdatei von der App"
+    },
+    "lblAppRequestMessageFetchAnyCredential": {
+        "message": "Anfrage zum Abrufen von Zugangsdaten"
+    },
+    "messageAppVaultFileDownload": {
+        "message": "Obwohl die Tresor-Sicherungsdatei verschlüsselt ist, enthält sie Metadaten über den Tresor. Du solltest die Tresor-Sicherungsdatei nur in einem vertrauenswürdigen lokalen Netzwerk herunterladen. Fortfahren?"
+    },
+    "messageSettingsSaved": {
+        "message": "Einstellungen wurden gespeichert."
+    },
+    "titleAppLinking": {
+        "message": "Mit der ANOTHERpass-App verknüpfen"
+    },
+    "titleAppReLinking": {
+        "message": "Erneut mit der ANOTHERpass-App verknüpfen"
+    },
+    "messageAppLinking": {
+        "message": "Scanne diesen QR-Code mit der ANOTHERpass-App, gib die bereitgestellte App-Adresse ein und klicke auf Weiter. Der Vorgang kann einige Minuten dauern."
+    },
+    "messageAppReLinking": {
+        "message": "Öffne die ANOTHERpass-App mit der Tresor-ID $vaultId$, scanne den QR-Code unten, gebe die bereitgestellte App-Adresse ein und klicke auf Weiter. Der Vorgang kann einige Minuten dauern.",
+        "placeholders": {
+            "vaultId": {
+              "content": "$1",
+              "example": "fh2389fhdd34"
+            }
+          }
+    }
+    ,
+    "errorMessageAlreadyLinked": {
+        "message": "Die Erweiterung ist bereits mit der App verknüpft!"
+    },
+    "titleConfirmAppLink": {
+        "message": "Bestätige App-Verknüpfung $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "messageConfirmAppLink": {
+        "message": "Achte darauf, dass der Fingerabdruck $fingerprint$ mit dem in der App übereinstimmt und vergiß nicht, auch dort die Verknüpfung zu akzeptieren.",
+        "placeholders": {
+            "fingerprint": {
+              "content": "$1",
+              "example": "AB-CDE-FG"
+            }
+          }
+    },
+    "lblConfirmAppLinkYesSame": {
+        "message": "Ja, stimmt überein"
+    },
+    "lblConfirmAppLinkNoDifferent": {
+        "message": "Nein, ist unterschiedlich!"
+    },
+    "successMessageAppLink": {
+        "message": "Die Erweiterung wurde erfolgreich mit dem Tresor $vaultId$ und der Link-ID $linkId$ verknüpft.",
+        "placeholders": {
+            "vaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "linkId": {
+                "content": "$2",
+                "example": "ABC-DEF"
             }
           }
     }

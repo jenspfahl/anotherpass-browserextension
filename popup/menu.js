@@ -189,7 +189,9 @@ getLocalValue("linked").then(async (linked) => {
         await setTemporaryKey("render_content_icon", renderContentIcon);
         await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
 
-        bsAlert("Success", "Settings sucessfully updated.");
+        bsAlert(
+          chrome.i18n.getMessage("titleSuccess"), 
+          chrome.i18n.getMessage("messageSettingsSaved"));
       }
 
     }
@@ -335,8 +337,8 @@ getLocalValue("linked").then(async (linked) => {
     }
     else if (e.target.id === "download_vault_backup") {
 
-      bsConfirm("Warning", 
-      "Although the vault backup file is encrypted, it contains metadata about your vault. You should only download the vault backup file in a trusted local network. Continue?")
+      bsConfirm(chrome.i18n.getMessage("titleWarning"), 
+      chrome.i18n.getMessage("messageAppVaultFileDownload"))
       .then(async (decision) => {
         if (decision === true) {
           chrome.runtime.sendMessage({
