@@ -17,7 +17,9 @@ getLocalValue("linked").then((linked) => {
       const isLinking = result;
       if (isLinking) {
         console.log("linking concurrently in process");
-        bsAlert("Error", "It seems there a different linking phase in progress. Please finish or close this one first.").then(_ => {
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageAppLinkInProgress")).then(_ => {
           window.close();
         });
       }
@@ -184,12 +186,16 @@ async function linkApp(relink, webClientId) {
           if (response == null || response.response == null) {
             if (response.error) {
               console.error("linking error from server: " + response.error);
-              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app. <br><code>Error: " + response.error + "</code>");
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppHostUnreachable") + "<br><code>Error: " + response.error + "</code>");
               
             }
             else {
               console.error("linking error from server, see previous logs");
-              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppHostUnreachable"));
               
             }
             document.getElementById("next").disabled = false;
@@ -210,18 +216,24 @@ async function linkApp(relink, webClientId) {
             const appPublicKey = await jwkToPublicKey(jwk);
 
             // read apps vault id
-            const newVaultId = response.response.linkedVaultId;
+            const appVaultId = response.response.linkedVaultId;
             const currentVaultId = await getLocalValue("linked_vault_id")
-            if (relink && newVaultId !== currentVaultId) {
+            if (relink && appVaultId !== currentVaultId) {
               await deleteTemporaryKey("is_linking");
-              console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + newVaultId);
-              bsAlert("Error", "Cannot re-link to a different vault id (<b>" + newVaultId + "</b>). Current: <b>" + currentVaultId + "</b>").then(_ => {
+              console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + appVaultId);
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppVaultDiffers",
+                [
+                  "<b>" + appVaultId + "</b>",
+                  "<b>" + currentVaultId + "</b>"
+                ])).then(_ => {
                 window.close();
               });
               return;
             }
 
-            await setTemporaryKey("linked_vault_id", newVaultId);
+            await setTemporaryKey("linked_vault_id", appVaultId);
 
             // read app generated base key
             const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
@@ -246,7 +258,7 @@ async function linkApp(relink, webClientId) {
                 await setLocalValue("web_client_id", webClientId);
                 await setLocalValue("server_address", ip);
                 await setLocalValue("server_port", port);
-                await setLocalValue("linked_vault_id", newVaultId);
+                await setLocalValue("linked_vault_id", appVaultId);
                 await setLocalValue("symmetric_key_length", baseKeyAsArray.length * 8);
                 await setKey("client_keypair", clientKeyPair);
                 await setKey("app_public_key", appPublicKey);
@@ -266,7 +278,7 @@ async function linkApp(relink, webClientId) {
                   chrome.i18n.getMessage("titleSuccess"),
                   chrome.i18n.getMessage(
                     "successMessageAppLink",
-                    [ "<b>" + newVaultId + "</b>", 
+                    [ "<b>" + appVaultId + "</b>", 
                      "<b class=\"fingerprint\">" + webClientId + "</b>"])).then(_ => {
                   window.close();
                 });
@@ -276,7 +288,9 @@ async function linkApp(relink, webClientId) {
                 await deleteTemporaryKeys();
                 await destroySessionKey();
 
-                bsAlert("Failure", "Linking the extension has been denied in the app.").then(_ => {
+                bsAlert(
+                  chrome.i18n.getMessage("titleError"), 
+                  chrome.i18n.getMessage("errorMessageAppLinkDenied")).then(_ => {
                   window.close();
                 });
               }
@@ -287,7 +301,9 @@ async function linkApp(relink, webClientId) {
         },
         error => {
           console.error("unknown linking error from server: ", error);
-          bsAlert("Error", "Cannot link with the app due to an unknown problem. Open the app and try again. <br><code>Error: " + response.error + "</code>");
+          bsAlert(
+            chrome.i18n.getMessage("titleError"),
+            chrome.i18n.getMessage("errorMessageAppUnknownError") + "<br><code>Error: " + response.error + "</code>");
           document.getElementById("next").disabled = false;
           document.getElementById("host").disabled = false;
           document.getElementById("port").disabled = false;

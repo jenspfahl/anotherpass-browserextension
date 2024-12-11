@@ -622,6 +622,31 @@
                 "example": "ABC-DEF"
             }
           }
+    },
+    "errorMessageAppLinkDenied": {
+        "message": "Die Verknüpfung der Erweiterung wurde in der App verweigert."
+    },
+    "errorMessageAppUnknownError": {
+        "message": "Aufgrund eines unbekannten Problems kann keine Verbindung mit der App hergestellt werden. Öffne die App und versuche es erneut."
+    },
+    "errorMessageAppHostUnreachable": {
+        "message": "Keine Verbindung zur App möglich. Überprüfe, ob Handle, IP oder Hostname korrekt sind und ob der QR-Code mit der ANOTHERpass-App gescannt wurde."
+    },
+    "errorMessageAppVaultDiffers": {
+        "message": "Eine erneute Verknüpfung mit einem anderen Tresor ($remoteVaultId$) ist nicht möglich. Aktuelle Tresor-ID: $localVaultId$",
+        "placeholders": {
+            "remoteVaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "localVaultId": {
+                "content": "$2",
+                "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAppLinkInProgress": {
+        "message": "Es scheint, als ob eine andere Verknüpfung gerade etabliert wird. Bitte schließe eine von beiden."
     }
 
 }

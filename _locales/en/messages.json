@@ -618,6 +618,31 @@
                 "example": "ABC-DEF"
             }
           }
+    },
+    "errorMessageAppLinkDenied": {
+        "message": "Linking the extension has been denied in the app."
+    },
+    "errorMessageAppUnknownError": {
+        "message": "Cannot link with the app due to an unknown problem. Open the app and try again."
+    },
+    "errorMessageAppHostUnreachable": {
+        "message": "Unable to connect to the app. Check that the handle, IP or hostname are correct and that you have scanned the QR code with the ANOTHERpass app."
+    },
+    "errorMessageAppVaultDiffers": {
+        "message": "Cannot relink to a different vault id ($remoteVaultId$). Current: $localVaultId$",
+        "placeholders": {
+            "remoteVaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "localVaultId": {
+                "content": "$2",
+                "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAppLinkInProgress": {
+        "message": "It seems there a different linking phase in progress. Please finish or close this one first."
     }
     
 }
