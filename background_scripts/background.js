@@ -409,8 +409,8 @@ async function listLocalCredentials(url, sendResponse) {
     allCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
     suggestedCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
 
-    console.debug("credentials", allCredentialNames);
-    console.debug("matches", suggestedCredentialNames);
+    //console.debug("credentials", allCredentialNames);
+    //console.debug("matches", suggestedCredentialNames);
   
 
     sendResponse({matches: suggestedCredentialNames, credentials: allCredentialNames});

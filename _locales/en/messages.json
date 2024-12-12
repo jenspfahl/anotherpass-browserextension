@@ -47,6 +47,9 @@
         "message": "Import and Close",
         "description" : "Button label for importing a credential and closing something"
     },
+    "lblDontShowAgain": {
+        "message": "Don't show this message again."
+    },
     "vaultUnlocked": {
         "message": "Vault unlocked",
         "description" : "Lock status about the local vault"

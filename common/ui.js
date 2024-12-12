@@ -23,12 +23,24 @@ function updateExtensionIcon(unlocked) {
   }
 }
 
-async function bsAlert(title, message, closeLabel) {
+async function bsAlert(title, message, closeLabel, dontShowKey) {
     const modalElem = document.createElement('div');
     const lblClose = closeLabel || chrome.i18n.getMessage("lblClose");
 
     modalElem.id = "modal-confirm";
     modalElem.className = "modal";
+
+    let dontShowAgain = "";
+    if (dontShowKey) {
+      dontShowAgain = `
+          <div class="form-check mx-4">
+            <input class="form-check-input" type="checkbox" value="" id="dontShowAgain">
+            <label class="form-check-label" for="dontShowAgain">
+            <small>${chrome.i18n.getMessage("lblDontShowAgain")}</small>
+            </label>
+          </div>     
+      `;
+    }
     modalElem.innerHTML = `
       <div class="modal-dialog modal-dialog-centered _modal-dialog-scrollable">
         <div class="modal-content">
@@ -39,7 +51,8 @@ async function bsAlert(title, message, closeLabel) {
           <div class="modal-body fs-6 overflow-auto">
             ${message}
         </div>    
-        <div class="modal-footer">             
+        <div class="modal-footer">    
+         ${dontShowAgain}   
         <button id="modal-btn-ok" type="button" class="btn btn-primary rounded-0">${lblClose}</button>
         </div>
       </div>
@@ -50,6 +63,14 @@ async function bsAlert(title, message, closeLabel) {
       backdrop: 'static'
     });
     myModal.show();
+
+    if (dontShowKey) {
+      document.addEventListener("click", (e) => {
+        if (e.target.id === "dontShowAgain") {
+          setLocalValue(dontShowKey, e.target.checked);
+        }
+      });
+    }
   
     return new Promise((resolve, reject) => {
       document.body.addEventListener('click', response)

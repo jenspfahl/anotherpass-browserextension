@@ -208,6 +208,8 @@ getLocalValue("linked").then(async (linked) => {
 
       document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
+      removeLocalValue("dont_show_unlock_message_again");
+
     }
 
     if (e.target.id === "link") {

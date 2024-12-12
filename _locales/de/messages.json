@@ -47,6 +47,9 @@
         "message": "Importiern und Schließen",
         "description" : "Button label for importing a credential and closing something"
     },
+    "lblDontShowAgain": {
+        "message": "Diese Meldung nicht mehr anzeigen."
+    },
     "vaultUnlocked": {
         "message": "Tresor entsperrt",
         "description" : "Lock status about the local vault"
@@ -60,7 +63,7 @@
         "description" : "states that the local vault is explicitly locked"
     },
     "messageLocalVaultUnlocked": {
-        "message": "Lokaler Tresor wurde entsperrt",
+        "message": "Lokaler Tresor wurde entsperrt.",
         "description" : "states that the local vault is explicitly unlocked"
     },
     "wordCredentials": {

@@ -379,12 +379,21 @@ getLocalValue("linked").then(async (linked) => {
                 chrome.runtime.sendMessage({ action: "refresh_credential_dialog", tabId: targetTabId });
               }
 
-              //TODO close automatically if autoclose is enabled
-              bsAlert(
-                chrome.i18n.getMessage("titleSuccess"), 
-                chrome.i18n.getMessage("messageLocalVaultUnlocked")).then(_ => {
-                window.close();
-              });
+              const autoCloseUnlockDialog = await getLocalValue("dont_show_unlock_message_again");
+              if (autoCloseUnlockDialog) {
+                window.close();                
+              }
+              else {
+              
+                bsAlert(
+                  chrome.i18n.getMessage("titleSuccess"), 
+                  chrome.i18n.getMessage("messageLocalVaultUnlocked"),
+                  chrome.i18n.getMessage("lblClose"),
+                  "dont_show_unlock_message_again").then(_ => {
+                  window.close();
+                });   
+              }
+              
             }
             else if (requestData.command === "fetch_multiple_credentials" || requestData.command === "fetch_all_credentials") {
               const credentials = response.credentials;
@@ -392,7 +401,6 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
               const count = await saveAllCredentials(credentials, clientKey);
 
-              //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
                 chrome.i18n.getMessage("successMessageCredentialsImported", [count])).then(_ => {
@@ -409,7 +417,6 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
 
               saveCredential(credential, clientKey);
-              //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
                 chrome.i18n.getMessage("successMessageCredentialSynchronised", credential.name)).then(_ => {
@@ -421,7 +428,6 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
 
               const count = await saveAllCredentials(credentials, clientKey);
-              //TODO close automatically if autoclose is enabled
               bsAlert(
                 chrome.i18n.getMessage("titleSuccess"), 
                 chrome.i18n.getMessage("successMessageCredentialsSynchronised", [count])).then(_ => {
