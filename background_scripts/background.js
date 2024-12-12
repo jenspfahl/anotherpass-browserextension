@@ -515,26 +515,34 @@ async function setupVaultPassword(password) {
   const clientKey = await getClientKey(true);
   if (clientKey) {
 
-    const exportedClientKey = await aesKeyToArray(clientKey);
+    try {
+      const exportedClientKey = await aesKeyToArray(clientKey);
 
 
-    const salt = createRandomValues(16);
-    await setLocalValue("local_v_salt", salt);
+      const salt = createRandomValues(16);
+      await setLocalValue("local_v_salt", bytesToBase64(salt)); 
+  
+      const aesKey = await deriveKeyFromPassword(password, salt);
 
-    const aesKey = await deriveKeyFromPassword(password, salt);
-    const aesEncryptedClientKey = await encryptMessage(aesKey, bytesToBase64(exportedClientKey));
+      const aesEncryptedClientKey = await encryptMessage(aesKey, bytesToBase64(exportedClientKey));
+  
+  
+      const keyPair = await getKey("client_keypair");
+      const appPublicKey = keyPair.publicKey;
 
-
-    const keyPair = await getKey("client_keypair");
-    const appPublicKey = keyPair.publicKey;
-    const rsaEncryptedClientKey = await encryptWithPublicKey(appPublicKey, new TextEncoder().encode(aesEncryptedClientKey));
-
-    await setLocalValue("local_v_key", bytesToBase64(rsaEncryptedClientKey));
+      const rsaEncryptedClientKey = await encryptWithPublicKey(appPublicKey, new TextEncoder().encode(aesEncryptedClientKey));
+  
+      await setLocalValue("local_v_key", bytesToBase64(rsaEncryptedClientKey));
+    }
+    catch(e) {
+      console.error("Cannot save password", e);
+      throw e;
+    }
   }
 }
 
 async function loadClientKeyFromStorage(password) {
-  const salt = await getLocalValue("local_v_salt");
+  const salt = base64ToBytes(await getLocalValue("local_v_salt"));
   const encryptedClientKey = await getLocalValue("local_v_key");
   
   if (salt && encryptedClientKey) {

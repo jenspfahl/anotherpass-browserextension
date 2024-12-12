@@ -377,10 +377,10 @@
         "message": "Speichern"
     },
     "lblReset": {
-        "message": "Zurücks."
+        "message": "Zurücksetzen"
     },
     "lblRelink": {
-        "message": "Erneut verknüpfen"
+        "message": "App erneut verknüpfen"
     },
     "lblUpdate": {
         "message": "Aktualisieren"

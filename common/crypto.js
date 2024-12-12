@@ -549,14 +549,14 @@ async function createIndex(targetUrl) {
 
 async function deriveKeyFromPassword(password, salt) {
   const enc = new TextEncoder();
-  const passwordKey = await window.crypto.subtle.importKey(
+  const passwordKey = await crypto.subtle.importKey(
     "raw",
     enc.encode(password),
     "PBKDF2",
     false,
     ["deriveBits", "deriveKey"],
   );
-  return await window.crypto.subtle.deriveKey(
+  return await crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
       salt: salt,

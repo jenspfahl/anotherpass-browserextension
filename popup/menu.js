@@ -744,19 +744,21 @@ function updateMenuUi(webClientId, linked) {
 
 (async () => {
 
-  const clientKey = await getClientKey();
-  updateVaultUi(clientKey);
-
-  if (!clientKey) {
-    console.debug("Local vault locked, nothing to display");
-    return;
+  const linked = await getLocalValue("linked");
+  if (linked) {
+    const clientKey = await getClientKey();
+    updateVaultUi(clientKey);
+  
+    if (!clientKey) {
+      console.debug("Local vault locked, nothing to display");
+      return;
+    }
+    else {
+  
+      await loadCredentials(clientKey);
+     
+    }
   }
-  else {
-
-    await loadCredentials(clientKey);
-   
-  }
-
 
  
 })()

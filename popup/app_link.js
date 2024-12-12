@@ -38,7 +38,7 @@ getLocalValue("linked").then((linked) => {
         let webClientId;
         if (relink) {
           document.getElementById("headline").innerHTML = chrome.i18n.getMessage("titleAppReLinking");
-          document.getElementById("instruction").innerHTML = chrome.i18n.getMessage("messageAppReLinking", "<b>" + currentVaultId + "</b>");
+          document.getElementById("instruction").innerHTML = chrome.i18n.getMessage("messageAppReLinking", ["<b>" + currentVaultId + "</b>"]);
           webClientId = await getLocalValue("web_client_id");
         }
         else {
