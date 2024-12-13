@@ -149,7 +149,7 @@
           }
     },
     "messageUnlockLocalVault": {
-        "message": "Gib das Passwort ein um den lokalen Tresor zu entsperren oder verwende die ANOTHERpass App.",
+        "message": "Gib das Passwort ein, um den lokalen Tresor zu entsperren oder verwende die ANOTHERpass App.",
         "description" : "Message of a dialog to unlock the local vault with a password or the app"
     },
     "errorMessageUnlockLocalVault": {
