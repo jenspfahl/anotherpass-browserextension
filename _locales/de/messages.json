@@ -1,0 +1,655 @@
+{
+    "extName": {
+        "message": "ANOTHERpass Browsererweiterung",
+        "description" : "Name of the extension"
+    },
+    "extDescription": {
+        "message": "Verwende ANOTHERpass im Browser",
+        "description" : "Description of the extension"
+    },
+    "extensionCap": {
+        "message": "Erweiterung",
+        "description" : "Single wording of extension, Capitalised"
+    },
+    "extensionInfo": {
+        "message": "Die ANOTHERpass Erweiterung ist unter GPLv3 lizensiert. Lizenz und Quellcode kann <a href=\"https://github.com/jenspfahl/anotherpass-webext\" target=\"_blank\">hier</a> eingesehen werden.",
+        "description" : "Info text"
+    },
+    "extensionHelp1": {
+        "message": "Mit dieser Browsererweiterung kann auf einen verknüpften <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a>-Tresor zugegriffen werden.",
+        "description" : "1. Help chapter"
+    },
+    "extensionHelp2": {
+        "message": "Um die Erweiterung benutzen zu können, benötigst du die <a href=\"https://anotherpass.jepfa.de/download\" target=\"_blank\">ANOTHERpass Android-App</a> auf deinem Mobilgerät. Mehr Informationen über die Erweiterung findest du <a href=\"https://anotherpass.jepfa.de/extension\" target=\"_blank\">hier</a>.",
+        "description" : "2. Help chapter"
+    },
+    "extensionHelp3": {
+        "message": "Als Erstes musst du die Erweiterug mit der ANOTHERpass App verknüpfen. Klicke dafür auf das Verbinden-Symbol &#128279; oben :-)",
+        "description" : "3. Help chapter"
+    },
+    "lblOk": {
+        "message": "Ok",
+        "description" : "Button label for confirming something"
+    },
+    "lblCancel": {
+        "message": "Abbrechen",
+        "description" : "Button label for canelling something"
+    },
+    "lblClose": {
+        "message": "Schließen",
+        "description" : "Button label for closing something"
+    },
+    "lblNext": {
+        "message": "Weiter",
+        "description" : "Button label for moving to the next step"
+    },
+    "lblImportAndClose": {
+        "message": "Importiern und Schließen",
+        "description" : "Button label for importing a credential and closing something"
+    },
+    "lblDontShowAgain": {
+        "message": "Diese Meldung nicht mehr anzeigen."
+    },
+    "vaultUnlocked": {
+        "message": "Tresor entsperrt",
+        "description" : "Lock status about the local vault"
+    },
+    "vaultLocked": {
+        "message": "Tresor gesperrt",
+        "description" : "Lock status about the local vault"
+    },
+    "localVaultLocked": {
+        "message": "lokaler Tresor gesperrt",
+        "description" : "states that the local vault is explicitly locked"
+    },
+    "messageLocalVaultUnlocked": {
+        "message": "Lokaler Tresor wurde entsperrt.",
+        "description" : "states that the local vault is explicitly unlocked"
+    },
+    "wordCredentials": {
+        "message": "Zugangsdaten",
+        "description" : "Plural for credential"
+    },
+    "lblNoLocalCredentials": {
+        "message": "keine gespeicherten Zugangsdaten",
+        "description" : "Indicates no stored local credentials in the local vault"
+    },
+    "lblPassword": {
+        "message": "Passwort",
+        "description" : "A label for a password input field"
+    },
+    "lblRepeatPassword": {
+        "message": "Passwort wiederholen",
+        "description" : "A label for a repeat-password input field"
+    },
+    "hintInputPassword": {
+        "message": "Verwende ein schwer zu erratenes Passwort",
+        "description" : "A hint as tooltip on password input fields"
+    },
+    "errorPasswordTooShort": {
+        "message": "Passwort zu kurz!",
+        "description" : "Error shown if a password entered in a password field is too short"
+    },
+    "errorPasswordDiffers": {
+        "message": "Passwortwiederholung ist unterschiedlich!",
+        "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
+    },
+    "titleSuccess": {
+        "message": "Erfolg",
+        "description" : "Success-Title of alert dialogs"
+    },
+    "titleWarning": {
+        "message": "Warnung",
+        "description" : "Warning-Title of alert dialogs"
+    },
+    "titleError": {
+        "message": "Fehler",
+        "description" : "Error-Title of alert dialogs"
+    },
+    "titleConfigureLocalVaultPassword": {
+        "message": "Setze ein Passwort für den lokalen Tresor",
+        "description" : "Title of a dialog to configure a local vault password"
+    },
+    "messageConfigureLocalVaultPassword": {
+        "message": "Für mehr Komfort kann ein Passwort für den lokalen Tresor erstellt werden, um den lokalen Tresor zu entsperren, ohne die ANOTHERpass-App verwenden zu müssen. Du kannst weiterhin die App jederzeit zum Entsperren verwenden.",
+        "description" : "Message of a dialog to configure a local vault password"
+    },
+    "successMessageConfigureLocalVaultPassword": {
+        "message": "Passwort für lokalen Tresor erstellt.",
+        "description" : "Success-Message of a dialog after configuring a local vault password"
+    },
+    "titleRemoveLocalVaultPassword": {
+        "message": "Entferne Passwort für den lokalen Tresor",
+        "description" : "Title of a dialog to remove the configured local vault password"
+    },
+    "messageRemoveLocalVaultPassword": {
+        "message": "Möchtest du wirklich das Passwort für den lokalen Tresor entfernen? Das bedeutet, dass du den lokalen Tresor nur mit der ANOTHERpass-App entsperren kannst.",
+        "description" : "Message of a dialog to remove the configured local vault password"
+    },
+    "successMessageRemoveLocalVaultPassword": {
+        "message": "Passwort für lokalen Tresor entfernt.",
+        "description" : "Success-Message of a dialog after removing the local vault password"
+    },
+    "titleLockLocalVault": {
+        "message": "Lokalen Tresor sperren",
+        "description" : "Title of a dialog to lock the local vault"
+    },
+    "titleUnlockLocalVault": {
+        "message": "Lokalen Tresor entsperren",
+        "description" : "Title of a dialog to unlock the local vault with a password or the app"
+    },
+    "successMessageUnlockLocalVault": {
+        "message": "Erweiterung erfolgreich von der App getrennt! Nun kannst du das verknüpfte Gerät $linkId$ von der App entfernen.",
+        "description" : "Success message of a dialog if unlocking the local vault with a password was successful",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "messageUnlockLocalVault": {
+        "message": "Gib das Passwort ein, um den lokalen Tresor zu entsperren oder verwende die ANOTHERpass App.",
+        "description" : "Message of a dialog to unlock the local vault with a password or the app"
+    },
+    "errorMessageUnlockLocalVault": {
+        "message": "Lokaler Tresor konnte nicht mit dem angegebenen Passwort entsperrt werden. Falsches Passwort?",
+        "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
+    },
+    "messageLocalVaultIsLocked": {
+        "message": "Lokaler Tresor muss erst entsperrt oder Zugangsdaten von der App abgefragt werden.",
+        "description" : "More comprehensive message displayed if the local vault is locked"
+    },
+    "lblUseTheApp": {
+        "message": "Verwende die App",
+        "description" : "Button label to initiate the app flow to unlock the local vault"
+    },
+    "lblLinkedState": {
+        "message": "Verknüpft (als $linkId$)",
+        "description" : "Label to indicate a linked extension (with the app) and the link id",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblNotLinkedState": {
+        "message": "Nicht verknüpft",
+        "description" : "Label to indicate an unlinked extension (with the app)"
+    },
+    "titleLinkTheApp": {
+        "message": "Mit der ANOTHERpass-App verknüpfen"
+    },
+    "titleUnlinkFromApp": {
+        "message": "Von der App trennen"
+    },
+    "messageUnlinkFromApp": {
+        "message": "Soll wirklich die Verknüpfung zur App mit der Link-ID $linkId$ getrennt werden? Es wird auch der lokale Tresor komplett gelöscht werden.",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblUnlink": {
+        "message": "Trennen",
+        "description" : "Label on a buton to unlink the extension"
+    },
+    "linkedVaultId": {
+        "message": "mit App-Tresor ID",
+        "description" : "To what ANOTHERpass vault id the extension is linked to"
+    },
+    "titleLinkDetails": {
+        "message": "Verknüpfungsdetails für $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblLocalVault": {
+        "message": "Lokaler Tresor"
+    },
+    "lblSettings": {
+        "message": "Einstellungen"
+    },
+    "lblHelp": {
+        "message": "Hilfe"
+    },
+    "lblAbout": {
+        "message": "Über die Erweiterung"
+    },
+    "tooltipFetchSingleCredential": {
+        "message": "Rufe einzelne Zugangsdaten aus der App ab"
+    },
+    "tooltipCreateNewCredential": {
+        "message": "Neue Zugangsdaten in der App erstellen"
+    },
+    "lblFetchMultipleCredentials": {
+        "message": "Mehrere Zugangsdaten abrufen"
+    },
+    "tooltipFetchMultipleCredentials": {
+        "message": "Rufe mehrere Zugangsdaten aus der App ab"
+    },
+    "lblFetchAllCredentials": {
+        "message": "Alle Zugangsdaten abrufen"
+    },
+    "tooltipFetchAllCredentials": {
+        "message": "Rufe alle, außer verschleierte, Zugangsdaten aus der App ab"
+    },
+    "lblDownloadBackupFile": {
+        "message": "Tresor-Sicherungsdatei herunterladen"
+    },
+    "tooltipDownloadBackupFile": {
+        "message": "Lade eine verschlüsselte Sicherungsdatei des App-Tresors herunter"
+    },
+    "tooltipSynchronizeAll": {
+        "message": "Synchronisiere alle lokalen Zugangsdaten mit der App"
+    },
+    "lblSearchCredentials": {
+        "message": "Durchsuche Zugangsdaten"
+    },
+    "tooltipSearchCredentials": {
+        "message": "Suche nach Zugangsdaten im lokalen Tresor"
+    },
+    "lblSortOrderDesc": {
+        "message": "Absteigend sortieren"
+    },
+    "lblSortOrderAsc": {
+        "message": "Aufsteigend sortieren"
+    },
+    "tooltipSortOrder": {
+        "message": "Die Sortierreihenfolge der loken Zugangsdaten ändern"
+    },
+    "titleDeleteAllLocalCredentials": {
+        "message": "Lösche alle lokalen Zugangsdaten"
+    },
+    "messageDeleteAllLocalCredentials": {
+        "message": "Sollen wirklich alle Zugangsdaten des lokalen Tresors gelöscht werden? Es werden keine Zugangsdaten in der App gelöscht."
+    },
+    "successMessageDeleteAllLocalCredentials": {
+        "message": "Der lokale Tresor ist jetzt leer."
+    },
+    "tooltipDeleteAllLocalCredentials": {
+        "message": "Lösche alle lokalen Zugangsdaten vom lokalen Tresor"
+    },
+    "lblCredential": {
+        "message": "Zugangsdaten",
+        "description": "A label used to combine with a credential name"
+    },
+    "tooltipCopyPassword": {
+        "message": "Kopiere Passwort in die Zwischenablage"
+    },
+    "successMessagePasswordCopied": {
+        "message": "Passwort in die Zwischenablage kopiert."
+    },
+    "lblImportedAt": {
+        "message": "Importiert am"
+    },
+    "lblWebsite": {
+        "message": "Webseite"
+    },
+    "lblUser": {
+        "message": "Nutzer"
+    },
+    "lblApplyCredentialToWebsite": {
+        "message": "Auf Webseite anwenden"
+    },
+    "tooltipApplyCredentialToWebsite": {
+        "message": "Wende diese Zugangsdaten auf der aktuellen Webseite an"
+    },
+    "lblSyncCredentialWithApp": {
+        "message": "Synchronisieren"
+    },
+    "tooltipSyncCredentialWithApp": {
+        "message": "Synchronisiere diese Zugangsdaten mit der App"
+    },
+    "lblDeleteCredential": {
+        "message": "Löschen"
+    },
+    "tooltipDeleteCredential": {
+        "message": "Lösche diese Zugangsdaten vom lokalen Tresor"
+    },
+    "titleDeleteCredential": {
+        "message": "Lösche '$credentialName$'",
+        "placeholders": {
+            "credentialName": {
+              "content": "$1",
+              "example": "Wikipedia"
+            }
+          }
+    },
+    "messageDeleteCredential": {
+        "message": "Sollen diese Zugangsdaten wirklich vom lokalen Tresor entfernt werden?"
+    },
+    "lblSettingsColorTheme": {
+        "message": "Farbgebung",
+        "description": "Means dark or light theme"
+    },
+    "lblSettingsColorThemeDark": {
+        "message": "Dunkel",
+        "description": "Means dark theme"
+    },
+    "lblSettingsColorThemeLight": {
+        "message": "Hell",
+        "description": "Means light theme"
+    },
+    "lblSettingsColorThemeAuto": {
+        "message": "Automatisch",
+        "description": "Means automatically light or dark theme, controlled by the OS"
+    },
+    "lblSettingsAutoLock": {
+        "message": "Minuten der Inaktivität nachdem der entsperrte lokale Tresor gesperrt wird"
+    },
+    "lblSettingsRenderIcon": {
+        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Icon (Aktualisierung der Webseite erforderlich, wenn dies geändert wurde)."
+    },
+    "lblSettingsIconOpacity": {
+        "message": "Deckkraft dieses Icons"
+    },
+    "lblSettingsHostWithAppName": {
+        "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass-App"
+    },
+    "lblSettingsHost": {
+        "message": "Hostname, Handle oder IP-Addresse"
+    },
+    "lblSettingsPort": {
+        "message": "und der Port",
+        "description": "hostname and port kind of belongs together"
+    },
+    "lblSettingsPollingTimeout": {
+        "message": "Die Erweiterung fragt Zugangsdaten mit diesem Zeitlimit in Sekunden ab",
+        "description": "How long shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsPollingIntervall": {
+        "message": "und fragt aller X Sekunden",
+        "description": "In which intervall shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsManageHostAlternatives": {
+        "message": "Alternativen verwalten",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblChooseHostAlternative": {
+        "message": "wähle einen alternative Adresse",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblSave": {
+        "message": "Speichern"
+    },
+    "lblReset": {
+        "message": "Zurücksetzen"
+    },
+    "lblRelink": {
+        "message": "App erneut verknüpfen"
+    },
+    "lblUpdate": {
+        "message": "Aktualisieren"
+    },
+    "errorMessageMissingAppServer": {
+        "message": "Ein Handle, ein Hostname oder eine IP-Adresse muss angegeben werden."
+    },
+    "errorMessageInvalidAppServer": {
+        "message": "Angegebenes Handle, Hostname oder IP-Adresse ist ungültig."
+    },
+    "errorMessageInvalidAppPort": {
+        "message": "Ein nummerischer Port-Wert ist erforderlich, welcher zwischen 1024 und 49151 sein muss."
+    },
+    "errorMessageInvalidPollingTimeout": {
+        "message": "Ungültiges Anfrage-Zeitlimit, muss zwischen 1 und 300 Sekunden sein."
+    },
+    "errorMessageInvalidPollingInterval": {
+        "message": "Ungültiger Polling-Wert, muss zwischen 1 und 60 Sekunden sein."
+    },
+    "errorMessageInvalidLockTimeout": {
+        "message": "Ungültige Zeitangabe zum Sperren des Tresors, muss zwischen 1 und 10080 Minuten sein."
+    },
+    "errorMessageInvalidOpacityValue": {
+        "message": "Ungültiger Icon-Deckkraft-Wert, muss zwischen 1 und 100 sein."
+    },
+    "titleManageServers": {
+        "message": "Alternative App-Adressen verwalten"
+    },
+    "messageManageServers": {
+        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein. Änderungen an dieser Liste wirken sich nicht auf die aktuell konfigurierte Hostadresse aus."
+    }
+    ,
+    "tooltipResolvedHandle": {
+        "message": "Dieses Handle entspricht der IP $ip$",
+        "description" : "Explains which IP address is encoded in this handle",
+        "placeholders": {
+            "ip": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+
+    },
+    "lblAppHost": {
+        "message": "IP, Handle oder Hostname",
+        "description": "Indicates the app host as hostname, IP address or handle"
+    },
+    "lblNotes": {
+        "message": "Hinweis",
+        "description": "Indicates general notes"
+    },
+    "lblNewHostAddress": {
+        "message": "Neue Host-Adresse"
+    },
+    "lblCurrentHostAddress": {
+        "message": "Aktuelle Host-Addresse"
+    },
+    "errorMessageInvalidAppHost": {
+        "message": "IP, Handle oder Hostname ist ungültig"
+    },
+    "lblAddressMarkedForDeletion": {
+        "message": "$address$ zum Löschen vorgesehen",
+        "description" : "Explains that the given app host address is going to be removed once saved.",
+        "placeholders": {
+            "address": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblOpenCredentialChooser": {
+        "message": "Öffne Auswahldialog"
+    }
+    ,
+    "lblRequestCredential": {
+        "message": "Zugangsdaten abfragen"
+    },
+    "lblCreateCredential": {
+        "message": "Neue Zugangsdaten erstellen"
+    },
+    "lblSuggestedCredentialSection": {
+        "message": "Vorschläge"
+    },
+    "lblAllCredentialSection": {
+        "message": "Alle"
+    },
+    "titleRequestApproval" : {
+        "message": "Genehmigung über die ANOTHERpass-App",
+        "description": "Title of any app-interative dialog"
+    },
+    "lblAppRequestAs": {
+        "message": "Anfragen als"
+    },
+    "lblAppRequestFingerprint": {
+        "message": "Mit Fingerprint"
+    },
+    "lblAppRequestTo": {
+        "message": "An App-Adresse"
+    },
+    "lblAppRequestForWebsite": {
+        "message": "Für Webseite"
+    },
+    "lblAppRequestRememberSelection": {
+        "message": "Auswahl für diese Webseite merken"
+    },
+    "lblAppRequestSaveSelection": {
+        "message": "Auswahl im lokalen Tresor speichern"
+    },
+    "errorMessageExtensionNotLinked": {
+        "message": "Die Erweiterung ist nicht mit einer ANOTHERpass-App verknüpft!"
+    },
+    "errorMessageRequestRejected": {
+        "message": "Die Anfrage wurde in der App abgelehnt oder der App-Tresor war gesperrt."
+    },
+    "errorMessageCommunicationFailure": {
+        "message": "Kommunikation mit der App fehlgeschlagen. Ein Update der App könnte dieses Problem lösen."
+    },
+    "errorMessageSomethingWentWrong": {
+        "message": "Etwas ist schief gelaufen. Stelle sicher, dass die neueste Version installiert wurde. Sollte dieser Fehler weiterhin bestehen, melde ihn bitte."
+    },
+    "errorMessageRequestTimedOut": {
+        "message": "Die App wurde nicht innerhalb einer angemessenen Zeit geöffnet oder die App-Adresse oder der Port stimmt nicht überein."
+    },
+    "successMessageCredentialsImported": {
+        "message": "$count$ Zugangsdaten importiert.",
+        "description" : "Success message of fetching many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialsSynchronised": {
+        "message": "$count$ Zugangsdaten synchronisiert.",
+        "description" : "Success message of synchronising many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialSynchronised": {
+        "message": "Zugangsdaten '$name$' synchronisiert.",
+        "description" : "Success message of synchronising one particular credential",
+        "placeholders": {
+            "name": {
+              "content": "$1",
+              "example": "Github"
+            }
+          }
+    },
+    "textAppRequestHint": {
+        "message": "Nimm dein Mobilgerät, öffne die ANOTHERpass-App, starte den Server und folge den Anweisungen."
+    },
+    "lblAppRequestMessageUnlockLocalVault": {
+        "message": "Anfrage zum Entsperren des lokalen Tresors"
+    },
+    "lblAppRequestMessageFetchCredentials": {
+        "message": "Anfrage zum Abrufen mehrerer Zugangsdaten"
+    },
+    "lblAppRequestMessageFetchAllCredentials": {
+        "message": "Anfrage zum Abrufen ALLER Zugangsdaten"
+    },
+    "lblAppRequestMessageSyncLocalVault": {
+        "message": "Anfrage zum Synchronisieren des lokalen Tresors"
+    },
+    "lblAppRequestMessageCreateNewCredential": {
+        "message": "Anfrage zum Erstellen von Zugangsdaten in der App"
+    },
+    "lblAppRequestMessageDownloadVaultFile": {
+        "message": "Anfrage zum Herunterladen der Tresor-Sicherungsdatei von der App"
+    },
+    "lblAppRequestMessageFetchAnyCredential": {
+        "message": "Anfrage zum Abrufen von Zugangsdaten"
+    },
+    "messageAppVaultFileDownload": {
+        "message": "Obwohl die Tresor-Sicherungsdatei verschlüsselt ist, enthält sie Metadaten über den Tresor. Du solltest die Tresor-Sicherungsdatei nur in einem vertrauenswürdigen lokalen Netzwerk herunterladen. Fortfahren?"
+    },
+    "messageSettingsSaved": {
+        "message": "Einstellungen wurden gespeichert."
+    },
+    "titleAppLinking": {
+        "message": "Mit der ANOTHERpass-App verknüpfen"
+    },
+    "titleAppReLinking": {
+        "message": "Erneut mit der ANOTHERpass-App verknüpfen"
+    },
+    "messageAppLinking": {
+        "message": "Scanne diesen QR-Code mit der ANOTHERpass-App, gib die bereitgestellte App-Adresse ein und klicke auf Weiter. Der Vorgang kann einige Minuten dauern."
+    },
+    "messageAppReLinking": {
+        "message": "Öffne die ANOTHERpass-App mit der Tresor-ID $vaultId$, scanne den QR-Code unten, gebe die bereitgestellte App-Adresse ein und klicke auf Weiter. Der Vorgang kann einige Minuten dauern.",
+        "placeholders": {
+            "vaultId": {
+              "content": "$1",
+              "example": "fh2389fhdd34"
+            }
+          }
+    }
+    ,
+    "errorMessageAlreadyLinked": {
+        "message": "Die Erweiterung ist bereits mit der App verknüpft!"
+    },
+    "titleConfirmAppLink": {
+        "message": "Bestätige App-Verknüpfung $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "messageConfirmAppLink": {
+        "message": "Achte darauf, dass der Fingerabdruck $fingerprint$ mit dem in der App übereinstimmt und vergiß nicht, auch dort die Verknüpfung zu akzeptieren.",
+        "placeholders": {
+            "fingerprint": {
+              "content": "$1",
+              "example": "AB-CDE-FG"
+            }
+          }
+    },
+    "lblConfirmAppLinkYesSame": {
+        "message": "Ja, stimmt überein"
+    },
+    "lblConfirmAppLinkNoDifferent": {
+        "message": "Nein, ist unterschiedlich!"
+    },
+    "successMessageAppLink": {
+        "message": "Die Erweiterung wurde erfolgreich mit dem Tresor $vaultId$ und der Link-ID $linkId$ verknüpft.",
+        "placeholders": {
+            "vaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "linkId": {
+                "content": "$2",
+                "example": "ABC-DEF"
+            }
+          }
+    },
+    "errorMessageAppLinkDenied": {
+        "message": "Die Verknüpfung der Erweiterung wurde in der App verweigert."
+    },
+    "errorMessageAppUnknownError": {
+        "message": "Aufgrund eines unbekannten Problems kann keine Verbindung mit der App hergestellt werden. Öffne die App und versuche es erneut."
+    },
+    "errorMessageAppHostUnreachable": {
+        "message": "Keine Verbindung zur App möglich. Überprüfe, ob Handle, IP oder Hostname korrekt sind und ob der QR-Code mit der ANOTHERpass-App gescannt wurde."
+    },
+    "errorMessageAppVaultDiffers": {
+        "message": "Eine erneute Verknüpfung mit einem anderen Tresor ($remoteVaultId$) ist nicht möglich. Aktuelle Tresor-ID: $localVaultId$",
+        "placeholders": {
+            "remoteVaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "localVaultId": {
+                "content": "$2",
+                "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAppLinkInProgress": {
+        "message": "Es scheint, als ob eine andere Verknüpfung gerade etabliert wird. Bitte schließe eine von beiden."
+    }
+
+}

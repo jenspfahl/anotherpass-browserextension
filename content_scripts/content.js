@@ -219,6 +219,7 @@ function addButton(input, opacityOfContentIcon) {
 
     const button = document.createElement('button');
     button.type = "button";
+    button.title = "ANOTHERpass";
     button.classList.add("requestCredentialButton");
 
     const inputHeight = input.clientHeight + 2;

@@ -46,6 +46,22 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
       });
 
       return true;  
+    }   
+
+    case "setup_vault_password": {
+      setupVaultPassword(message.password).then(() => {
+        sendResponse();
+      });
+
+      return true;  
+    }
+
+    case "unlock_with_password": {
+      loadClientKeyFromStorage(message.password).then((result) => {
+        sendResponse({result: result});
+      });
+
+      return true;  
     }
     
     case "update_extension_icon": {
@@ -217,7 +233,8 @@ getLocalValue("linked").then(async (linked) => {
 
 
 function closeAllCredentialDialogs() {
-  chrome.tabs.query({ currentWindow: false }, function (tabs) {
+
+  chrome.tabs.query({ }, function (tabs) {
 
     for (var i = 0; i < tabs.length; i++) {
       chrome.tabs.sendMessage(tabs[i].id, { action: "close_credential_dialog" });
@@ -228,7 +245,7 @@ function closeAllCredentialDialogs() {
 function createContextMenu() {
   chrome.contextMenus.create({
     id: "anotherpass-open-dialog",
-    title: "Open ANOTHERpass dialog",
+    title: chrome.i18n.getMessage("lblOpenCredentialChooser"),
     contexts: ["editable"],
   },
     () => void chrome.runtime.lastError
@@ -236,7 +253,7 @@ function createContextMenu() {
 
   chrome.contextMenus.create({
     id: "anotherpass-credential-request",
-    title: "Request credential from ANOTHERpass",
+    title: chrome.i18n.getMessage("lblRequestCredential"),
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
@@ -246,7 +263,7 @@ function createContextMenu() {
 
   chrome.contextMenus.create({
     id: "anotherpass-credential-create-request",
-    title: "Create new credential in ANOTHERpass",
+    title: chrome.i18n.getMessage("lblCreateCredential"),
     contexts: ["editable"],
   },
     // See https://extensionworkshop.com/documentation/develop/manifest-v3-migration-guide/#event-pages-and-backward-compatibility
@@ -345,6 +362,9 @@ async function listLocalCredentials(url, sendResponse) {
   const clientKey = await getClientKey(true);
 
   if (clientKey) {
+
+    updateExtensionIcon(true);
+
     
     const allCredentialNames = [];
     const suggestedCredentialNames = [];
@@ -389,8 +409,8 @@ async function listLocalCredentials(url, sendResponse) {
     allCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
     suggestedCredentialNames.sort((a,b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0));
 
-    console.debug("credentials", allCredentialNames);
-    console.debug("matches", suggestedCredentialNames);
+    //console.debug("credentials", allCredentialNames);
+    //console.debug("matches", suggestedCredentialNames);
   
 
     sendResponse({matches: suggestedCredentialNames, credentials: allCredentialNames});
@@ -437,10 +457,10 @@ async function linkToApp(sendResponse) {
 
 
 function openPasswordRequestDialog(command, tabId, website, credentialUid, user) {
-  var width = 660;
+  var width = 640;
   var height = 570;
   if (website) {
-    width = 680;
+    width = 660;
     height = 680;
   }
 
@@ -491,6 +511,69 @@ async function unlinkApp() {
 
 }
 
+async function setupVaultPassword(password) {
+  const clientKey = await getClientKey(true);
+  if (clientKey) {
+
+    try {
+      const exportedClientKey = await aesKeyToArray(clientKey);
+
+
+      const salt = createRandomValues(16);
+      await setLocalValue("local_v_salt", bytesToBase64(salt)); 
+  
+      const aesKey = await deriveKeyFromPassword(password, salt);
+
+      const aesEncryptedClientKey = await encryptMessage(aesKey, bytesToBase64(exportedClientKey));
+  
+  
+      const keyPair = await getKey("client_keypair");
+      const appPublicKey = keyPair.publicKey;
+
+      const rsaEncryptedClientKey = await encryptWithPublicKey(appPublicKey, new TextEncoder().encode(aesEncryptedClientKey));
+  
+      await setLocalValue("local_v_key", bytesToBase64(rsaEncryptedClientKey));
+    }
+    catch(e) {
+      console.error("Cannot save password", e);
+      throw e;
+    }
+  }
+}
+
+async function loadClientKeyFromStorage(password) {
+  const salt = base64ToBytes(await getLocalValue("local_v_salt"));
+  const encryptedClientKey = await getLocalValue("local_v_key");
+  
+  if (salt && encryptedClientKey) {
+
+    try {
+
+      const keyPair = await getKey("client_keypair");
+      const aesEncryptedClientKey = await decryptWithPrivateKey(keyPair.privateKey, base64ToBytes(encryptedClientKey));
+    
+      const aesKey = await deriveKeyFromPassword(password, salt);
+      const decryptedClientKey = await decryptMessage(aesKey, new TextDecoder().decode(aesEncryptedClientKey));
+
+
+      if (decryptedClientKey) {
+        await setTemporaryKey("clientKey", {
+          clientKey: decryptedClientKey,
+          timestamp: Date.now(),
+        }, true);
+        return true;
+      }
+      else {
+        console.warn("Cannot decrypt local clientKey");
+      }
+    } catch(e) {
+      console.error("cannot decrypt password", e);
+    }
+  }
+
+  return false;
+}
+
 
 // duplicate of ui.js 
 function updateExtensionIcon(unlocked) {
@@ -503,7 +586,7 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-open-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault unlocked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultUnlocked") + ")" });
   }
   else {
     chrome.action.setIcon({
@@ -514,6 +597,6 @@ function updateExtensionIcon(unlocked) {
         96: "/icons/anotherpass-96.png"
       },
     });
-    chrome.action.setTitle({ title: "ANOTHERpass (Vault locked)" });
+    chrome.action.setTitle({ title: "ANOTHERpass (" + chrome.i18n.getMessage("vaultLocked") + ")" });
   }
 }

@@ -1,3 +1,8 @@
+document.getElementById("cancel").innerHTML = chrome.i18n.getMessage("lblCancel");
+document.getElementById("next").innerHTML = chrome.i18n.getMessage("lblNext");
+document.getElementById("host").placeholder = chrome.i18n.getMessage("lblSettingsHostWithAppName");
+
+
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const relink = requestData.relink
 getLocalValue("linked").then((linked) => {
@@ -12,7 +17,9 @@ getLocalValue("linked").then((linked) => {
       const isLinking = result;
       if (isLinking) {
         console.log("linking concurrently in process");
-        bsAlert("Error", "It seems there a different linking phase in progress. Please finish or close this one first.").then(_ => {
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageAppLinkInProgress")).then(_ => {
           window.close();
         });
       }
@@ -30,12 +37,13 @@ getLocalValue("linked").then((linked) => {
   
         let webClientId;
         if (relink) {
-          document.getElementById("headline").innerHTML = "Re-link with ANOTHERpass app";
-          document.getElementById("instruction").innerHTML = "Open the ANOTHERpass app with vault id <b>" + currentVaultId + "</b>, scan the QR code below with the ANOTHERpass app, input the provided IP, hostname or handle and click Next. The re-linking may take a few minutes.";
+          document.getElementById("headline").innerHTML = chrome.i18n.getMessage("titleAppReLinking");
+          document.getElementById("instruction").innerHTML = chrome.i18n.getMessage("messageAppReLinking", ["<b>" + currentVaultId + "</b>"]);
           webClientId = await getLocalValue("web_client_id");
         }
         else {
-          document.getElementById("instruction").innerText = "Scan this QR code with the ANOTHERpass app, input the provided IP / hostname and click Next. The linking-process may take a few minutes.";
+          document.getElementById("headline").innerHTML = chrome.i18n.getMessage("titleAppLinking");
+          document.getElementById("instruction").innerText = chrome.i18n.getMessage("messageAppLinking");
           webClientId = generateWebClientId();
         }
   
@@ -49,17 +57,19 @@ getLocalValue("linked").then((linked) => {
         document.addEventListener("input", (e) => {
           if (e.target.id === "host") {
             e.target.title = "";
+            document.getElementById("next").disabled = false;
       
             if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
               e.target.classList.remove("invalid-state");
               const ipFromHandle = handleToIpAddress(e.target.value);
               if (ipFromHandle) {
-                e.target.title = "The handle will be translated to " + ipFromHandle;
+                e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);;
               }
             }
             else {
               e.target.classList.add("invalid-state");
-              e.target.title = "Server address invalid! Won't be stored.";
+              e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
+              document.getElementById("next").disabled = true;
             }
           }
         });
@@ -74,7 +84,9 @@ getLocalValue("linked").then((linked) => {
     });
   }
   else {
-    bsAlert("Error", "Extension already linked with the app!").then(_ => {
+    bsAlert(
+      chrome.i18n.getMessage("titleError"), 
+      chrome.i18n.getMessage("errorMessageAlreadyLinked")).then(_ => {
       window.close();
     });
   }
@@ -134,18 +146,26 @@ async function linkApp(relink, webClientId) {
       const port = parseInt(document.getElementById("port").value);
 
       if (!ip || ip == "") {
-        bsAlert("Error", "A handle, hostname or IP address is required");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageMissingAppServer"));      
       }
       else if (!isValidIPAdressOrHostnameOrHandle(ip)) {
-        bsAlert("Error", "Invalid handle, hostname or IP address");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidAppServer"));      
       }
       else if (isNaN(port) || port < 1024 || port > 49151) {
-        bsAlert("Error", "A nummeric port number is required, which should be between 1024 and 49151.");
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageInvalidAppPort"));      
       }
       else {
 
         // update UI
         document.getElementById("next").disabled = true; 
+        document.getElementById("host").disabled = true;
+        document.getElementById("port").disabled = true;
         document.querySelector("#loading_pad").style.display = '';
         document.querySelector("#qr_code_pad").style.display = 'none';
 
@@ -166,15 +186,21 @@ async function linkApp(relink, webClientId) {
           if (response == null || response.response == null) {
             if (response.error) {
               console.error("linking error from server: " + response.error);
-              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app. <br><code>Error: " + response.error + "</code>");
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppHostUnreachable") + "<br><code>Error: " + response.error + "</code>");
               
             }
             else {
               console.error("linking error from server, see previous logs");
-              bsAlert("Error", "Cannot link with the app. Check whether the handle, IP or hostname is correct and you have scanned the QR code with ANOTHERpass app.");
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppHostUnreachable"));
               
             }
             document.getElementById("next").disabled = false;
+            document.getElementById("host").disabled = false;
+            document.getElementById("port").disabled = false;
             document.querySelector("#loading_pad").style.display = 'none';
             document.querySelector("#qr_code_pad").style.display = '';
           }
@@ -190,18 +216,24 @@ async function linkApp(relink, webClientId) {
             const appPublicKey = await jwkToPublicKey(jwk);
 
             // read apps vault id
-            const newVaultId = response.response.linkedVaultId;
+            const appVaultId = response.response.linkedVaultId;
             const currentVaultId = await getLocalValue("linked_vault_id")
-            if (relink && newVaultId !== currentVaultId) {
+            if (relink && appVaultId !== currentVaultId) {
               await deleteTemporaryKey("is_linking");
-              console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + newVaultId);
-              bsAlert("Error", "Cannot re-link to a different vault id (<b>" + newVaultId + "</b>). Current: <b>" + currentVaultId + "</b>").then(_ => {
+              console.error("relink vault id mismatch: current: " + currentVaultId + ", new:" + appVaultId);
+              bsAlert(
+                chrome.i18n.getMessage("titleError"),
+                chrome.i18n.getMessage("errorMessageAppVaultDiffers",
+                [
+                  "<b>" + appVaultId + "</b>",
+                  "<b>" + currentVaultId + "</b>"
+                ])).then(_ => {
                 window.close();
               });
               return;
             }
 
-            await setTemporaryKey("linked_vault_id", newVaultId);
+            await setTemporaryKey("linked_vault_id", appVaultId);
 
             // read app generated base key
             const baseKeyAsArray = base64ToBytes(response.response.sharedBaseKey);
@@ -213,10 +245,10 @@ async function linkApp(relink, webClientId) {
             const publicKeyFingerprint = await getPublicKeyShortenedFingerprint(appPublicKey);
 
             bsConfirm(
-              "Confirm app link <b>" + webClientId + "</b>", 
-              "Ensure that the fingerprint <h1 class=\"fingerprint\">" + publicKeyFingerprint + "</h1> is the same as shown in the app and don't forget to accept there too.",
-              "Yes, same",
-              "No, different"
+              chrome.i18n.getMessage("titleConfirmAppLink", "<b>" + webClientId + "</b>"), 
+              chrome.i18n.getMessage("messageConfirmAppLink", "<h1 class=\"fingerprint\">" + publicKeyFingerprint + "</h1>"),
+              chrome.i18n.getMessage("lblConfirmAppLinkYesSame"),
+              chrome.i18n.getMessage("lblConfirmAppLinkNoDifferent")
             )
             .then(async (decision) => {
               if (decision === true) {
@@ -226,7 +258,7 @@ async function linkApp(relink, webClientId) {
                 await setLocalValue("web_client_id", webClientId);
                 await setLocalValue("server_address", ip);
                 await setLocalValue("server_port", port);
-                await setLocalValue("linked_vault_id", newVaultId);
+                await setLocalValue("linked_vault_id", appVaultId);
                 await setLocalValue("symmetric_key_length", baseKeyAsArray.length * 8);
                 await setKey("client_keypair", clientKeyPair);
                 await setKey("app_public_key", appPublicKey);
@@ -242,7 +274,12 @@ async function linkApp(relink, webClientId) {
 
                 await setTemporaryKey("linked", true);
 
-                bsAlert("Success", "Extension successfully linked to vault <b>" + newVaultId + "</b> with the link identifier <b class=\"fingerprint\">" + webClientId + "</b>.").then(_ => {
+                bsAlert(
+                  chrome.i18n.getMessage("titleSuccess"),
+                  chrome.i18n.getMessage(
+                    "successMessageAppLink",
+                    [ "<b>" + appVaultId + "</b>", 
+                     "<b class=\"fingerprint\">" + webClientId + "</b>"])).then(_ => {
                   window.close();
                 });
               }
@@ -251,7 +288,9 @@ async function linkApp(relink, webClientId) {
                 await deleteTemporaryKeys();
                 await destroySessionKey();
 
-                bsAlert("Failure", "Linking the extension has been denied in the app.").then(_ => {
+                bsAlert(
+                  chrome.i18n.getMessage("titleError"), 
+                  chrome.i18n.getMessage("errorMessageAppLinkDenied")).then(_ => {
                   window.close();
                 });
               }
@@ -262,8 +301,12 @@ async function linkApp(relink, webClientId) {
         },
         error => {
           console.error("unknown linking error from server: ", error);
-          bsAlert("Error", "Cannot link with the app due to an unknown problem. Open the app and try again. <br><code>Error: " + response.error + "</code>");
+          bsAlert(
+            chrome.i18n.getMessage("titleError"),
+            chrome.i18n.getMessage("errorMessageAppUnknownError") + "<br><code>Error: " + response.error + "</code>");
           document.getElementById("next").disabled = false;
+          document.getElementById("host").disabled = false;
+          document.getElementById("port").disabled = false;
           document.querySelector("#loading_pad").style.display = 'none';
           document.querySelector("#qr_code_pad").style.display = '';
         });

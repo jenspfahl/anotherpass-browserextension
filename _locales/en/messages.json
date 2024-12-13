@@ -1,0 +1,651 @@
+{
+    "extName": {
+        "message": "ANOTHERpass Browser Extension",
+        "description" : "Name of the extension"
+    },
+    "extDescription": {
+        "message": "Use ANOTHERpass in the browser",
+        "description" : "Description of the extension"
+    },
+    "extensionCap": {
+        "message": "Extension",
+        "description" : "Single wording of extension, Capitalised"
+    },
+    "extensionInfo": {
+        "message": "ANOTHERpass Extension is licensed under GPLv3. License and source code can be found <a href=\"https://github.com/jenspfahl/anotherpass-webext\" target=\"_blank\">here</a>.",
+        "description" : "Info text"
+    },
+    "extensionHelp1": {
+        "message": "This is an browser extension to access a linked <a href=\"https://anotherpass.jepfa.de\" target=\"_blank\">ANOTHERpass</a> vault.",
+        "description" : "1. Help chapter"
+    },
+    "extensionHelp2": {
+        "message": "To use this extension you need the <a href=\"https://anotherpass.jepfa.de/download\" target=\"_blank\">ANOTHERpass Android app</a> on your mobile device. More details about this extension can be found <a href=\"https://anotherpass.jepfa.de/extension\" target=\"_blank\">here</a>.",
+        "description" : "2. Help chapter"
+    },
+    "extensionHelp3": {
+        "message": "To get it working, you have to link the extension with your ANOTHERpass app by clicking on the link icon &#128279; displayed above :-)",
+        "description" : "3. Help chapter"
+    },
+    "lblOk": {
+        "message": "Ok",
+        "description" : "Button label for confirming something"
+    },
+    "lblCancel": {
+        "message": "Cancel",
+        "description" : "Button label for canelling something"
+    },
+    "lblClose": {
+        "message": "Close",
+        "description" : "Button label for closing something"
+    },
+    "lblNext": {
+        "message": "Next",
+        "description" : "Button label for moving to the next step"
+    },
+    "lblImportAndClose": {
+        "message": "Import and Close",
+        "description" : "Button label for importing a credential and closing something"
+    },
+    "lblDontShowAgain": {
+        "message": "Don't show this message again."
+    },
+    "vaultUnlocked": {
+        "message": "Vault unlocked",
+        "description" : "Lock status about the local vault"
+    },
+    "vaultLocked": {
+        "message": "Vault locked",
+        "description" : "Lock status about the local vault"
+    },
+    "localVaultLocked": {
+        "message": "local vault locked",
+        "description" : "states that the local vault is explicitly locked"
+    },
+    "messageLocalVaultUnlocked": {
+        "message": "Local vault has been unlocked.",
+        "description" : "states that the local vault is explicitly unlocked"
+    },
+    "wordCredentials": {
+        "message": "credentials",
+        "description" : "Plural for credential"
+    },
+    "lblNoLocalCredentials": {
+        "message": "no stored credentials",
+        "description" : "Indicates no stored local credentials in the local vault"
+    },
+    "lblPassword": {
+        "message": "Password",
+        "description" : "A label for a password field"
+    },
+    "lblRepeatPassword": {
+        "message": "Repeat password",
+        "description" : "A label for a repeat-password field"
+    },
+    "hintInputPassword": {
+        "message": "Remember to select a hard to guess password",
+        "description" : "A hint as tooltip on password input fields"
+    },
+    "errorPasswordTooShort": {
+        "message": "Password too short!",
+        "description" : "Error shown if a password entered in a password field is too short"
+    },
+    "errorPasswordDiffers": {
+        "message": "Repeated password differs!",
+        "description" : "Error shown if a password entered in a password field differs to the repeat-password field"
+    },
+    "titleSuccess": {
+        "message": "Success",
+        "description" : "Success-Title of alert dialogs"
+    },
+    "titleWarning": {
+        "message": "Warning",
+        "description" : "Warning-Title of alert dialogs"
+    },
+    "titleError": {
+        "message": "Error",
+        "description" : "Error-Title of alert dialogs"
+    },
+    "titleConfigureLocalVaultPassword": {
+        "message": "Configure local vault password",
+        "description" : "Title of a dialog to configure a local vault password"
+    },
+    "messageConfigureLocalVaultPassword": {
+        "message": "For more convinience you can configure a local vault password to unlock the local vault without the need of using the ANOTHERpass app. You may still use the app to unlock at any time.",
+        "description" : "Message of a dialog to configure a local vault password"
+    },
+    "successMessageConfigureLocalVaultPassword": {
+        "message": "Local vault password configured.",
+        "description" : "Success-Message of a dialog after configuring a local vault password"
+    },
+    "titleRemoveLocalVaultPassword": {
+        "message": "Remove local vault password",
+        "description" : "Title of a dialog to remove the configured local vault password"
+    },
+    "messageRemoveLocalVaultPassword": {
+        "message": "You are about to delete the local vault password. That means you will only be able to unlock the local vault with the ANOTHERpass app. Continue?",
+        "description" : "Message of a dialog to remove the configured local vault password"
+    },
+    "successMessageRemoveLocalVaultPassword": {
+        "message": "Local vault password removed.",
+        "description" : "Success-Message of a dialog after removing the local vault password"
+    },
+    "titleLockLocalVault": {
+        "message": "Lock local vault",
+        "description" : "Title of a dialog to lock the local vault"
+    },
+    "titleUnlockLocalVault": {
+        "message": "Unlock local vault",
+        "description" : "Title of a dialog to unlock the local vault with a password or the app"
+    },
+    "messageUnlockLocalVault": {
+        "message": "Enter the password to unlock the local vault or use the ANOTHERpass app.",
+        "description" : "Message of a dialog to unlock the local vault with a password or the app"
+    },
+    "successMessageUnlockLocalVault": {
+        "message": "Extension successfully un-linked from the app! You can now remove the linked device $linkId$ from your app.",
+        "description" : "Success message of a dialog if unlocking the local vault with a password was successful",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "errorMessageUnlockLocalVault": {
+        "message": "Cannot unlock the local vault with provided password. Wrong password?",
+        "description" : "Error message of a dialog if unlocking the local vault with a password has failed"
+    },
+    "messageLocalVaultIsLocked": {
+        "message": "Local vault is locked, unlock first or fetch credential from the app.",
+        "description" : "More comprehensive message displayed if the local vault is locked"
+    },
+    "lblUseTheApp": {
+        "message": "Use the app",
+        "description" : "Button label to initiate the app flow to unlock the local vault"
+    },
+    "lblLinkedState": {
+        "message": "Linked (as $linkId$)",
+        "description" : "Label to indicate a linked extension (with the app) and the link id",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblNotLinkedState": {
+        "message": "Not linked",
+        "description" : "Label to indicate an unlinked extension (with the app)"
+    },
+    "titleLinkTheApp": {
+        "message": "Link with ANOTHERpass app"
+    },
+    "titleUnlinkFromApp": {
+        "message": "Unlink from the app"
+    },
+    "messageUnlinkFromApp": {
+        "message": "Are you sure to unlink $linkId$ from the app? This will also wipe the local vault with all local credentials.",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblUnlink": {
+        "message": "Unlink",
+        "description" : "Label on a buton to unlink the extension"
+    },
+    "linkedVaultId": {
+        "message": "with app vault Id",
+        "description" : "To what ANOTHERpass vault id the extension is linked to"
+    },
+    "titleLinkDetails": {
+        "message": "Link details of $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "lblLocalVault": {
+        "message": "Local vault"
+    },
+    "lblSettings": {
+        "message": "Settings"
+    },
+    "lblHelp": {
+        "message": "Help"
+    },
+    "lblAbout": {
+        "message": "About this extension"
+    },
+    "tooltipFetchSingleCredential": {
+        "message": "Fetch single credential from the app"
+    },
+    "tooltipCreateNewCredential": {
+        "message": "Create new credential in the app"
+    },
+    "lblFetchMultipleCredentials": {
+        "message": "Fetch multiple credentials"
+    },
+    "tooltipFetchMultipleCredentials": {
+        "message": "Fetch a selection of credentials from the app"
+    },
+    "lblFetchAllCredentials": {
+        "message": "Fetch all credentials"
+    },
+    "tooltipFetchAllCredentials": {
+        "message": "Fetch all credential from the app, except veiled"
+    },
+    "lblDownloadBackupFile": {
+        "message": "Download vault backup file"
+    },
+    "tooltipDownloadBackupFile": {
+        "message": "Download the encrypted vault backup file from the app"
+    },
+    "tooltipSynchronizeAll": {
+        "message": "Synchronize all local credentials with the app"
+    },
+    "lblSearchCredentials": {
+        "message": "Search credentials"
+    },
+    "tooltipSearchCredentials": {
+        "message": "Search credentials in local vault"
+    },
+    "lblSortOrderDesc": {
+        "message": "Sort descending"
+    },
+    "lblSortOrderAsc": {
+        "message": "Sort ascending"
+    },
+    "tooltipSortOrder": {
+        "message": "Change the sort order of the local credentials"
+    },
+    "titleDeleteAllLocalCredentials": {
+        "message": "Delete all local credentials"
+    },
+    "messageDeleteAllLocalCredentials": {
+        "message": "Are you sure to delete all credentials from the local vault? This wont delete any credenial from the linked device."
+    },
+    "successMessageDeleteAllLocalCredentials": {
+        "message": "Local vault cleared."
+    },
+    "tooltipDeleteAllLocalCredentials": {
+        "message": "Delete all local credentials from the local vault"
+    },
+    "lblCredential": {
+        "message": "Credential",
+        "description": "A label used to combine with a credential name"
+    },
+    "tooltipCopyPassword": {
+        "message": "Copy password to clipboard"
+    },
+    "successMessagePasswordCopied": {
+        "message": "Password copied to the clipboard."
+    },
+    "lblImportedAt": {
+        "message": "Imported at"
+    },
+    "lblWebsite": {
+        "message": "Website"
+    },
+    "lblUser": {
+        "message": "Benutzer"
+    },
+    "lblApplyCredentialToWebsite": {
+        "message": "Apply on website"
+    },
+    "tooltipApplyCredentialToWebsite": {
+        "message": "Apply this credential on current website"
+    },
+    "lblSyncCredentialWithApp": {
+        "message": "Sync with app"
+    },
+    "tooltipSyncCredentialWithApp": {
+        "message": "Synchronise this credential with the app"
+    },
+    "lblDeleteCredential": {
+        "message": "Delete"
+    },
+    "tooltipDeleteCredential": {
+        "message": "Delete this credential from the local vault"
+    },
+    "titleDeleteCredential": {
+        "message": "Delete '$credentialName$'",
+        "placeholders": {
+            "credentialName": {
+              "content": "$1",
+              "example": "Wikipedia"
+            }
+          }
+    },
+    "messageDeleteCredential": {
+        "message": "Are you sure to delete this credential from the local vault?"
+    },
+    "lblSettingsColorTheme": {
+        "message": "Color theme",
+        "description": "Means dark or light theme"
+    },
+    "lblSettingsColorThemeDark": {
+        "message": "Dark",
+        "description": "Means dark theme"
+    },
+    "lblSettingsColorThemeLight": {
+        "message": "Light",
+        "description": "Means light theme"
+    },
+    "lblSettingsColorThemeAuto": {
+        "message": "Auto",
+        "description": "Means automatically light or dark theme, controlled by the OS"
+    },
+    "lblSettingsAutoLock": {
+        "message": "Minutes of inactivity after the unlocked local vault is locked"
+    },
+    "lblSettingsRenderIcon": {
+        "message": "Display a credential-icon in each username and password input field (website-reload is needed if this has been changed)"
+    },
+    "lblSettingsIconOpacity": {
+        "message": "Opacity of this icon"
+    },
+    "lblSettingsHostWithAppName": {
+        "message": "ANOTHERpass app hostname, handle or IP address"
+    },
+    "lblSettingsHost": {
+        "message": "Hostname, handle or IP address"
+    },
+    "lblSettingsPort": {
+        "message": "and its port",
+        "description": "hostname and port kind of belongs together"
+    },
+    "lblSettingsPollingTimeout": {
+        "message": "The extension polls for credentials with this timeout in seconds",
+        "description": "How long shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsPollingIntervall": {
+        "message": "and polls every X seconds",
+        "description": "In which intervall shall the extension poll the app host to retrieve data"
+    },
+    "lblSettingsManageHostAlternatives": {
+        "message": "Manage alternatives",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblChooseHostAlternative": {
+        "message": "choose an alternative address",
+        "description": "Means app host or handle or ip alternatives"
+    },
+    "lblSave": {
+        "message": "Save"
+    },
+    "lblReset": {
+        "message": "Reset"
+    },
+    "lblRelink": {
+        "message": "Relink the app again"
+    },
+    "lblUpdate": {
+        "message": "Update"
+    },
+    "errorMessageMissingAppServer": {
+        "message": "A handle, hostname or IP address is required."
+    },
+    "errorMessageInvalidAppServer": {
+        "message": "Invalid handle, hostname or IP address."
+    },
+    "errorMessageInvalidAppPort": {
+        "message": "A nummeric port number is required, which should be between 1024 and 49151."
+    },
+    "errorMessageInvalidPollingTimeout": {
+        "message": "Invalid polling timeout, should be a number between 1 and 300."
+    },
+    "errorMessageInvalidPollingInterval": {
+        "message": "Invalid polling interval, should be a number between 1 and 60."
+    },
+    "errorMessageInvalidLockTimeout": {
+        "message": "Invalid lock timeout, should be a number between 1 and 10080."
+    },
+    "errorMessageInvalidOpacityValue": {
+        "message": "Invalid icon opacity, should be a number between 1 and 100."
+    },
+    "titleManageServers": {
+        "message": "Manage alternative app hosts"
+    },
+    "messageManageServers": {
+        "message": "All app host addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in a different network, the address of the phone to connect can differ. Changing anything here doesn't effect the current configured host address."
+    },
+    "tooltipResolvedHandle": {
+        "message": "This handle will be translated to $ip$",
+        "description" : "Explains which IP address is encoded in this handle",
+        "placeholders": {
+            "ip": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblAppHost": {
+        "message": "IP, handle or hostname",
+        "description": "Indicates the app host as hostname, IP address or handle"
+    },
+    "lblNotes": {
+        "message": "Notes",
+        "description": "Indicates general notes"
+    },
+    "lblNewHostAddress": {
+        "message": "New host address"
+    },
+    "lblCurrentHostAddress": {
+        "message": "Current host address"
+    },
+    "errorMessageInvalidAppHost": {
+        "message": "IP, handle or hostname is invalid"
+    },
+    "lblAddressMarkedForDeletion": {
+        "message": "$address$ marked for deletion",
+        "description" : "Explains that the given app host address is going to be removed once saved.",
+        "placeholders": {
+            "address": {
+              "content": "$1",
+              "example": "172.29.0.1"
+            }
+          }
+    },
+    "lblOpenCredentialChooser": {
+        "message": "Open chooser dialog"
+    },
+    "lblRequestCredential": {
+        "message": "Request credential"
+    },
+    "lblCreateCredential": {
+        "message": "Create new credential"
+    },
+    "lblSuggestedCredentialSection": {
+        "message": "Suggested"
+    },
+    "lblAllCredentialSection": {
+        "message": "All"
+    },
+    "titleRequestApproval" : {
+        "message": "Request approval via the ANOTHERpass app",
+        "description": "Title of any app-interative dialog"
+    },
+    "lblAppRequestAs": {
+        "message": "Requesting as"
+    },
+    "lblAppRequestFingerprint": {
+        "message": "With fingerprint"
+    },
+    "lblAppRequestTo": {
+        "message": "To app address"
+    },
+    "lblAppRequestForWebsite": {
+        "message": "For website"
+    },
+    "lblAppRequestRememberSelection": {
+        "message": "Remember my selection for this website"
+    },
+    "lblAppRequestSaveSelection": {
+        "message": "Save my selection in the local vault"
+    },
+    "errorMessageExtensionNotLinked": {
+        "message": "The extension is not linked with an ANOTHERpass app! Please link it first."
+    },
+    "errorMessageRequestRejected": {
+        "message": "The request has been rejected in the app or the app vault was locked."
+    },
+    "errorMessageCommunicationFailure": {
+        "message": "Failed to communicate with the app. Updating the app could solve this problem."
+    },
+    "errorMessageSomethingWentWrong": {
+        "message": "Something went wrong. Make sure you have the latest version installed. If this error persists, please report it."
+    },
+    "errorMessageRequestTimedOut": {
+        "message": "You didn't open the app in reasonable time or the app address or port is incorrect."
+    },
+    "successMessageCredentialsImported": {
+        "message": "$count$ credentials imported.",
+        "description" : "Success message of fetching many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialsSynchronised": {
+        "message": "$count$ credentials synchronised.",
+        "description" : "Success message of synchronising many credentials",
+        "placeholders": {
+            "count": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
+    "successMessageCredentialSynchronised": {
+        "message": "Credential '$name$' synchronised.",
+        "description" : "Success message of synchronising one particular credential",
+        "placeholders": {
+            "name": {
+              "content": "$1",
+              "example": "Github"
+            }
+          }
+    },
+    "textAppRequestHint": {
+        "message": "Take your mobile device, open the ANOTHERpass app, start the server and follow the instructions."
+    },
+    "lblAppRequestMessageUnlockLocalVault": {
+        "message": "Request to unlock local vault"
+    },
+    "lblAppRequestMessageFetchCredentials": {
+        "message": "Request to fetch multiple credentials"
+    },
+    "lblAppRequestMessageFetchAllCredentials": {
+        "message": "Request to fetch ALL credentials"
+    },
+    "lblAppRequestMessageSyncLocalVault": {
+        "message": "Request to synchronize local vault"
+    },
+    "lblAppRequestMessageCreateNewCredential": {
+        "message": "Request to create a new credential in the app"
+    },
+    "lblAppRequestMessageDownloadVaultFile": {
+        "message": "Request to download the vault backup file from the app"
+    },
+    "lblAppRequestMessageFetchAnyCredential": {
+        "message": "Request to fetch a credential"
+    },
+    "messageAppVaultFileDownload": {
+        "message": "Although the vault backup file is encrypted, it contains metadata about your vault. You should only download the vault backup file in a trusted local network. Continue?"
+    },
+    "messageSettingsSaved": {
+        "message": "Settings sucessfully updated."
+    },
+    "titleAppLinking": {
+        "message": "Link with the ANOTHERpass app"
+    },
+    "titleAppReLinking": {
+        "message": "Relink with the ANOTHERpass app"
+    },
+    "messageAppLinking": {
+        "message": "Scan this QR code with the ANOTHERpass app, enter the provided app address and click Next. The linking-process may take a few minutes."
+    },
+    "messageAppReLinking": {
+        "message": "Open the ANOTHERpass app with vault id $vaultId$, scan the QR code below, enter the provided app address and click Next. The re-linking-process may take a few minutes.",
+        "placeholders": {
+            "vaultId": {
+              "content": "$1",
+              "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAlreadyLinked": {
+        "message": "This extension is already linked with the app!"
+    },
+    "titleConfirmAppLink": {
+        "message": "Confirm app link $linkId$",
+        "placeholders": {
+            "linkId": {
+              "content": "$1",
+              "example": "ABC-DEF"
+            }
+          }
+    },
+    "messageConfirmAppLink": {
+        "message": "Ensure that the fingerprint $fingerprint$ matches the one shown in the app and don't forget to accept there too.",
+        "placeholders": {
+            "fingerprint": {
+              "content": "$1",
+              "example": "AB-CDE-FG"
+            }
+          }
+    },
+    "lblConfirmAppLinkYesSame": {
+        "message": "Yes, same"
+    },
+    "lblConfirmAppLinkNoDifferent": {
+        "message": "No, different!"
+    },
+    "successMessageAppLink": {
+        "message": "The extension was successfully linked to the vault $vaultId$ with the link identifier $linkId$.",
+        "placeholders": {
+            "vaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "linkId": {
+                "content": "$2",
+                "example": "ABC-DEF"
+            }
+          }
+    },
+    "errorMessageAppLinkDenied": {
+        "message": "Linking the extension has been denied in the app."
+    },
+    "errorMessageAppUnknownError": {
+        "message": "Cannot link with the app due to an unknown problem. Open the app and try again."
+    },
+    "errorMessageAppHostUnreachable": {
+        "message": "Unable to connect to the app. Check that the handle, IP or hostname are correct and that you have scanned the QR code with the ANOTHERpass app."
+    },
+    "errorMessageAppVaultDiffers": {
+        "message": "Cannot relink to a different vault id ($remoteVaultId$). Current: $localVaultId$",
+        "placeholders": {
+            "remoteVaultId": {
+                "content": "$1",
+                "example": "fh2389fhdd34"
+            },
+            "localVaultId": {
+                "content": "$2",
+                "example": "fh2389fhdd34"
+            }
+          }
+    },
+    "errorMessageAppLinkInProgress": {
+        "message": "It seems there a different linking phase in progress. Please finish or close this one first."
+    }
+    
+}

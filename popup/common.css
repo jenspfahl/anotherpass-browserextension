@@ -86,6 +86,12 @@
   font-weight: 900;
 }
 
+.fingerprint_medium{
+  font-family: 'Roboto Mono Bold',monospace;
+  font-size: 19px;
+  font-weight: 900;
+}
+
 .menuSize {
   width: 400px;
   height: 600px;
@@ -100,4 +106,88 @@
 .invalid-state {
   color: red !important;
   border-color: red !important;
+}
+
+.translatedExtensionWord::before {
+  content: "__MSG_extensionCap__";
+}
+
+.translatedLinkedVaultId::before {
+  content: "__MSG_linkedVaultId__";
+}
+
+.translatedSettingsColorTheme::before {
+  content: "__MSG_lblSettingsColorTheme__";
+}
+
+.translatedSettingsColorThemeLight::before {
+  content: "__MSG_lblSettingsColorThemeLight__";
+}
+
+.translatedSettingsColorThemeDark::before {
+  content: "__MSG_lblSettingsColorThemeDark__";
+}
+
+.translatedSettingsColorThemeAuto::before {
+  content: "__MSG_lblSettingsColorThemeAuto__";
+}
+
+.translatedSettingsAutolockAuto::before {
+  content: "__MSG_lblSettingsAutoLock__";
+}
+
+.translatedSettingsRenderIcon::before {
+  content: "__MSG_lblSettingsRenderIcon__";
+}
+
+.translatedSettingsIconOpacity::before {
+  content: "__MSG_lblSettingsIconOpacity__";
+}
+
+.translatedSettingsHostWithAppName::before {
+  content: "__MSG_lblSettingsHostWithAppName__";
+}
+
+.translatedSettingsHost::before {
+  content: "__MSG_lblSettingsHost__";
+}
+
+.translatedSettingsPort::before {
+  content: "__MSG_lblSettingsPort__";
+}
+
+.translatedSettingsPollingTimeout::before {
+  content: "__MSG_lblSettingsPollingTimeout__";
+}
+
+.translatedSettingsPollingIntervall::before {
+  content: "__MSG_lblSettingsPollingIntervall__";
+}
+
+.translatedTitleRequestApproval::before {
+  content: "__MSG_titleRequestApproval__";
+}
+
+.translatedAppRequestAs::before {
+  content: "__MSG_lblAppRequestAs__";
+}
+
+.translatedAppRequestFingerprint::before {
+  content: "__MSG_lblAppRequestFingerprint__";
+}
+
+.translatedAppRequestTo::before {
+  content: "__MSG_lblAppRequestTo__";
+}
+
+.translatedAppRequestForWebsite::before {
+  content: "__MSG_lblAppRequestForWebsite__";
+}
+
+.translatedAppRequestRememberSelection::before {
+  content: "__MSG_lblAppRequestRememberSelection__";
+}
+
+.translatedAppRequestSaveSelection::before {
+  content: "__MSG_lblAppRequestSaveSelection__";
 }

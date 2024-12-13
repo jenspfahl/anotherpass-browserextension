@@ -1,3 +1,9 @@
+document.getElementById("update_server").innerHTML = chrome.i18n.getMessage("lblUpdate");
+document.getElementById("close").innerHTML = chrome.i18n.getMessage("lblCancel");
+document.getElementById("host").placeholder = chrome.i18n.getMessage("lblAppHost");
+
+
+
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const targetTabId = requestData.tabId;
 
@@ -34,17 +40,21 @@ document.addEventListener("click", async (e) => {
     const newServer = hostField.value;
 
     if (!newServer || newServer == "") {
-      bsAlert("Error", "A handle, hostname or IP address is required");
+      bsAlert(
+        chrome.i18n.getMessage("titleError"), 
+        chrome.i18n.getMessage("errorMessageMissingAppServer"));
     }
     else if (!isValidIPAdressOrHostnameOrHandle(newServer)) {
-      bsAlert("Error", "Invalid handle, hostname or IP address");
+      bsAlert(
+        chrome.i18n.getMessage("titleError"), 
+        chrome.i18n.getMessage("errorMessageInvalidAppServer"));
     }
     else {
       await addNewAlternativeServer(newServer);
       await loadAlternativeServersToUi(newServer);
       const ipFromHandle = handleToIpAddress(newServer);
       if (ipFromHandle) {
-        hostField.title = "The handle will be translated to " + ipFromHandle;
+        hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
       }
       else {
         hostField.title = "";
@@ -54,7 +64,11 @@ document.addEventListener("click", async (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
-    document.getElementById("copy").innerText = "Copied!";
+    document.getElementById("copy").innerHTML = `
+    <span id="copy" class="material-symbols-outlined size-24">
+    check
+    </span>
+    `;
   }
   else if (e.target.id === "password_field") {
     document.getElementById("password_field").innerText = _credential.password;
@@ -67,7 +81,9 @@ getLocalValue("linked").then(async (linked) => {
   const webClientId = await getLocalValue("web_client_id");
 
   if (!linked) {
-    bsAlert("Error", "Extension not linked with an app! Please link it first.").then(_ => {
+    bsAlert(
+      chrome.i18n.getMessage("titleError"), 
+      chrome.i18n.getMessage("errorMessageExtensionNotLinked")).then(_ => {
       window.close();
     });
   } 
@@ -79,26 +95,32 @@ getLocalValue("linked").then(async (linked) => {
     hostField.value = server;
     const ipFromHandle = handleToIpAddress(hostField.value);
     if (ipFromHandle) {
-      hostField.title = "The handle will be translated to " + ipFromHandle;
+      hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
     }
     else {
       hostField.title = "";
     }
 
+    const updateButton = document.getElementById("update_server");
+
+
     document.addEventListener("input", (e) => {
       if (e.target.id === "host") {
         e.target.title = "";
+
+        updateButton.disabled = false;
 
         if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
           e.target.classList.remove("invalid-state");
           const ipFromHandle = handleToIpAddress(e.target.value);
           if (ipFromHandle) {
-            e.target.title = "The handle will be translated to " + ipFromHandle;
+            e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
           }
         }
         else {
           e.target.classList.add("invalid-state");
-          e.target.title = "Server address invalid! Won't be stored.";
+          e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
+          updateButton.disabled = true;
         }
       }
     });
@@ -120,7 +142,7 @@ getLocalValue("linked").then(async (linked) => {
         await loadAlternativeServersToUi(newServer);
         const ipFromHandle = handleToIpAddress(newServer);
         if (ipFromHandle) {
-          hostField.title = "The handle will be translated to " + ipFromHandle;
+          hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
         }
         else {
           hostField.title = "";
@@ -129,24 +151,30 @@ getLocalValue("linked").then(async (linked) => {
     });
 
 
+    let requestText;
     if (requestData.command === "get_client_key") {
-      document.getElementById("instruction").innerText = "Requesting to unlock local vault .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageUnlockLocalVault";
     }
     else if (requestData.command === "fetch_multiple_credentials") {
-      document.getElementById("instruction").innerText = "Requesting to fetch multiple credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageFetchCredentials";
     }  
     else if (requestData.command === "fetch_all_credentials") {
-      document.getElementById("instruction").innerText = "Requesting to fetch ALL credentials .. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageFetchAllCredentials";
     }
     else if (requestData.command === "fetch_credentials_for_uids") {
-      document.getElementById("instruction").innerText = "Requesting to synchronize local vault.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageSyncLocalVault";
     }
     else if (requestData.command === "create_credential_for_url") {
-      document.getElementById("instruction").innerText = "Requesting to create a new credential in the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageCreateNewCredential";
     }
     else if (requestData.command === "download_vault_backup") {
-      document.getElementById("instruction").innerText = "Requesting to download the vault backup file from the app.. move to your phone, open ANOTHERpass, start the server and follow the instructions.";
+      requestText = "lblAppRequestMessageDownloadVaultFile";
     }
+    else {
+      requestText = "lblAppRequestMessageFetchAnyCredential";
+    }
+
+    document.getElementById("instruction").innerHTML = "<strong>" + chrome.i18n.getMessage(requestText) + " .. </strong><p><small>" + chrome.i18n.getMessage("textAppRequestHint") + "</small>";
 
     console.debug("requestData", requestData);
     const targetUrl = requestData.website;
@@ -271,7 +299,9 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Warning", "The request has been rejected in the app or the vault was locked.").then(_ => {
+            bsAlert(
+              chrome.i18n.getMessage("titleWarning"), 
+              chrome.i18n.getMessage("errorMessageRequestRejected")).then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -284,7 +314,9 @@ getLocalValue("linked").then(async (linked) => {
 
             destroySessionKey();
 
-            bsAlert("Error", "Failed to communicate to the app. Updating the app could solve this problem. <br><code>Error: " + response.error + "</code>").then(_ => {
+            bsAlert(
+              chrome.i18n.getMessage("titleError"), 
+              chrome.i18n.getMessage("errorMessageCommunicationFailure") + "<br><code>Error: " + response.error + "</code>").then(_ => {
               window.close();
             });
             return STOP_POLLING;
@@ -331,7 +363,9 @@ getLocalValue("linked").then(async (linked) => {
               }
               else {
                 console.error("No target tabId but expected");
-                bsAlert("Error", "Something went wrong.").then(_ => {
+                bsAlert(
+                  chrome.i18n.getMessage("titleError"), 
+                  chrome.i18n.getMessage("errorMessageSomethingWentWrong")).then(_ => {
                   window.close();
                 });
               }
@@ -345,10 +379,21 @@ getLocalValue("linked").then(async (linked) => {
                 chrome.runtime.sendMessage({ action: "refresh_credential_dialog", tabId: targetTabId });
               }
 
-              //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", "Local vault unlocked.").then(_ => {
-                window.close();
-              });
+              const autoCloseUnlockDialog = await getLocalValue("dont_show_unlock_message_again");
+              if (autoCloseUnlockDialog) {
+                window.close();                
+              }
+              else {
+              
+                bsAlert(
+                  chrome.i18n.getMessage("titleSuccess"), 
+                  chrome.i18n.getMessage("messageLocalVaultUnlocked"),
+                  chrome.i18n.getMessage("lblClose"),
+                  "dont_show_unlock_message_again").then(_ => {
+                  window.close();
+                });   
+              }
+              
             }
             else if (requestData.command === "fetch_multiple_credentials" || requestData.command === "fetch_all_credentials") {
               const credentials = response.credentials;
@@ -356,8 +401,9 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
               const count = await saveAllCredentials(credentials, clientKey);
 
-              //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", count + " credentials imported.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                chrome.i18n.getMessage("successMessageCredentialsImported", [count])).then(_ => {
                 window.close();
               });
             }
@@ -371,8 +417,9 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
 
               saveCredential(credential, clientKey);
-              //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", "Credential synchronised.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                chrome.i18n.getMessage("successMessageCredentialSynchronised", credential.name)).then(_ => {
                 window.close();
               });
             } 
@@ -381,8 +428,9 @@ getLocalValue("linked").then(async (linked) => {
               const clientKey = await unlockVault(clientKeyBase64);
 
               const count = await saveAllCredentials(credentials, clientKey);
-              //TODO close automatically if autoclose is enabled
-              bsAlert("Success!", count + " credentials synchronised.").then(_ => {
+              bsAlert(
+                chrome.i18n.getMessage("titleSuccess"), 
+                chrome.i18n.getMessage("successMessageCredentialsSynchronised", [count])).then(_ => {
                 window.close();
               });
             }
@@ -407,7 +455,9 @@ getLocalValue("linked").then(async (linked) => {
 
           destroySessionKey();
 
-          bsAlert("Error", "You haven't opened the app in reasonable time or the host or port is wrong.").then(_ => {
+          bsAlert(
+            chrome.i18n.getMessage("titleError"), 
+            chrome.i18n.getMessage("errorMessageRequestTimedOut")).then(_ => {
             window.close();
           });
         });
@@ -441,13 +491,13 @@ getLocalValue("linked").then(async (linked) => {
 
 
           bsConfirm(
-            "Credential '" + credential.name + "'", 
+            chrome.i18n.getMessage("lblCredential") + " '" + credential.name + "'", 
             `
             <div class="container text-left">
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      Website:
+                    ${chrome.i18n.getMessage("lblWebsite")}:
                     </div>
                   </div>
                   <div class="col-8">
@@ -462,7 +512,7 @@ getLocalValue("linked").then(async (linked) => {
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      User:
+                    ${chrome.i18n.getMessage("lblUser")}:
                     </div>
                   </div>
                   <div class="col-8">
@@ -472,28 +522,33 @@ getLocalValue("linked").then(async (linked) => {
                   </div>
                 
                 </div>
-            
+        
+
                 <div class="row">
                   <div class="col">
                     <div class="mb-3">
-                      Password:
+                    ${chrome.i18n.getMessage("lblPassword")}:
                     </div>
                   </div>
                   <div class="col-8">
                     <div class="mb-1">
                       <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
-                      <button type="button" id="copy" title="Copy password to clipboard" class="btn btn-outline-primary rounded-0">Copy</button>
+                
+                      <button class="btn pt-0 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                        <span id="copy" class="material-symbols-outlined size-24">
+                        content_copy
+                        </span>
+                      </button>
                     </div>
                   </div>
-                
                 </div>
 
 
               </div>
 
             `,
-            "Import and Close",
-            "Close"
+            chrome.i18n.getMessage("lblImportAndClose"),
+            chrome.i18n.getMessage("lblClose")
           )
           .then(async (decision) => {
             console.log("decision:" + decision);
@@ -511,7 +566,9 @@ getLocalValue("linked").then(async (linked) => {
           });
         }
       } catch(e) {
-        bsAlert("Error", "Something went wrong! Re-link the app to solve this problem.").then(_ => {
+        bsAlert(
+          chrome.i18n.getMessage("titleError"), 
+          chrome.i18n.getMessage("errorMessageSomethingWentWrong")).then(_ => {
           window.close();
         });
         console.error("cannot fetch credential", e)
@@ -546,7 +603,7 @@ async function loadAlternativeServersToUi(currentServer) {
   }
   alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
   const hostSelector = document.getElementById("host_selector");
-  hostSelector.innerHTML = "<option selected> - choose an alternative server - </option>";
+  hostSelector.innerHTML = "<option selected> - " + chrome.i18n.getMessage("lblChooseHostAlternative") + " - </option>";
   
   if (alternativeServers.length > 0) {
     hostSelector.classList.remove("d-none");
