@@ -98,6 +98,16 @@ getTemporaryKey("linked").then(async (linked) => {
 
       if (msg.action === "paste_credential") {
         pasteCredential(msg.password, msg.user);
+
+
+        // store credential in session for the next minute and add an action icon to paste it from mem, used if e.g. username and password is requested in two steps.
+        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password});
+        // delayed search in case of missing loaded elements
+        setTimeout(() => {
+          console.log("clear cached credential");
+          deleteTemporaryKey("last_used_credential");
+        }, 5 * 60 * 1000); //TODO make this configurable
+
         if (_dialog) {
           popupOpen = false;
           _dialog.close();

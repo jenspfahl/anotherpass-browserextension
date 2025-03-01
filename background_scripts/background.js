@@ -144,6 +144,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
       return true;  
     }
+    
+    case "paste_credential": {
+      pasteCredential(message.tabId, message.user, message.password);
+
+      return true;  
+    }
 
         
     case "apply_credential": {
@@ -317,6 +323,10 @@ async function forwardCredential(tabId, uid) {
     }
     
   }
+}
+
+async function pasteCredential(tabId, user, password) {
+  chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user });
 }
 
 async function findLocalByUid(prefix, uid) {

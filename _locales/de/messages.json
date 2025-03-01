@@ -225,6 +225,9 @@
     "tooltipFetchSingleCredential": {
         "message": "Rufe einzelne Zugangsdaten aus der App ab"
     },
+    "tooltipPasteRecentCredential": {
+        "message": "Zuletzt verwendete Zugangsdaten einfügen"
+    },
     "tooltipCreateNewCredential": {
         "message": "Neue Zugangsdaten in der App erstellen"
     },

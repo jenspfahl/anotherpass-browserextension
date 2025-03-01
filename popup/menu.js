@@ -258,6 +258,7 @@ getLocalValue("linked").then(async (linked) => {
       if (isUnlocked) {
         // lock local vault
         deleteTemporaryKey("clientKey");
+        deleteTemporaryKey("last_used_credential");
         updateVaultUi();
         document.getElementById("credential_list").innerHTML = "";
         updateExtensionIcon();

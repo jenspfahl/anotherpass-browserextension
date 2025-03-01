@@ -225,6 +225,9 @@
     "tooltipFetchSingleCredential": {
         "message": "Fetch single credential from the app"
     },
+    "tooltipPasteRecentCredential": {
+        "message": "Paste lastly used credential"
+    },
     "tooltipCreateNewCredential": {
         "message": "Create new credential in the app"
     },
