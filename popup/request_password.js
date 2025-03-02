@@ -359,7 +359,7 @@ getLocalValue("linked").then(async (linked) => {
               }
 
               if (targetTabId) {
-                sendPasteCredentialMessage(targetTabId, credential.password, credential.user);
+                sendPasteCredentialMessage(targetTabId, credential.password, credential.user, credential.name.substring(0, 25));
               }
               else {
                 console.error("No target tabId but expected");
@@ -463,10 +463,15 @@ getLocalValue("linked").then(async (linked) => {
         });
 
 
-        function sendPasteCredentialMessage(tabId, password, user) {
+        function sendPasteCredentialMessage(tabId, password, user, name) {
 
           console.debug("send to tabId", tabId);
-          chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user }, function () {
+          chrome.tabs.sendMessage(tabId, { 
+            action: "paste_credential", 
+            password: password,
+            user: user,
+            name: name
+          }, function () {
             window.close();
           });    
         }
