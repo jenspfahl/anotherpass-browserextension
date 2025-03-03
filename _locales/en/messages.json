@@ -344,6 +344,15 @@
         "message": "Auto",
         "description": "Means automatically light or dark theme, controlled by the OS"
     },
+    "lblIconPosition": {
+        "message": "Position of the icon in the text field"
+    },
+    "lblIconPositionLeft": {
+        "message": "On the left side"
+    },
+    "lblIconPositionRight": {
+        "message": "On the right side"
+    },
     "lblSettingsAutoLock": {
         "message": "Minutes of inactivity after the unlocked local vault is locked"
     },

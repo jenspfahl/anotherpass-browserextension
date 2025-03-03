@@ -226,9 +226,11 @@ getLocalValue("linked").then(async (linked) => {
   
     const renderContentIcon = await getLocalValue("render_content_icon");
     const opacityOfContentIcon = await getLocalValue("opacity_content_icon");
+    const positionOfContentIcon = await getLocalValue("position_content_icon");
 
     await setSessionValue("render_content_icon", renderContentIcon);
     await setSessionValue("opacity_content_icon", opacityOfContentIcon);
+    await setSessionValue("position_content_icon", positionOfContentIcon);
   
   
     createContextMenu();

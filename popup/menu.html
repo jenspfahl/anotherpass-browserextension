@@ -133,12 +133,12 @@
             <div class="mb-3">
               <label for="settings-theme" class="form-label translatedSettingsColorTheme">:</label>            
               <div id="settings-theme"  class="nav-item dropdown">
-                <button id="settings-theme" class="btn btn-link nav-link py-2 px-0 px-lg-2 dropdown-toggle d-flex align-items-center"
+                <button id="settings-theme" class="btn btn-link nav-link py-2 px-2 px-lg-2 dropdown-toggle d-flex align-items-center border"
                         type="button"
                         aria-expanded="false"
                         data-bs-toggle="dropdown"
                         data-bs-display="static"
-                        aria-label="Toggle theme (auto)">
+                        aria-label="Toggle theme">
                   <span class="d-lg-none ms-2" id="bd-theme-text">Toggle theme</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="bd-theme-text">
@@ -179,6 +179,31 @@
               <label for="opacity_content_icon" class="form-label translatedSettingsIconOpacity">:</label>            
               <input id="opacity_content_icon" class="form-control" type="number" min="0" max="100" placeholder="Opacity of the icon" aria-label="The opacity of the icon">
             </div>
+          
+          
+            <div class="mb-3">
+              <label for="position_content_icon" class="form-label translatedSettingsIconPosition">:</label>            
+              <div id="position_content_icon"  class="nav-item dropdown">
+                <button id="position_content_icon" class="btn btn-link nav-link py-2 px-2 px-lg-2 dropdown-toggle d-flex align-items-center border"
+                        type="button"
+                        aria-expanded="false"
+                        data-bs-toggle="dropdown"
+                        data-bs-display="static"
+                        aria-label="Icon position">
+                  <span class="d-lg-none ms-2" id="position_content_icon_text">Icon position</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="position_content_icon_text">
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionLeft" id="icon_position_left" aria-pressed="false">
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionRight" id="icon_position_right" aria-pressed="false">
+                    </button>
+                  </li>
+                </ul>
+              </div>           
+             </div>
           
             <hr>
 

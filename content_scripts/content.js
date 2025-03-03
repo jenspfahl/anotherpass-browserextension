@@ -15,6 +15,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
     const renderContentIcon = await getTemporaryKey("render_content_icon");
     const opacityOfContentIcon = await getTemporaryKey("opacity_content_icon");
+    const positionOfContentIcon = await getTemporaryKey("position_content_icon");
 
     console.debug("renderContentIcon", renderContentIcon);
 
@@ -37,7 +38,7 @@ getTemporaryKey("linked").then(async (linked) => {
                   const input = inputs[l];
 
                   console.debug("found password field");
-                  addButton(input, opacityOfContentIcon);
+                  addButton(input, opacityOfContentIcon, positionOfContentIcon);
                 }
               }
 
@@ -59,7 +60,7 @@ getTemporaryKey("linked").then(async (linked) => {
         const input = inputs[j];
 
         console.debug("found password field");
-        addButton(input, opacityOfContentIcon);
+        addButton(input, opacityOfContentIcon, positionOfContentIcon);
       }
 
       // delayed search in case of missing loaded elements
@@ -72,7 +73,7 @@ getTemporaryKey("linked").then(async (linked) => {
           const input = inputs[j];
 
           console.debug("found password field");
-          addButton(input, opacityOfContentIcon);
+          addButton(input, opacityOfContentIcon, positionOfContentIcon);
 
         }
 
@@ -197,7 +198,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
 const injectedButtonId = "___synthetic_ANOTHERpass_____";
 
-function addButton(input, opacityOfContentIcon) {
+function addButton(input, opacityOfContentIcon, positionOfContentIcon) {
 
   console.debug("input.type", input.type);
   console.debug("input.nodeName", input.nodeName);
@@ -226,6 +227,7 @@ function addButton(input, opacityOfContentIcon) {
   if (target.id !== injectedButtonId) {
     const div = document.createElement('div');
     div.id = injectedButtonId;
+    div.style.position = "relative";
 
     const button = document.createElement('button');
     button.type = "button";
@@ -249,8 +251,12 @@ function addButton(input, opacityOfContentIcon) {
     button.style.minHeight = inputHeight + "px";
     button.style.border = input.border;
     button.style.opacity = opacityOfContentIcon + "%";
-
     button.style.backgroundImage = "url(" + iconUrl + ")";
+ 
+    if (positionOfContentIcon === 'right') {
+      button.style.right = "0px";
+    }
+   
 
     target.insertBefore(div, input);
 

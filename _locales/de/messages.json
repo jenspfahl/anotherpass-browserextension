@@ -344,6 +344,15 @@
         "message": "Automatisch",
         "description": "Means automatically light or dark theme, controlled by the OS"
     },
+    "lblIconPosition": {
+        "message": "Position des Icons im Textfeld"
+    },
+    "lblIconPositionLeft": {
+        "message": "Auf der linken Seite"
+    },
+    "lblIconPositionRight": {
+        "message": "Auf der rechten Seite"
+    },
     "lblSettingsAutoLock": {
         "message": "Minuten der Inaktivität nachdem der entsperrte lokale Tresor gesperrt wird"
     },

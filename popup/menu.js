@@ -49,6 +49,7 @@ getLocalValue("linked").then(async (linked) => {
   const lockTimeout = await getLocalValue("lock_timeout") || 60;
   const renderContentIcon = await getLocalValue("render_content_icon");
   const opacityOfContentIcon = await getLocalValue("opacity_content_icon") || 90;
+  const positionOfContentIcon = await getLocalValue("position_content_icon") || 'left';
 
 
   // load current configurated server
@@ -115,6 +116,8 @@ getLocalValue("linked").then(async (linked) => {
 
   document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
+  updateIconPositionDropDown(positionOfContentIcon);
+
   document.getElementById("server-settings-port").value = port;
 
   document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
@@ -131,6 +134,13 @@ getLocalValue("linked").then(async (linked) => {
       const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
       const renderContentIcon = document.getElementById("render_content_icon").checked;
       const opacityOfContentIcon = parseInt(document.getElementById("opacity_content_icon").value);
+      let positionOfContentIcon = 'left';
+      if (document.getElementById("icon_position_right").classList.contains('active')) {
+        positionOfContentIcon = 'right';
+      }
+      else if (document.getElementById("icon_position_left").classList.contains('active')) {
+        positionOfContentIcon = 'left';
+      }
 
 
       const server = hostField.value;
@@ -185,9 +195,12 @@ getLocalValue("linked").then(async (linked) => {
         await setLocalValue("lock_timeout", lockTimeout);
         await setLocalValue("render_content_icon", renderContentIcon);
         await setLocalValue("opacity_content_icon", opacityOfContentIcon);
+        await setLocalValue("position_content_icon", positionOfContentIcon);
 
         await setTemporaryKey("render_content_icon", renderContentIcon);
         await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
+        await setTemporaryKey("position_content_icon", positionOfContentIcon);
+
 
         bsAlert(
           chrome.i18n.getMessage("titleSuccess"), 
@@ -208,9 +221,21 @@ getLocalValue("linked").then(async (linked) => {
 
       document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
+      updateIconPositionDropDown(positionOfContentIcon);
+
+
+
       removeLocalValue("dont_show_unlock_message_again");
 
     }
+
+    if (e.target.id === "icon_position_left") {
+      updateIconPositionDropDown('left');
+    }
+    else if (e.target.id === "icon_position_right") {
+      updateIconPositionDropDown('right');
+    }
+    
 
     if (e.target.id === "link") {
 
@@ -663,6 +688,19 @@ getLocalValue("linked").then(async (linked) => {
   updateMenuUi(webClientId, linked);
 
 
+
+  function updateIconPositionDropDown(positionOfContentIcon) {
+    if (positionOfContentIcon === 'right') {
+      document.getElementById("position_content_icon_text").innerText = chrome.i18n.getMessage("lblIconPositionRight");
+      document.getElementById("icon_position_right").classList.add('active');
+      document.getElementById("icon_position_left").classList.remove('active');
+    }
+    else {
+      document.getElementById("position_content_icon_text").innerText = chrome.i18n.getMessage("lblIconPositionLeft");
+      document.getElementById("icon_position_left").classList.add('active');
+      document.getElementById("icon_position_right").classList.remove('active');
+    }
+  }
 });
 
 function updateLocalVaultPasswordMenuItem() {
