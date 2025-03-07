@@ -72,6 +72,23 @@ getLocalValue("linked").then((linked) => {
               document.getElementById("next").disabled = true;
             }
           }
+          else if (e.target.id === "port") {
+
+            const port = parseInt(e.target.value);
+            if (isNaN(port) || port < 1024 || port > 49151) {
+              e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppPort");
+        
+              console.log("port invald", e.target.value);
+              e.target.classList.add("invalid-state");
+              document.getElementById("next").disabled = true;
+            }
+            else {
+              e.target.classList.remove("invalid-state");
+              e.target.title = "";
+              document.getElementById("next").disabled = false;
+            }
+    
+          }
         });
   
         

@@ -369,7 +369,7 @@
         "message": "Hostname, Handle oder IP-Addresse"
     },
     "lblSettingsPort": {
-        "message": "und der Port",
+        "message": "App-Server-Port",
         "description": "hostname and port kind of belongs together"
     },
     "lblSettingsPollingTimeout": {
@@ -379,10 +379,6 @@
     "lblSettingsPollingIntervall": {
         "message": "und fragt aller X Sekunden",
         "description": "In which intervall shall the extension poll the app host to retrieve data"
-    },
-    "lblSettingsManageHostAlternatives": {
-        "message": "Alternativen verwalten",
-        "description": "Means app host or handle or ip alternatives"
     },
     "lblChooseHostAlternative": {
         "message": "wähle einen alternative Adresse",
@@ -422,10 +418,10 @@
         "message": "Ungültiger Icon-Deckkraft-Wert, muss zwischen 1 und 100 sein."
     },
     "titleManageServers": {
-        "message": "Alternative App-Adressen verwalten"
+        "message": "App-Adressen verwalten"
     },
     "messageManageServers": {
-        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein. Änderungen an dieser Liste wirken sich nicht auf die aktuell konfigurierte Hostadresse aus."
+        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein."
     }
     ,
     "tooltipResolvedHandle": {
@@ -448,10 +444,13 @@
         "description": "Indicates general notes"
     },
     "lblNewHostAddress": {
-        "message": "Neue Host-Adresse"
+        "message": "Neue alternative App-Adresse"
     },
     "lblCurrentHostAddress": {
-        "message": "Aktuelle Host-Addresse"
+        "message": "Aktuelle App-Addresse"
+    },
+    "lblAlternativeHostAddress": {
+        "message": "Alternative App-Adressen"
     },
     "errorMessageInvalidAppHost": {
         "message": "IP, Handle oder Hostname ist ungültig"
