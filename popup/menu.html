@@ -175,56 +175,44 @@
               </label>
             </div>
 
-            <div class="mb-3">
-              <label for="opacity_content_icon" class="form-label translatedSettingsIconOpacity">:</label>            
-              <input id="opacity_content_icon" class="form-control" type="number" min="0" max="100" placeholder="Opacity of the icon" aria-label="The opacity of the icon">
+            <div id="icon-settings">
+              <div class="mb-3">
+                <label for="opacity_content_icon" class="form-label translatedSettingsIconOpacity">:</label>            
+                <input id="opacity_content_icon" class="form-control" type="number" min="0" max="100" placeholder="Opacity of the icon" aria-label="The opacity of the icon">
+              </div>
+            
+            
+              <div class="mb-3">
+                <label for="position_content_icon" class="form-label translatedSettingsIconPosition">:</label>            
+                <div id="position_content_icon"  class="nav-item dropdown">
+                  <button id="position_content_icon" class="btn btn-link nav-link py-2 px-2 px-lg-2 dropdown-toggle d-flex align-items-center border"
+                          type="button"
+                          aria-expanded="false"
+                          data-bs-toggle="dropdown"
+                          data-bs-display="static"
+                          aria-label="Icon position">
+                    <span class="d-lg-none ms-2" id="position_content_icon_text">Icon position</span>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="position_content_icon_text">
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionLeft" id="icon_position_left" aria-pressed="false">
+                      </button>
+                    </li>
+                    <li>
+                      <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionRight" id="icon_position_right" aria-pressed="false">
+                      </button>
+                    </li>
+                  </ul>
+                </div>           
+              </div>
             </div>
-          
-          
-            <div class="mb-3">
-              <label for="position_content_icon" class="form-label translatedSettingsIconPosition">:</label>            
-              <div id="position_content_icon"  class="nav-item dropdown">
-                <button id="position_content_icon" class="btn btn-link nav-link py-2 px-2 px-lg-2 dropdown-toggle d-flex align-items-center border"
-                        type="button"
-                        aria-expanded="false"
-                        data-bs-toggle="dropdown"
-                        data-bs-display="static"
-                        aria-label="Icon position">
-                  <span class="d-lg-none ms-2" id="position_content_icon_text">Icon position</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-start" aria-labelledby="position_content_icon_text">
-                  <li>
-                    <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionLeft" id="icon_position_left" aria-pressed="false">
-                    </button>
-                  </li>
-                  <li>
-                    <button type="button" class="dropdown-item d-flex align-items-center translatedSettingsIconPositionRight" id="icon_position_right" aria-pressed="false">
-                    </button>
-                  </li>
-                </ul>
-              </div>           
-             </div>
           
             <hr>
 
+            
             <div class="mb-3">
-              <label for="server-settings-host" class="form-label translatedSettingsHostWithAppName">:</label>            
-              <input id="server-settings-host" class="form-control" type="text" placeholder="Host, handle or IP" aria-label="The hostname, the handle or IP address">
-              <select id="host_selector" class="form-select form-select-sm" aria-label="Other known servers">
-              </select> 
-              <div class="mt-0">
-                <button id="manage_servers" type="button" class="btn btn-outline-secondary rounded-0"></button>
-              </div>
+              <button id="manage_servers" type="button" class="btn btn-secondary rounded-0"></button>
             </div>
-
-
-
-            <div class="mb-3">
-              <label for="server-settings-port" class="form-label translatedSettingsPort">:</label>            
-              <input id="server-settings-port" class="form-control" type="number" min="1024" max="49151" placeholder="Port" aria-label="The TCP port">
-            </div>
-
-
 
             <div class="mb-3">
               <label for="server-settings-polling-timeout" class="form-label translatedSettingsPollingTimeout">:</label>            
@@ -238,17 +226,15 @@
               <input id="server-settings-polling-interval" class="form-control" type="number" min="1" max="60" placeholder="Polling interval" aria-label="Polling interval in seconds">
             </div>
 
-
-            <div>  
-              <button id="btn-save-settings" type="button" class="btn btn-primary rounded-0"></button>
-              <button id="btn-reset-settings" type="button" class="btn btn-outline-primary rounded-0"></button>
-            </div>
             <div class="mb-3">
               <hr>
             </div>
-            <div class="float-end mb-3">    
+
+            <div>  
               <button id="relink" type="button" class="btn btn-secondary rounded-0"></button>
             </div>
+            
+            
 
           </div>
         </div>
@@ -266,7 +252,7 @@
             <span id="extensionInfo"></span>
             <br>
             <br>
-            (c) Jens Pfahl 2025
+            (c) Jens Pfahl 2024, 2025
           </p>
           <div>
             <small><small id="version"></small></small>

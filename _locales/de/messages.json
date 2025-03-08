@@ -345,7 +345,7 @@
         "description": "Means automatically light or dark theme, controlled by the OS"
     },
     "lblIconPosition": {
-        "message": "Position des Icons im Textfeld"
+        "message": "Position des Symbols im Textfeld"
     },
     "lblIconPositionLeft": {
         "message": "Auf der linken Seite"
@@ -357,10 +357,10 @@
         "message": "Minuten der Inaktivität nachdem der entsperrte lokale Tresor gesperrt wird"
     },
     "lblSettingsRenderIcon": {
-        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Icon (Aktualisierung der Webseite erforderlich, wenn dies geändert wurde)."
+        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Symbol. Achtung: Aktualisierung der Webseiten erforderlich, wenn diese Einstellungen geändert wurden!"
     },
     "lblSettingsIconOpacity": {
-        "message": "Deckkraft dieses Icons"
+        "message": "Deckkraft dieses Symbols"
     },
     "lblSettingsHostWithAppName": {
         "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass-App"

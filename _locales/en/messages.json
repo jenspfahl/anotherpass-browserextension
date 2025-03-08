@@ -357,7 +357,7 @@
         "message": "Minutes of inactivity after the unlocked local vault is locked"
     },
     "lblSettingsRenderIcon": {
-        "message": "Display a credential-icon in each username and password input field (website-reload is needed if this has been changed)"
+        "message": "Display a credential-icon in each username and password input field. Note: All websites need to be reloaded if these settings have been changed!"
     },
     "lblSettingsIconOpacity": {
         "message": "Opacity of this icon"

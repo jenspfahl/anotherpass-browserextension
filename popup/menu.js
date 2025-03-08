@@ -31,8 +31,6 @@ document.getElementById("link").title = chrome.i18n.getMessage("titleLinkTheApp"
 document.getElementById("unlink").title = chrome.i18n.getMessage("titleUnlinkFromApp");
 
 document.getElementById("manage_servers").innerHTML = chrome.i18n.getMessage("titleManageServers");
-document.getElementById("btn-save-settings").innerHTML = chrome.i18n.getMessage("lblSave");
-document.getElementById("btn-reset-settings").innerHTML = chrome.i18n.getMessage("lblReset");
 document.getElementById("relink").innerHTML = chrome.i18n.getMessage("lblRelink");
 
 
@@ -52,57 +50,8 @@ getLocalValue("linked").then(async (linked) => {
   const positionOfContentIcon = await getLocalValue("position_content_icon") || 'left';
 
 
-  // load current configurated server
-  const server = await getLocalValue("server_address");
-  const hostField = document.getElementById("server-settings-host");
-  hostField.value = server;
-  const ipFromHandle = handleToIpAddress(hostField);
-  if (ipFromHandle) {
-    hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-  }
-
-  document.addEventListener("input", (e) => {
-    if (e.target.id === "server-settings-host") {
-      e.target.title = "";
-      document.getElementById("btn-save-settings").disabled = false;
-
-
-      if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-        e.target.classList.remove("invalid-state");
-        const ipFromHandle = handleToIpAddress(e.target.value);
-        if (ipFromHandle) {
-          e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-        }
-      }
-      else {
-        e.target.classList.add("invalid-state");
-        e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
-        document.getElementById("btn-save-settings").disabled = true;
-      }
-    }
-  });
-
   updateLocalVaultPasswordMenuItem();
 
-  // load all known servers
-  await loadAlternativeServersToUi();
-  const hostSelector = document.getElementById("host_selector");
-  hostSelector.addEventListener("change", function() {
-    if (hostField.value) {
-      hostField.value = hostSelector.value;
-      const ipFromHandle = handleToIpAddress(hostField.value);
-      if (ipFromHandle) {
-        hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-      }
-      else {
-        hostField.title = "";
-      }
-      const options = hostSelector.querySelectorAll("option");
-      if (options.length > 0) {
-          options[0].selected = true;
-      }
-    }
-  });
 
   const pollingTimeout = await getLocalValue("polling_timeout") || 60;
   const pollingInterval = await getLocalValue("polling_interval") || 2;
@@ -110,7 +59,15 @@ getLocalValue("linked").then(async (linked) => {
   document.getElementById("linked_vault_id").innerText = linkedVaultId;
 
   document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-  document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
+
+  let showIconEnabled = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
+  document.getElementById("render_content_icon").checked = showIconEnabled;
+  if (showIconEnabled) {
+    document.getElementById("icon-settings").classList.remove("d-none");
+  }
+  else {
+    document.getElementById("icon-settings").classList.add("d-none");
+  }
 
   document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
@@ -123,104 +80,86 @@ getLocalValue("linked").then(async (linked) => {
 
   searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
 
-  document.addEventListener("click", async (e) => {
+  document.getElementById("render_content_icon").addEventListener("change", async function() {
+    showIconEnabled = this.checked;
 
-    if (e.target.id === "btn-save-settings") {
+    if (showIconEnabled) {
+      document.getElementById("icon-settings").classList.remove("d-none");
+    }
+    else {
+      document.getElementById("icon-settings").classList.add("d-none");
+    }
 
-      const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
-      const renderContentIcon = document.getElementById("render_content_icon").checked;
-      const opacityOfContentIcon = parseInt(document.getElementById("opacity_content_icon").value);
-      let positionOfContentIcon = 'left';
-      if (document.getElementById("icon_position_right").classList.contains('active')) {
-        positionOfContentIcon = 'right';
-      }
-      else if (document.getElementById("icon_position_left").classList.contains('active')) {
-        positionOfContentIcon = 'left';
-      }
+    await setLocalValue("render_content_icon", showIconEnabled);
+    await setTemporaryKey("render_content_icon", showIconEnabled);
+  });
 
-
-      const server = hostField.value;
-
-      const pollingTimeout = parseInt(document.getElementById("server-settings-polling-timeout").value);
-      const pollingInterval = parseInt(document.getElementById("server-settings-polling-interval").value);
-
-
-      if (!server || server == "") {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageMissingAppServer"));
-      }
-      else if (!isValidIPAdressOrHostnameOrHandle(server)) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidAppServer"));
-      }
-  
-      else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidPollingTimeout"));
-      }
-      else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidPollingInterval"));
-      }
-      else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidLockTimeout"));
-      }
-      else if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidOpacityValue"));
+  document.addEventListener("input", async (e) => {
+    if (e.target.id === "server-settings-lock-timeout") {      
+      const newLockTimeout = parseInt(e.target.value);
+      if (isNaN(newLockTimeout) || newLockTimeout < 1 || newLockTimeout > 10080) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidLockTimeout");
+        e.target.classList.add("invalid-state");
       }
       else {
-        await addNewAlternativeServer(server);
-        await loadAlternativeServersToUi();
-              
-        await setLocalValue("polling_timeout", pollingTimeout);
-        await setLocalValue("polling_interval", pollingInterval);
-        await setLocalValue("lock_timeout", lockTimeout);
-        await setLocalValue("render_content_icon", renderContentIcon);
-        await setLocalValue("opacity_content_icon", opacityOfContentIcon);
-        await setLocalValue("position_content_icon", positionOfContentIcon);
-
-        await setTemporaryKey("render_content_icon", renderContentIcon);
-        await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
-        await setTemporaryKey("position_content_icon", positionOfContentIcon);
-
-
-        bsAlert(
-          chrome.i18n.getMessage("titleSuccess"), 
-          chrome.i18n.getMessage("messageSettingsSaved"));
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("lock_timeout", newLockTimeout);
       }
-
+    }
+    else if (e.target.id === "opacity_content_icon") {      
+      const opacityOfContentIcon = parseInt(e.target.value);
+      if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidOpacityValue");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("opacity_content_icon", opacityOfContentIcon);
+        await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);    
+    }
+    }
+    else if (e.target.id === "server-settings-polling-timeout") {      
+      const pollingTimeout = parseInt(e.target.value);
+      if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidPollingTimeout");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("polling_timeout", pollingTimeout);
+      }
+    }
+    else if (e.target.id === "server-settings-polling-interval") {      
+      const pollingInterval = parseInt(e.target.value);
+      if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidPollingInterval");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("polling_interval", pollingInterval);
+      }
     }
 
-    if (e.target.id === "btn-reset-settings") {
-
-      document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
-      document.getElementById("server-settings-polling-interval").value = pollingInterval;
-
-      document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-      document.getElementById("render_content_icon").checked = true;
-
-      document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
-
-      updateIconPositionDropDown(positionOfContentIcon);
+  });
 
 
+  document.addEventListener("click", async (e) => {
 
-      removeLocalValue("dont_show_unlock_message_again");
-
-    }
+  
 
     if (e.target.id === "icon_position_left") {
+      await setLocalValue("position_content_icon", 'left');
+      await setTemporaryKey("position_content_icon", 'left');
       updateIconPositionDropDown('left');
     }
     else if (e.target.id === "icon_position_right") {
+      await setLocalValue("position_content_icon", 'right');
+      await setTemporaryKey("position_content_icon", 'right');
       updateIconPositionDropDown('right');
     }
     
@@ -1113,37 +1052,6 @@ function updateCredentialCountUi(credentialCount) {
   else {
     document.getElementById("vaultStatus").innerText = credentialCount + " " + chrome.i18n.getMessage("wordCredentials");
   }
-}
-
-
-async function loadAlternativeServersToUi() {
-  const alternativeServers = await loadAllAlternativeServers();
-  const hostSelector = document.getElementById("host_selector");
-  hostSelector.innerHTML = "<option selected> - " + chrome.i18n.getMessage("lblChooseHostAlternative") + " - </option>";
-
-  alternativeServers
-    .map((altServer) => {
-    const opt = document.createElement("option");
-    
-    opt.value = altServer.host;
-
-    let text;
-    if (altServer.description.length > 0) {
-      text = altServer.host + " ( " + altServer.description + " )";
-    }
-    else {
-      text = altServer.host;
-    }
-    const ipFromHandle = handleToIpAddress(altServer.host);
-    if (ipFromHandle) {
-      text = text + " - " + ipFromHandle;
-    }
-    
-    
-  
-    opt.innerText = text;
-    hostSelector.append(opt);
-  });
 }
 
 async function loadAllAlternativeServers() {
