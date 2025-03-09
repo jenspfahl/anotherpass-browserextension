@@ -191,8 +191,6 @@ getLocalValue("linked").then(async (linked) => {
           }).then(async (response) => {
             updateMenuUi(null, null);
 
-            await loadAlternativeServersToUi()
-
 
             bsAlert(
               chrome.i18n.getMessage("titleSuccess"), 
@@ -688,8 +686,6 @@ getLocalValue("linked").then(async (linked) => {
           console.debug("new port", port);
           await setLocalValue("server_port", port);
 
-
-          await loadAlternativeServersToUi()
         }
       });
     }

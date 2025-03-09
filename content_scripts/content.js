@@ -14,73 +14,74 @@ getTemporaryKey("linked").then(async (linked) => {
   if (linked) {
 
     const renderContentIcon = await getTemporaryKey("render_content_icon");
+    const renderIcons = (renderContentIcon == undefined || renderContentIcon === true || renderContentIcon === "true");
     const opacityOfContentIcon = await getTemporaryKey("opacity_content_icon");
     const positionOfContentIcon = await getTemporaryKey("position_content_icon");
 
     console.debug("renderContentIcon", renderContentIcon);
 
-    if (renderContentIcon == undefined || renderContentIcon === true || renderContentIcon === "true") {
-      var obs = new MutationObserver(function (mutations, observer) {
-        //console.debug("got mutations", mutations.length);
-        for (var j = 0; j < mutations.length; j++) {
-          const mutation = mutations[j];
-          //console.debug("got mutation", mutation);
+    
+    var obs = new MutationObserver(function (mutations, observer) {
+      //console.debug("got mutations", mutations.length);
+      for (var j = 0; j < mutations.length; j++) {
+        const mutation = mutations[j];
+        //console.debug("got mutation", mutation);
 
-          for (var i = 0; i < mutation.addedNodes.length; i++) {
-              const addedNode = mutation.addedNodes[i];
-              //console.debug("got added node", addedNode);
+        for (var i = 0; i < mutation.addedNodes.length; i++) {
+            const addedNode = mutation.addedNodes[i];
+            //console.debug("got added node", addedNode);
 
-              if (typeof addedNode.querySelectorAll !== "undefined") { 
-                const inputs = addedNode.querySelectorAll("input");
-                //console.debug("got password type", inputs);
+            if (typeof addedNode.querySelectorAll !== "undefined") { 
+              const inputs = addedNode.querySelectorAll("input");
+              //console.debug("got password type", inputs);
 
-                for (var l = 0; l < inputs.length; l++) {
-                  const input = inputs[l];
+              for (var l = 0; l < inputs.length; l++) {
+                const input = inputs[l];
 
-                  console.debug("found password field");
-                  addButton(input, opacityOfContentIcon, positionOfContentIcon);
-                }
+                console.debug("found password field");
+                addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
               }
+            }
 
-          }
         }
+      }
 
 
-      });
+    });
 
-      console.log("add observation listener");
-      obs.observe(document.body, { childList: true, subtree: true, attributes: false, characterData: false });
+    console.log("add observation listener");
+    obs.observe(document.body, { childList: true, subtree: true, attributes: false, characterData: false });
 
 
-      console.log("presearch credential fields");
+    console.log("presearch credential fields");
+    const inputs = document.querySelectorAll("input");
+    console.log("found input count on research", inputs.length);
+
+    for (var j = 0; j < inputs.length; j++) {
+      const input = inputs[j];
+
+      console.debug("found password field");
+      addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
+    }
+
+    // delayed search in case of missing loaded elements
+    setTimeout(() => {
+      console.log("search credential fields");
       const inputs = document.querySelectorAll("input");
-      console.log("found input count on research", inputs.length);
+      console.log("found input count", inputs.length);
 
       for (var j = 0; j < inputs.length; j++) {
         const input = inputs[j];
 
         console.debug("found password field");
-        addButton(input, opacityOfContentIcon, positionOfContentIcon);
+        addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
+
       }
 
-      // delayed search in case of missing loaded elements
-      setTimeout(() => {
-        console.log("search credential fields");
-        const inputs = document.querySelectorAll("input");
-        console.log("found input count", inputs.length);
+    }, 2500);
 
-        for (var j = 0; j < inputs.length; j++) {
-          const input = inputs[j];
-
-          console.debug("found password field");
-          addButton(input, opacityOfContentIcon, positionOfContentIcon);
-
-        }
-
-      }, 2500);
-
-      
-    }
+    
+  
 
     const response = await chrome.runtime.sendMessage({ action: "get_tab_id" });
     const currentTabId = response.tabId;
@@ -198,7 +199,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
 const injectedButtonId = "___synthetic_ANOTHERpass_____";
 
-function addButton(input, opacityOfContentIcon, positionOfContentIcon) {
+function addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon) {
 
   console.debug("input.type", input.type);
   console.debug("input.nodeName", input.nodeName);
@@ -222,6 +223,9 @@ function addButton(input, opacityOfContentIcon, positionOfContentIcon) {
     return;
   }
 
+  if (!renderIcons) {
+    return;
+  }
   
   const target = input.parentNode;
   if (target.id !== injectedButtonId) {
