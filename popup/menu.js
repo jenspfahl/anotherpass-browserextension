@@ -661,8 +661,9 @@ getLocalValue("linked").then(async (linked) => {
               const currentDescription = await getLocalValue(PREFIX_ALT_SERVER + server.host);
 
               const changedHost = changedHosts.get(server.host);
-              if (changedHost) {
-                const changedDescription = changedDescriptions.get(server.host);
+              const changedDescription = changedDescriptions.get(server.host);
+
+              if (changedHost || changedDescription !== undefined) {
                 console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
                 await removeLocalValue(PREFIX_ALT_SERVER + server.host);
                 await setLocalValue(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
