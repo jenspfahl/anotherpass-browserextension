@@ -30,9 +30,7 @@ document.getElementById("delete_all_credentials").innerHTML = chrome.i18n.getMes
 document.getElementById("link").title = chrome.i18n.getMessage("titleLinkTheApp");
 document.getElementById("unlink").title = chrome.i18n.getMessage("titleUnlinkFromApp");
 
-document.getElementById("manage_servers").innerHTML = chrome.i18n.getMessage("lblSettingsManageHostAlternatives");
-document.getElementById("btn-save-settings").innerHTML = chrome.i18n.getMessage("lblSave");
-document.getElementById("btn-reset-settings").innerHTML = chrome.i18n.getMessage("lblReset");
+document.getElementById("manage_servers").innerHTML = chrome.i18n.getMessage("titleManageServers");
 document.getElementById("relink").innerHTML = chrome.i18n.getMessage("lblRelink");
 
 
@@ -49,61 +47,11 @@ getLocalValue("linked").then(async (linked) => {
   const lockTimeout = await getLocalValue("lock_timeout") || 60;
   const renderContentIcon = await getLocalValue("render_content_icon");
   const opacityOfContentIcon = await getLocalValue("opacity_content_icon") || 90;
+  const positionOfContentIcon = await getLocalValue("position_content_icon") || 'left';
 
-
-  // load current configurated server
-  const server = await getLocalValue("server_address");
-  const hostField = document.getElementById("server-settings-host");
-  hostField.value = server;
-  const ipFromHandle = handleToIpAddress(hostField);
-  if (ipFromHandle) {
-    hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-  }
-
-  document.addEventListener("input", (e) => {
-    if (e.target.id === "server-settings-host") {
-      e.target.title = "";
-      document.getElementById("btn-save-settings").disabled = false;
-
-
-      if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
-        e.target.classList.remove("invalid-state");
-        const ipFromHandle = handleToIpAddress(e.target.value);
-        if (ipFromHandle) {
-          e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-        }
-      }
-      else {
-        e.target.classList.add("invalid-state");
-        e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
-        document.getElementById("btn-save-settings").disabled = true;
-      }
-    }
-  });
 
   updateLocalVaultPasswordMenuItem();
 
-  // load all known servers
-  await loadAlternativeServersToUi();
-  const hostSelector = document.getElementById("host_selector");
-  hostSelector.addEventListener("change", function() {
-    if (hostField.value) {
-      hostField.value = hostSelector.value;
-      const ipFromHandle = handleToIpAddress(hostField.value);
-      if (ipFromHandle) {
-        hostField.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
-      }
-      else {
-        hostField.title = "";
-      }
-      const options = hostSelector.querySelectorAll("option");
-      if (options.length > 0) {
-          options[0].selected = true;
-      }
-    }
-  });
-
-  const port = await getLocalValue("server_port");
 
   const pollingTimeout = await getLocalValue("polling_timeout") || 60;
   const pollingInterval = await getLocalValue("polling_interval") || 2;
@@ -111,11 +59,19 @@ getLocalValue("linked").then(async (linked) => {
   document.getElementById("linked_vault_id").innerText = linkedVaultId;
 
   document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-  document.getElementById("render_content_icon").checked = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
+
+  let showIconEnabled = renderContentIcon == undefined || renderContentIcon === "true" || renderContentIcon === true;
+  document.getElementById("render_content_icon").checked = showIconEnabled;
+  if (showIconEnabled) {
+    document.getElementById("icon-settings").classList.remove("d-none");
+  }
+  else {
+    document.getElementById("icon-settings").classList.add("d-none");
+  }
 
   document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
 
-  document.getElementById("server-settings-port").value = port;
+  updateIconPositionDropDown(positionOfContentIcon);
 
   document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
   document.getElementById("server-settings-polling-interval").value = pollingInterval;
@@ -124,93 +80,89 @@ getLocalValue("linked").then(async (linked) => {
 
   searchInput.addEventListener("input", (e) => updateCredentialList(e.target.value));
 
-  document.addEventListener("click", async (e) => {
+  document.getElementById("render_content_icon").addEventListener("change", async function() {
+    showIconEnabled = this.checked;
 
-    if (e.target.id === "btn-save-settings") {
+    if (showIconEnabled) {
+      document.getElementById("icon-settings").classList.remove("d-none");
+    }
+    else {
+      document.getElementById("icon-settings").classList.add("d-none");
+    }
 
-      const lockTimeout = parseInt(document.getElementById("server-settings-lock-timeout").value);
-      const renderContentIcon = document.getElementById("render_content_icon").checked;
-      const opacityOfContentIcon = parseInt(document.getElementById("opacity_content_icon").value);
+    await setLocalValue("render_content_icon", showIconEnabled);
+    await setTemporaryKey("render_content_icon", showIconEnabled);
+  });
 
-
-      const server = hostField.value;
-      const port = parseInt(document.getElementById("server-settings-port").value);
-
-      const pollingTimeout = parseInt(document.getElementById("server-settings-polling-timeout").value);
-      const pollingInterval = parseInt(document.getElementById("server-settings-polling-interval").value);
-
-
-      if (!server || server == "") {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageMissingAppServer"));
-      }
-      else if (!isValidIPAdressOrHostnameOrHandle(server)) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidAppServer"));
-      }
-      else if (isNaN(port) || port < 1024 || port > 49151) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidAppPort"));
-      }
-      else if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidPollingTimeout"));
-      }
-      else if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidPollingInterval"));
-      }
-      else if (isNaN(lockTimeout) || lockTimeout < 1 || lockTimeout > 10080) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidLockTimeout"));
-      }
-      else if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
-        bsAlert(
-          chrome.i18n.getMessage("titleError"), 
-          chrome.i18n.getMessage("errorMessageInvalidOpacityValue"));
+  document.addEventListener("input", async (e) => {
+    if (e.target.id === "server-settings-lock-timeout") {      
+      const newLockTimeout = parseInt(e.target.value);
+      if (isNaN(newLockTimeout) || newLockTimeout < 1 || newLockTimeout > 10080) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidLockTimeout");
+        e.target.classList.add("invalid-state");
       }
       else {
-        await addNewAlternativeServer(server);
-        await loadAlternativeServersToUi();
-              
-        await setLocalValue("server_port", port);
-        await setLocalValue("polling_timeout", pollingTimeout);
-        await setLocalValue("polling_interval", pollingInterval);
-        await setLocalValue("lock_timeout", lockTimeout);
-        await setLocalValue("render_content_icon", renderContentIcon);
-        await setLocalValue("opacity_content_icon", opacityOfContentIcon);
-
-        await setTemporaryKey("render_content_icon", renderContentIcon);
-        await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);
-
-        bsAlert(
-          chrome.i18n.getMessage("titleSuccess"), 
-          chrome.i18n.getMessage("messageSettingsSaved"));
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("lock_timeout", newLockTimeout);
       }
-
+    }
+    else if (e.target.id === "opacity_content_icon") {      
+      const opacityOfContentIcon = parseInt(e.target.value);
+      if (isNaN(opacityOfContentIcon) || opacityOfContentIcon < 0 || opacityOfContentIcon > 100) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidOpacityValue");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("opacity_content_icon", opacityOfContentIcon);
+        await setTemporaryKey("opacity_content_icon", opacityOfContentIcon);    
+    }
+    }
+    else if (e.target.id === "server-settings-polling-timeout") {      
+      const pollingTimeout = parseInt(e.target.value);
+      if (isNaN(pollingTimeout) || pollingTimeout < 1 || pollingTimeout > 300) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidPollingTimeout");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("polling_timeout", pollingTimeout);
+      }
+    }
+    else if (e.target.id === "server-settings-polling-interval") {      
+      const pollingInterval = parseInt(e.target.value);
+      if (isNaN(pollingInterval) || pollingInterval < 1 || pollingInterval > 60) {
+        e.target.title = chrome.i18n.getMessage("errorMessageInvalidPollingInterval");
+        e.target.classList.add("invalid-state");
+      }
+      else {
+        e.target.classList.remove("invalid-state");
+        e.target.title = "";
+        await setLocalValue("polling_interval", pollingInterval);
+      }
     }
 
-    if (e.target.id === "btn-reset-settings") {
-      document.getElementById("server-settings-host").value = server;
-      document.getElementById("server-settings-port").value = port;
+  });
 
-      document.getElementById("server-settings-polling-timeout").value = pollingTimeout;
-      document.getElementById("server-settings-polling-interval").value = pollingInterval;
 
-      document.getElementById("server-settings-lock-timeout").value = lockTimeout;
-      document.getElementById("render_content_icon").checked = true;
+  document.addEventListener("click", async (e) => {
 
-      document.getElementById("opacity_content_icon").value = opacityOfContentIcon;
+  
 
-      removeLocalValue("dont_show_unlock_message_again");
-
+    if (e.target.id === "icon_position_left") {
+      await setLocalValue("position_content_icon", 'left');
+      await setTemporaryKey("position_content_icon", 'left');
+      updateIconPositionDropDown('left');
     }
+    else if (e.target.id === "icon_position_right") {
+      await setLocalValue("position_content_icon", 'right');
+      await setTemporaryKey("position_content_icon", 'right');
+      updateIconPositionDropDown('right');
+    }
+    
 
     if (e.target.id === "link") {
 
@@ -239,8 +191,6 @@ getLocalValue("linked").then(async (linked) => {
           }).then(async (response) => {
             updateMenuUi(null, null);
 
-            await loadAlternativeServersToUi()
-
 
             bsAlert(
               chrome.i18n.getMessage("titleSuccess"), 
@@ -258,6 +208,7 @@ getLocalValue("linked").then(async (linked) => {
       if (isUnlocked) {
         // lock local vault
         deleteTemporaryKey("clientKey");
+        deleteTemporaryKey("last_used_credential");
         updateVaultUi();
         document.getElementById("credential_list").innerHTML = "";
         updateExtensionIcon();
@@ -461,45 +412,72 @@ getLocalValue("linked").then(async (linked) => {
     }
     else if (e.target.id === "manage_servers") {
 
-      const currentServer = await getLocalValue("server_address");
+      const allServers = [];
+      const alternativeServers = await loadAllAlternativeServers();
 
-      const allServers = await loadAllServers();
-    
+      // find current add add him on top
+      const currentServer = await getLocalValue("server_address");
+      let port = await getLocalValue("server_port");
+
+      let currentServerInAlternativeList = false;
+      alternativeServers.forEach((altServer) => {
+        if (altServer.host == currentServer) {
+          currentServerInAlternativeList = true;
+          allServers.splice(0, 0, altServer);
+        }
+        else {
+          // Push to end
+          allServers.push(altServer);
+        }
+      });
+      if (!currentServerInAlternativeList) {
+        allServers.splice(0, 0, { host: currentServer, description: "" });
+      }
 
       const html = [];
       const serversToBeDeleted = [];
       const changedHosts = new Map();
       const changedDescriptions = new Map();
       let addedHost, addedDescription;
+      let newServer = currentServer;
 
       html.push("<h6>" + chrome.i18n.getMessage("messageManageServers") + "</h6>");
     
+      
 
-      allServers.map((server) => {
+      allServers.forEach((server, index) => {
 
         const ipFromHandle = handleToIpAddress(server.host);
         let hostTooltip = "";
         if (ipFromHandle) {
           hostTooltip = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
         }
-              
-        let htmlLine;
-        if (server.host === currentServer) {
-          htmlLine = `
+            
+        const isNewServerRow = index == 0;
+        if (isNewServerRow) {
+          const htmlLine = `
           <h8> - ${chrome.i18n.getMessage("lblCurrentHostAddress")} -</h8>
-          <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
+          <div id="server_row_${currentServer}" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
-              <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
+              <input id="server_host_${currentServer}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
             </div>
             <div class="col-4">
-              <input id="server_description_${server.host}" value="${server.description}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblNotes")}" aria-label="server notes">
+              <input id="server_description_${currentServer}" value="${server.description}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblNotes")}" aria-label="server notes">
             </div>
           </div>
 
-      `;
+          `;
+          html.push(htmlLine);
+
         }
         else {
-          htmlLine = `
+
+          if (index == 1) {
+            html.push(`<h8> - ${chrome.i18n.getMessage("lblAlternativeHostAddress")} -</h8>`);
+
+          }
+
+          const htmlLine = `
           <div id="server_row_${server.host}" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
               <input id="server_host_${server.host}" value="${server.host}" title="${hostTooltip}" class="form-control input-sm" type="text" placeholder="${chrome.i18n.getMessage("lblAppHost")}" aria-label="IP address or hostame">
@@ -516,11 +494,10 @@ getLocalValue("linked").then(async (linked) => {
             </div>
           </div>
 
-      `;
+          `;
+          html.push(htmlLine);
         }
         
-        html.push(htmlLine);
-    
 
         document.addEventListener("input", (e) => {
           if (e.target.id === "server_host_" + server.host) {
@@ -529,6 +506,9 @@ getLocalValue("linked").then(async (linked) => {
 
             if (isValidIPAdressOrHostnameOrHandle(e.target.value)) {
               changedHosts.set(server.host, e.target.value);
+              if (isNewServerRow) {
+                newServer = e.target.value;
+              }
               e.target.classList.remove("invalid-state");
               const okButton = document.getElementById("modal-btn-ok");
               if (okButton) { 
@@ -557,6 +537,8 @@ getLocalValue("linked").then(async (linked) => {
         });
 
 
+
+
         document.addEventListener("click", (e) => {
           if (e.target.id === "delete_server_" + server.host) {
             e.target.innerText = "";
@@ -571,7 +553,10 @@ getLocalValue("linked").then(async (linked) => {
 
       });
 
+
+
       html.push(`
+        <br/>
         <h8> - ${chrome.i18n.getMessage("lblNewHostAddress")} -</h8>
           <div id="new_server_row" class="row mh-0 ph-0 mb-2">
             <div class="col-6">
@@ -582,9 +567,21 @@ getLocalValue("linked").then(async (linked) => {
             </div>
           </div>
         `);
+  
+
+      html.push(`
+        <hr/>
+        <h8>${chrome.i18n.getMessage("lblSettingsPort")}</h8>
+        <div class="mb-3">
+          <input id="server-settings-port" class="form-control" type="number" min="1024" max="49151" placeholder="Port" aria-label="The TCP port" value="${port}">
+        </div>
+      `);  
 
       document.addEventListener("input", (e) => {
         if (e.target.id === "new_server_host") {
+
+          e.target.title = "";
+
           if (e.target.value === "" || isValidIPAdressOrHostnameOrHandle(e.target.value)) {
             addedHost = e.target.value;
             e.target.classList.remove("invalid-state");
@@ -592,10 +589,15 @@ getLocalValue("linked").then(async (linked) => {
             if (okButton) {
               okButton.disabled = false;
             }
+            const ipFromHandle = handleToIpAddress(e.target.value);
+            if (ipFromHandle) {
+              e.target.title = chrome.i18n.getMessage("tooltipResolvedHandle", ipFromHandle);
+            }
           }
           else {
             console.log("host invald", e.target.value);
             e.target.classList.add("invalid-state");
+            e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppHost");
             const okButton = document.getElementById("modal-btn-ok");
             if (okButton) { 
               okButton.disabled = true;
@@ -604,6 +606,29 @@ getLocalValue("linked").then(async (linked) => {
         }
         else if (e.target.id === "new_server_description") {
           addedDescription = e.target.value;
+        }
+        else if (e.target.id === "server-settings-port") {
+          
+          const newPort = parseInt(e.target.value);
+          if (isNaN(newPort) || newPort < 1024 || newPort > 49151) {
+            e.target.title = chrome.i18n.getMessage("errorMessageInvalidAppPort");
+      
+            console.log("port invald", e.target.value);
+            e.target.classList.add("invalid-state");
+            const okButton = document.getElementById("modal-btn-ok");
+            if (okButton) { 
+              okButton.disabled = true;
+            }
+          }
+          else {
+            e.target.classList.remove("invalid-state");
+            e.target.title = "";
+            const okButton = document.getElementById("modal-btn-ok");
+            if (okButton) {
+              okButton.disabled = false;
+            }
+            port = newPort;
+          }
         }
       });
 
@@ -637,22 +662,31 @@ getLocalValue("linked").then(async (linked) => {
 
               const changedHost = changedHosts.get(server.host);
               const changedDescription = changedDescriptions.get(server.host);
-              console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
-              await removeLocalValue(PREFIX_ALT_SERVER + server.host);
-              await setLocalValue(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
-              
+
+              if (changedHost || changedDescription !== undefined) {
+                console.debug("change server " + PREFIX_ALT_SERVER + server.host + " with " + changedHost + " and " + changedDescription);
+                await removeLocalValue(PREFIX_ALT_SERVER + server.host);
+                await setLocalValue(PREFIX_ALT_SERVER + (changedHost || server.host), changedDescription === undefined ? currentDescription : changedDescription);
+              }
             }
           });
 
           // handle creation
           if (addedHost && addedHost.trim().length > 0) {
-            const currentDescription = await getLocalValue(PREFIX_ALT_SERVER + addedHost);
             console.debug("add server " + PREFIX_ALT_SERVER + addedHost + " with " + addedDescription);
             await setLocalValue(PREFIX_ALT_SERVER + addedHost, addedDescription || "");
           }
 
 
-          await loadAlternativeServersToUi()
+          // save curent
+          console.debug("new server", newServer);
+          await setLocalValue("server_address", newServer);
+          
+
+          // save port
+          console.debug("new port", port);
+          await setLocalValue("server_port", port);
+
         }
       });
     }
@@ -662,6 +696,19 @@ getLocalValue("linked").then(async (linked) => {
   updateMenuUi(webClientId, linked);
 
 
+
+  function updateIconPositionDropDown(positionOfContentIcon) {
+    if (positionOfContentIcon === 'right') {
+      document.getElementById("position_content_icon_text").innerText = chrome.i18n.getMessage("lblIconPositionRight");
+      document.getElementById("icon_position_right").classList.add('active');
+      document.getElementById("icon_position_left").classList.remove('active');
+    }
+    else {
+      document.getElementById("position_content_icon_text").innerText = chrome.i18n.getMessage("lblIconPositionLeft");
+      document.getElementById("icon_position_left").classList.add('active');
+      document.getElementById("icon_position_right").classList.remove('active');
+    }
+  }
 });
 
 function updateLocalVaultPasswordMenuItem() {
@@ -1004,50 +1051,23 @@ function updateCredentialCountUi(credentialCount) {
   }
 }
 
+async function loadAllAlternativeServers() {
+  const serverMap = new Map();
 
-async function loadAlternativeServersToUi() {
-  const alternativeServers = await loadAllServers();
-  const hostSelector = document.getElementById("host_selector");
-  hostSelector.innerHTML = "<option selected> - " + chrome.i18n.getMessage("lblChooseHostAlternative") + " - </option>";
-
-  alternativeServers
-    .map((altServer) => {
-    const opt = document.createElement("option");
-    
-    opt.value = altServer.host;
-
-    let text;
-    if (altServer.description.length > 0) {
-      text = altServer.host + " ( " + altServer.description + " )";
-    }
-    else {
-      text = altServer.host;
-    }
-    const ipFromHandle = handleToIpAddress(altServer.host);
-    if (ipFromHandle) {
-      text = text + " - " + ipFromHandle;
-    }
-    
-    
-  
-    opt.innerText = text;
-    hostSelector.append(opt);
-  });
-}
-
-async function loadAllServers() {
-  const alternativeServers = [];
   const all = await getAllLocalValues();
   for (const [key, value] of all) {
 
     if (key.startsWith(PREFIX_ALT_SERVER)) {
       const host = key.substring(PREFIX_ALT_SERVER.length);
       const description = value === undefined || value === null  || value === "null" ? "" : value.trim();
-      alternativeServers.push({ host: host, description: description });
+      serverMap.set(host, description);
     }
   }
-  alternativeServers.sort((a, b) => (a.host.localeCompare(b.host)));
-  return alternativeServers;
+
+  const servers = [];
+  serverMap.forEach((value, key) => servers.push({ host: key, description: value }));
+  servers.sort((a, b) => (a.host.localeCompare(b.host)));
+  return servers;
 }
 
 async function addNewAlternativeServer(newServer) {

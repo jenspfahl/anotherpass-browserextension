@@ -14,72 +14,74 @@ getTemporaryKey("linked").then(async (linked) => {
   if (linked) {
 
     const renderContentIcon = await getTemporaryKey("render_content_icon");
+    const renderIcons = (renderContentIcon == undefined || renderContentIcon === true || renderContentIcon === "true");
     const opacityOfContentIcon = await getTemporaryKey("opacity_content_icon");
+    const positionOfContentIcon = await getTemporaryKey("position_content_icon");
 
     console.debug("renderContentIcon", renderContentIcon);
 
-    if (renderContentIcon == undefined || renderContentIcon === true || renderContentIcon === "true") {
-      var obs = new MutationObserver(function (mutations, observer) {
-        //console.debug("got mutations", mutations.length);
-        for (var j = 0; j < mutations.length; j++) {
-          const mutation = mutations[j];
-          //console.debug("got mutation", mutation);
+    
+    var obs = new MutationObserver(function (mutations, observer) {
+      //console.debug("got mutations", mutations.length);
+      for (var j = 0; j < mutations.length; j++) {
+        const mutation = mutations[j];
+        //console.debug("got mutation", mutation);
 
-          for (var i = 0; i < mutation.addedNodes.length; i++) {
-              const addedNode = mutation.addedNodes[i];
-              //console.debug("got added node", addedNode);
+        for (var i = 0; i < mutation.addedNodes.length; i++) {
+            const addedNode = mutation.addedNodes[i];
+            //console.debug("got added node", addedNode);
 
-              if (typeof addedNode.querySelectorAll !== "undefined") { 
-                const inputs = addedNode.querySelectorAll("input");
-                //console.debug("got password type", inputs);
+            if (typeof addedNode.querySelectorAll !== "undefined") { 
+              const inputs = addedNode.querySelectorAll("input");
+              //console.debug("got password type", inputs);
 
-                for (var l = 0; l < inputs.length; l++) {
-                  const input = inputs[l];
+              for (var l = 0; l < inputs.length; l++) {
+                const input = inputs[l];
 
-                  console.debug("found password field");
-                  addButton(input, opacityOfContentIcon);
-                }
+                console.debug("found password field");
+                addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
               }
+            }
 
-          }
         }
+      }
 
 
-      });
+    });
 
-      console.log("add observation listener");
-      obs.observe(document.body, { childList: true, subtree: true, attributes: false, characterData: false });
+    console.log("add observation listener");
+    obs.observe(document.body, { childList: true, subtree: true, attributes: false, characterData: false });
 
 
-      console.log("presearch credential fields");
+    console.log("presearch credential fields");
+    const inputs = document.querySelectorAll("input");
+    console.log("found input count on research", inputs.length);
+
+    for (var j = 0; j < inputs.length; j++) {
+      const input = inputs[j];
+
+      console.debug("found password field");
+      addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
+    }
+
+    // delayed search in case of missing loaded elements
+    setTimeout(() => {
+      console.log("search credential fields");
       const inputs = document.querySelectorAll("input");
-      console.log("found input count on research", inputs.length);
+      console.log("found input count", inputs.length);
 
       for (var j = 0; j < inputs.length; j++) {
         const input = inputs[j];
 
         console.debug("found password field");
-        addButton(input, opacityOfContentIcon);
+        addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon);
+
       }
 
-      // delayed search in case of missing loaded elements
-      setTimeout(() => {
-        console.log("search credential fields");
-        const inputs = document.querySelectorAll("input");
-        console.log("found input count", inputs.length);
+    }, 2500);
 
-        for (var j = 0; j < inputs.length; j++) {
-          const input = inputs[j];
-
-          console.debug("found password field");
-          addButton(input, opacityOfContentIcon);
-
-        }
-
-      }, 2500);
-
-      
-    }
+    
+  
 
     const response = await chrome.runtime.sendMessage({ action: "get_tab_id" });
     const currentTabId = response.tabId;
@@ -98,6 +100,16 @@ getTemporaryKey("linked").then(async (linked) => {
 
       if (msg.action === "paste_credential") {
         pasteCredential(msg.password, msg.user);
+
+
+        // store credential in session for the next minute and add an action icon to paste it from mem, used if e.g. username and password is requested in two steps.
+        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password, name: msg.name});
+        // delayed search in case of missing loaded elements
+        setTimeout(() => {
+          console.log("clear cached credential");
+          deleteTemporaryKey("last_used_credential");
+        }, 5 * 60 * 1000); //TODO make this configurable
+
         if (_dialog) {
           popupOpen = false;
           _dialog.close();
@@ -187,7 +199,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
 const injectedButtonId = "___synthetic_ANOTHERpass_____";
 
-function addButton(input, opacityOfContentIcon) {
+function addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIcon) {
 
   console.debug("input.type", input.type);
   console.debug("input.nodeName", input.nodeName);
@@ -211,11 +223,15 @@ function addButton(input, opacityOfContentIcon) {
     return;
   }
 
+  if (!renderIcons) {
+    return;
+  }
   
   const target = input.parentNode;
   if (target.id !== injectedButtonId) {
     const div = document.createElement('div');
     div.id = injectedButtonId;
+    div.style.position = "relative";
 
     const button = document.createElement('button');
     button.type = "button";
@@ -239,8 +255,12 @@ function addButton(input, opacityOfContentIcon) {
     button.style.minHeight = inputHeight + "px";
     button.style.border = input.border;
     button.style.opacity = opacityOfContentIcon + "%";
-
     button.style.backgroundImage = "url(" + iconUrl + ")";
+ 
+    if (positionOfContentIcon === 'right') {
+      button.style.right = "0px";
+    }
+   
 
     target.insertBefore(div, input);
 

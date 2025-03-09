@@ -3,6 +3,7 @@ document.getElementById("search_input").placeholder = chrome.i18n.getMessage("lb
 document.getElementById("search_input").title = chrome.i18n.getMessage("tooltipSearchCredentials");
 document.getElementById("subtitle").innerText = chrome.i18n.getMessage("lblLocalVault");
 document.getElementById("fetch_credential").title = chrome.i18n.getMessage("tooltipFetchSingleCredential");
+document.getElementById("recent_credential").title = chrome.i18n.getMessage("tooltipPasteRecentCredential");
 document.getElementById("create_credential").title = chrome.i18n.getMessage("tooltipCreateNewCredential");
 
 
@@ -47,6 +48,24 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
 
     }
 
+    if (e.target.id === "recent_credential") {
+
+      getTemporaryKey("last_used_credential").then((credential) => {
+
+        chrome.runtime.sendMessage({ 
+          action: "paste_credential", 
+          password: credential.password, 
+          user: credential.user,
+          name: credential.name,
+          tabId: requestData.tabId });
+
+        // force popup close
+        chrome.runtime.sendMessage({ action: "close_credential_dialog", tabId: requestData.tabId });
+      });
+      
+
+    }
+
 
     if (e.target.id === "create_credential") {
       const response = await chrome.runtime.sendMessage({
@@ -75,6 +94,7 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
       if (isUnlocked) {
         // lock local vault
         deleteTemporaryKey("clientKey");
+        deleteTemporaryKey("last_used_credential");
         updateVaultUi();
         await chrome.runtime.sendMessage({
           action: "update_extension_icon"
@@ -204,8 +224,21 @@ function updateVaultUi(unlocked) {
     document.getElementById("lock").title = chrome.i18n.getMessage("titleLockLocalVault");
     document.getElementById("hint").classList.add("d-none");
     document.getElementById("search_group").classList.remove("d-none");
-
     document.getElementById("search_input").focus();
+
+    document.getElementById("recent_credential").title = chrome.i18n.getMessage("tooltipPasteRecentCredential");
+
+    getTemporaryKey("last_used_credential").then((value) => {
+      if (value != null) {
+        document.getElementById("recent_credential").classList.remove("d-none");
+        if (value.name) {
+          document.getElementById("recent_credential").title = chrome.i18n.getMessage("tooltipPasteRecentCredential") + ": " + value.name;
+        }
+      }
+      else {
+        document.getElementById("recent_credential").classList.add("d-none");
+      }
+    });
 
   }
   else {
@@ -216,6 +249,9 @@ function updateVaultUi(unlocked) {
     const list = document.getElementById("credential_list");
     list.innerHTML = "";
     document.getElementById("search_group").classList.add("d-none");
+
+    document.getElementById("recent_credential").classList.add("d-none");
+
 
   }
 }

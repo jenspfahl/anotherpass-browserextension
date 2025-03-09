@@ -144,6 +144,12 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
       return true;  
     }
+    
+    case "paste_credential": {
+      pasteCredential(message.tabId, message.user, message.password, message.name);
+
+      return true;  
+    }
 
         
     case "apply_credential": {
@@ -220,9 +226,11 @@ getLocalValue("linked").then(async (linked) => {
   
     const renderContentIcon = await getLocalValue("render_content_icon");
     const opacityOfContentIcon = await getLocalValue("opacity_content_icon");
+    const positionOfContentIcon = await getLocalValue("position_content_icon");
 
     await setSessionValue("render_content_icon", renderContentIcon);
     await setSessionValue("opacity_content_icon", opacityOfContentIcon);
+    await setSessionValue("position_content_icon", positionOfContentIcon);
   
   
     createContextMenu();
@@ -310,13 +318,17 @@ async function forwardCredential(tabId, uid) {
     if (encCredential) {
       try {
         const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
-        chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user });
+        chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user, name: credential.name });
       } catch(e) {
         console.error("cannot decrypt credential with uid " + uid + ". Ignored.", e);
       }
     }
     
   }
+}
+
+async function pasteCredential(tabId, user, password, name) {
+  chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user, name: name });
 }
 
 async function findLocalByUid(prefix, uid) {

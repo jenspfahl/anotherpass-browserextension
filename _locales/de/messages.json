@@ -225,6 +225,9 @@
     "tooltipFetchSingleCredential": {
         "message": "Rufe einzelne Zugangsdaten aus der App ab"
     },
+    "tooltipPasteRecentCredential": {
+        "message": "Zuletzt verwendete Zugangsdaten einfügen"
+    },
     "tooltipCreateNewCredential": {
         "message": "Neue Zugangsdaten in der App erstellen"
     },
@@ -341,14 +344,23 @@
         "message": "Automatisch",
         "description": "Means automatically light or dark theme, controlled by the OS"
     },
+    "lblIconPosition": {
+        "message": "Position des Symbols im Textfeld"
+    },
+    "lblIconPositionLeft": {
+        "message": "Auf der linken Seite"
+    },
+    "lblIconPositionRight": {
+        "message": "Auf der rechten Seite"
+    },
     "lblSettingsAutoLock": {
         "message": "Minuten der Inaktivität nachdem der entsperrte lokale Tresor gesperrt wird"
     },
     "lblSettingsRenderIcon": {
-        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Icon (Aktualisierung der Webseite erforderlich, wenn dies geändert wurde)."
+        "message": "Zeige in jedem Benutzernamen- und Passwort-Eingabefeld ein Zugangsdaten-Symbol. Achtung: Aktualisierung der Webseiten erforderlich, wenn diese Einstellungen geändert wurden!"
     },
     "lblSettingsIconOpacity": {
-        "message": "Deckkraft dieses Icons"
+        "message": "Deckkraft dieses Symbols"
     },
     "lblSettingsHostWithAppName": {
         "message": "Hostname, Handle oder IP-Addresse der ANOTHERpass-App"
@@ -357,7 +369,7 @@
         "message": "Hostname, Handle oder IP-Addresse"
     },
     "lblSettingsPort": {
-        "message": "und der Port",
+        "message": "App-Server-Port",
         "description": "hostname and port kind of belongs together"
     },
     "lblSettingsPollingTimeout": {
@@ -367,10 +379,6 @@
     "lblSettingsPollingIntervall": {
         "message": "und fragt aller X Sekunden",
         "description": "In which intervall shall the extension poll the app host to retrieve data"
-    },
-    "lblSettingsManageHostAlternatives": {
-        "message": "Alternativen verwalten",
-        "description": "Means app host or handle or ip alternatives"
     },
     "lblChooseHostAlternative": {
         "message": "wähle einen alternative Adresse",
@@ -410,10 +418,10 @@
         "message": "Ungültiger Icon-Deckkraft-Wert, muss zwischen 1 und 100 sein."
     },
     "titleManageServers": {
-        "message": "Alternative App-Adressen verwalten"
+        "message": "App-Adressen verwalten"
     },
     "messageManageServers": {
-        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein. Änderungen an dieser Liste wirken sich nicht auf die aktuell konfigurierte Hostadresse aus."
+        "message": "Alle App-Hostadressen in dieser Liste können zum Herstellen einer Verbindung mit der ANOTHERpass-App verwendet werden. Wenn du z.B. deinen Laptop in verschiedenen Netzwerken verwendest (zu Hause vs. auf Arbeit), kann die App-Hostadresse (z.B. die IP) unterschiedlich sein."
     }
     ,
     "tooltipResolvedHandle": {
@@ -436,10 +444,13 @@
         "description": "Indicates general notes"
     },
     "lblNewHostAddress": {
-        "message": "Neue Host-Adresse"
+        "message": "Neue alternative App-Adresse"
     },
     "lblCurrentHostAddress": {
-        "message": "Aktuelle Host-Addresse"
+        "message": "Aktuelle App-Addresse"
+    },
+    "lblAlternativeHostAddress": {
+        "message": "Alternative App-Adressen"
     },
     "errorMessageInvalidAppHost": {
         "message": "IP, Handle oder Hostname ist ungültig"

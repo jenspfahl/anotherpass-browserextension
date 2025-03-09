@@ -132,6 +132,18 @@
   content: "__MSG_lblSettingsColorThemeAuto__";
 }
 
+.translatedSettingsIconPosition::before {
+  content: "__MSG_lblIconPosition__";
+}
+
+.translatedSettingsIconPositionLeft::before {
+  content: "__MSG_lblIconPositionLeft__";
+}
+
+.translatedSettingsIconPositionRight::before {
+  content: "__MSG_lblIconPositionRight__";
+}
+
 .translatedSettingsAutolockAuto::before {
   content: "__MSG_lblSettingsAutoLock__";
 }

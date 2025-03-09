@@ -225,6 +225,9 @@
     "tooltipFetchSingleCredential": {
         "message": "Fetch single credential from the app"
     },
+    "tooltipPasteRecentCredential": {
+        "message": "Paste lastly used credential"
+    },
     "tooltipCreateNewCredential": {
         "message": "Create new credential in the app"
     },
@@ -341,11 +344,20 @@
         "message": "Auto",
         "description": "Means automatically light or dark theme, controlled by the OS"
     },
+    "lblIconPosition": {
+        "message": "Position of the icon in the text field"
+    },
+    "lblIconPositionLeft": {
+        "message": "On the left side"
+    },
+    "lblIconPositionRight": {
+        "message": "On the right side"
+    },
     "lblSettingsAutoLock": {
         "message": "Minutes of inactivity after the unlocked local vault is locked"
     },
     "lblSettingsRenderIcon": {
-        "message": "Display a credential-icon in each username and password input field (website-reload is needed if this has been changed)"
+        "message": "Display a credential-icon in each username and password input field. Note: All websites need to be reloaded if these settings have been changed!"
     },
     "lblSettingsIconOpacity": {
         "message": "Opacity of this icon"
@@ -357,7 +369,7 @@
         "message": "Hostname, handle or IP address"
     },
     "lblSettingsPort": {
-        "message": "and its port",
+        "message": "App server port",
         "description": "hostname and port kind of belongs together"
     },
     "lblSettingsPollingTimeout": {
@@ -367,10 +379,6 @@
     "lblSettingsPollingIntervall": {
         "message": "and polls every X seconds",
         "description": "In which intervall shall the extension poll the app host to retrieve data"
-    },
-    "lblSettingsManageHostAlternatives": {
-        "message": "Manage alternatives",
-        "description": "Means app host or handle or ip alternatives"
     },
     "lblChooseHostAlternative": {
         "message": "choose an alternative address",
@@ -410,10 +418,10 @@
         "message": "Invalid icon opacity, should be a number between 1 and 100."
     },
     "titleManageServers": {
-        "message": "Manage alternative app hosts"
+        "message": "Manage app addresses"
     },
     "messageManageServers": {
-        "message": "All app host addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in a different network, the address of the phone to connect can differ. Changing anything here doesn't effect the current configured host address."
+        "message": "All app addresses in this list can be used to connect to the ANOTHERpass app. For example if you use a laptop in a different network, the host address of your mobile to connect can differ."
     },
     "tooltipResolvedHandle": {
         "message": "This handle will be translated to $ip$",
@@ -434,10 +442,13 @@
         "description": "Indicates general notes"
     },
     "lblNewHostAddress": {
-        "message": "New host address"
+        "message": "New alternative app address"
     },
     "lblCurrentHostAddress": {
-        "message": "Current host address"
+        "message": "Current app address"
+    },
+    "lblAlternativeHostAddress": {
+        "message": "Alternative app address"
     },
     "errorMessageInvalidAppHost": {
         "message": "IP, handle or hostname is invalid"
