@@ -64,14 +64,28 @@ document.addEventListener("click", async (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
+    document.getElementById("copy").title = chrome.i18n.getMessage("successMessagePasswordCopied");
     document.getElementById("copy").innerHTML = `
     <span id="copy" class="material-symbols-outlined size-24">
     check
     </span>
     `;
   }
+  else if (e.target.id === "copy_otp") {
+    navigator.clipboard.writeText(calcOtp(_credential.otp));
+    document.getElementById("copy_otp").title = chrome.i18n.getMessage("successMessageOTPCopied");
+    document.getElementById("copy_otp").innerHTML = `
+    <span id="copy_otp" class="material-symbols-outlined size-24">
+    check
+    </span>
+    `;
+  }
   else if (e.target.id === "password_field") {
     document.getElementById("password_field").innerText = _credential.password;
+  }
+  else if (e.target.id === "otp_field") {
+    //TODO update TOTP automatically
+    document.getElementById("otp_field").innerText = calcOtp(_credential.otp);
   }
 });
 
@@ -495,6 +509,32 @@ getLocalValue("linked").then(async (linked) => {
           _credential = credential;
 
 
+          let otpContainer = "";
+          if (credential.otp) {
+            otpContainer = 
+            `
+            <div class="row">
+              <div class="col">
+                <div class="mb-3">
+                ${chrome.i18n.getMessage("lblOTP")}:
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="mb-1">
+                  <b id="otp_field" class="fingerprint_small cursor-pointer">******  </b>
+            
+                  <button class="btn pt-0 px-0 mt-0" type="button" id="copy_otp" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
+                    <span id="copy_otp" class="material-symbols-outlined size-24">
+                    content_copy
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            `;
+          }
+
           bsConfirm(
             chrome.i18n.getMessage("lblCredential") + " '" + credential.name + "'", 
             `
@@ -547,6 +587,9 @@ getLocalValue("linked").then(async (linked) => {
                     </div>
                   </div>
                 </div>
+
+
+                ${otpContainer}
 
 
               </div>

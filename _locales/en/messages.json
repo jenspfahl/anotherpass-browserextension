@@ -289,6 +289,12 @@
     "successMessagePasswordCopied": {
         "message": "Password copied to the clipboard."
     },
+    "tooltipCopyOTP": {
+        "message": "Copy one-time-password to clipboard"
+    },
+    "successMessageOTPCopied": {
+        "message": "One-time-password copied to the clipboard."
+    },
     "lblImportedAt": {
         "message": "Imported at"
     },
@@ -296,7 +302,10 @@
         "message": "Website"
     },
     "lblUser": {
-        "message": "Benutzer"
+        "message": "User"
+    },
+    "lblOTP": {
+        "message": "One-Time-Password"
     },
     "lblApplyCredentialToWebsite": {
         "message": "Apply on website"

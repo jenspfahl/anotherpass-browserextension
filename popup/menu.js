@@ -891,12 +891,54 @@ async function loadCredentials(clientKey) {
         `;
        
       }
+      if (e.target.id === "copy_otp_" + uuid) {
+        navigator.clipboard.writeText(calcOtp(credential.otp));
+        document.getElementById("copy_otp_" + uuid).title = chrome.i18n.getMessage("successMessageOTPCopied");
+        document.getElementById("copy_otp_" + uuid).innerHTML = `
+        <span id="copy_otp_${uuid}" class="material-symbols-outlined size-24">
+        check
+        </span>
+        `;
+       
+      }
       if (e.target.id === "password_field_" + uuid) {
         document.getElementById("password_field_" + uuid).innerText = credential.password;
       }
+      if (e.target.id === "otp_field_" + uuid) {
+        //TODO update TOTP automatically
+        document.getElementById("otp_field_" + uuid).innerText = calcOtp(credential.otp);
+      }
       if (e.target.id === "credential_dropdown_" + uuid) {
+
+        let otpContainer = "";
+        if (credential.otp) {
+          otpContainer = 
+          `
+          <div class="row">
+              <div class="col">
+                <div class="mb-3">
+                ${chrome.i18n.getMessage("lblOTP")}:
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="mb-1">
+                  <b id="otp_field_${uuid}" class="fingerprint_small cursor-pointer">******  </b>
+            
+                  <button class="btn pt-0 px-0 mt-0" type="button" id="copy_otp_${uuid}" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
+                    <span id="copy_otp_${uuid}" class="material-symbols-outlined size-24">
+                    content_copy
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          `;
+        }
+
         bsAlert(
           chrome.i18n.getMessage("lblCredential")+ " '" + credential.name + "'",
+
           `
             <div class="container text-left">
 
@@ -972,6 +1014,9 @@ async function loadCredentials(clientKey) {
                 </div>
               </div>
 
+
+              ${otpContainer}
+              
              
 
             </div>
