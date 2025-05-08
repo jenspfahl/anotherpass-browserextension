@@ -88,10 +88,19 @@ document.addEventListener("click", async (e) => {
   else if (e.target.id === "otp_field") {
     //update TOTP automatically
     if (_otpAuth) {
-      e.target.innerText = await calcOtp(_otpAuth);
-      setInterval(async () => {
-        e.target.innerText = await calcOtp(_otpAuth);
-      }, 1000);
+      if (_otpAuth.type == "totp") {
+        e.target.innerText = indicateTotpRemainingTime(_otpAuth) + " " + (await calcOtp(_otpAuth, true));
+
+        setInterval(async () => {
+          console.debug(calcTotpRemainingTime(_otpAuth));
+          e.target.innerText = indicateTotpRemainingTime(_otpAuth) + " " + (await calcOtp(_otpAuth, true));
+        }, 1000);
+      }
+      else {
+        e.target.title = chrome.i18n.getMessage("tooltipHotpCounter", _otpAuth.counter);
+        e.target.innerText = await calcOtp(_otpAuth, true);
+      }
+      
     }
   }
 });

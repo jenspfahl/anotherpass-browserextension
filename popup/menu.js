@@ -914,10 +914,18 @@ async function loadCredentials(clientKey) {
       if (e.target.id === "otp_field_" + uuid) {
         //update TOTP automatically
         if (otpAuth) {
-          e.target.innerText = await calcOtp(otpAuth);
-          setInterval(async () => {
-            e.target.innerText = await calcOtp(otpAuth);
-          }, 1000);
+          if (otpAuth.type == "totp") {
+            e.target.innerText = indicateTotpRemainingTime(otpAuth) + " " + (await calcOtp(otpAuth, true));
+
+            setInterval(async () => {
+              e.target.innerText = indicateTotpRemainingTime(otpAuth) + " " + (await calcOtp(otpAuth, true));
+            }, 1000);
+          }
+          else {
+            e.target.title = chrome.i18n.getMessage("tooltipHotpCounter", otpAuth.counter);
+            e.target.innerText = await calcOtp(otpAuth, true);
+          }
+          
         }
         
       }

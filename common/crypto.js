@@ -366,16 +366,50 @@ function longToByteArrayRFC6238(long) {
   return new Uint8Array(buffer); 
 }
 
-async function calcOtp(otpAuth) {
+async function calcOtp(otpAuth, format) {
 
   let counter = otpAuth.counter; 
   if (otpAuth.type === "totp") {
-    counter = Math.round( Date.now() / (otpAuth.period * 1000) );
+    counter = Math.floor( Date.now() / (otpAuth.period * 1000) );
   }
   const input = longToByteArrayRFC6238(counter);
   const bytes = await hmac(otpAuth.algorithm, otpAuth.secret, input);
 
-  return byteArrayToDigitsRFC6238(bytes, otpAuth.digits);
+  const otp = byteArrayToDigitsRFC6238(bytes, otpAuth.digits);
+
+  const otpString = otp.toString().padStart(otpAuth.digits, '0');
+  if (format) {
+    return formatOtp(otpString);
+  }
+  else {
+    return otpString;
+  }
+}
+
+function calcTotpRemainingTime(otpAuth) {
+
+  if (otpAuth.type === "totp") {
+    const periodInMillis = otpAuth.period * 1000;
+    const elapsedMillisOfPeriod = Date.now() % periodInMillis;
+
+    const duration = periodInMillis - elapsedMillisOfPeriod;
+    return duration / periodInMillis;
+  }
+  else {
+    return null;
+  }
+}
+
+function indicateTotpRemainingTime(otpAuth) {
+  const t = calcTotpRemainingTime(otpAuth);
+  if (t == null) {
+    return "";
+  }
+  if (t >= 0.8) return "\u25CB";
+  if (t >= 0.6) return "\u25D4";
+  if (t >= 0.4) return "\u25D1";
+  if (t >= 0.2) return "\u25D5";
+  return "\u25CF";
 }
 
 function base64ToBytes(base64) {
@@ -385,6 +419,20 @@ function base64ToBytes(base64) {
             .replace(/_/g, '/');
   const binString = atob(base64);
   return Uint8Array.from(binString, (m) => m.codePointAt(0));
+}
+
+function formatOtp(otpString) {
+  if (otpString.length === 6) {
+      return otpString.substring(0, 3) + ' ' + otpString.substring(3);
+  } else if (otpString.length === 7) {
+      return otpString.substring(0, 2) + ' ' + otpString.substring(2, 5) + ' ' + otpString.substring(5);
+  } else if (otpString.length === 8) {
+      return otpString.substring(0, 4) + ' ' + otpString.substring(4);
+  } else if (otpString.length === 9) {
+      return otpString.substring(0, 3) + ' ' + otpString.substring(3, 6) + ' ' + otpString.substring(6);
+  } else {
+      return otpString;
+  }
 }
 
 function bytesToBase64(bytes) {

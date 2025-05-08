@@ -295,6 +295,15 @@
     "successMessageOTPCopied": {
         "message": "Einmal-Passwort in die Zwischenablage kopiert."
     },
+    "tooltipHotpCounter": {
+        "message": "Aktueller Zähler: $counter$",
+        "placeholders": {
+            "counter": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
     "lblImportedAt": {
         "message": "Importiert am"
     },

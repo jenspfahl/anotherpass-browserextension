@@ -295,6 +295,15 @@
     "successMessageOTPCopied": {
         "message": "One-time-password copied to the clipboard."
     },
+    "tooltipHotpCounter": {
+        "message": "current counter: $counter$",
+        "placeholders": {
+            "counter": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
     "lblImportedAt": {
         "message": "Imported at"
     },
