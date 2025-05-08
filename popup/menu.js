@@ -853,6 +853,11 @@ async function loadCredentials(clientKey) {
   credentials.forEach(credential => {
     let uuid = credential.uid;
 
+    let otpAuth;
+    if (credential.otp) {
+      otpAuth = parseOtpAuth(credential.otp);
+    }
+
     const li = document.createElement("li");
 
     let searchable = credential.name.trim().toLowerCase();
@@ -883,8 +888,8 @@ async function loadCredentials(clientKey) {
     document.addEventListener("click", async (e) => {
       if (e.target.id === "copy_" + uuid) {
         navigator.clipboard.writeText(credential.password);
-        document.getElementById("copy_" + uuid).title = chrome.i18n.getMessage("successMessagePasswordCopied");
-        document.getElementById("copy_" + uuid).innerHTML = `
+        e.target.title = chrome.i18n.getMessage("successMessagePasswordCopied");
+        e.target.innerHTML = `
         <span id="copy_${uuid}" class="material-symbols-outlined size-24">
         check
         </span>
@@ -892,21 +897,29 @@ async function loadCredentials(clientKey) {
        
       }
       if (e.target.id === "copy_otp_" + uuid) {
-        navigator.clipboard.writeText(calcOtp(credential.otp));
-        document.getElementById("copy_otp_" + uuid).title = chrome.i18n.getMessage("successMessageOTPCopied");
-        document.getElementById("copy_otp_" + uuid).innerHTML = `
-        <span id="copy_otp_${uuid}" class="material-symbols-outlined size-24">
-        check
-        </span>
-        `;
-       
+        if (otpAuth) {
+          navigator.clipboard.writeText(await calcOtp(otpAuth));
+          e.target.title = chrome.i18n.getMessage("successMessageOTPCopied");
+          e.target.innerHTML = `
+          <span id="copy_otp_${uuid}" class="material-symbols-outlined size-24">
+          check
+          </span>
+          `;
+        }
+      
       }
       if (e.target.id === "password_field_" + uuid) {
-        document.getElementById("password_field_" + uuid).innerText = credential.password;
+        e.target.innerText = credential.password;
       }
       if (e.target.id === "otp_field_" + uuid) {
-        //TODO update TOTP automatically
-        document.getElementById("otp_field_" + uuid).innerText = calcOtp(credential.otp);
+        //update TOTP automatically
+        if (otpAuth) {
+          e.target.innerText = await calcOtp(otpAuth);
+          setInterval(async () => {
+            e.target.innerText = await calcOtp(otpAuth);
+          }, 1000);
+        }
+        
       }
       if (e.target.id === "credential_dropdown_" + uuid) {
 

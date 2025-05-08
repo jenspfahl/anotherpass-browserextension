@@ -5,6 +5,28 @@ const PREFIX_CREDENTIAL = "credential_"
 const PREFIX_ALT_SERVER = "alternative_server_"
 
 
+
+function base32Decode(encodedString) {
+  const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const encodedStringUpperCase = encodedString.toUpperCase();
+  let buffer = '';
+  let output = [];
+
+  for (let i = 0; i < encodedStringUpperCase.length; i++) {
+      const index = base32Chars.indexOf(encodedStringUpperCase[i]);
+      if (index === -1) continue; // Skip invalid characters
+
+      buffer += index.toString(2).padStart(5, '0'); // Convert to binary
+      while (buffer.length >= 8) {
+          output.push(parseInt(buffer.slice(0, 8), 2)); // Get byte
+          buffer = buffer.slice(8); // Remove used bits
+      }
+  }
+
+  return new Uint8Array(output);
+}
+
+
 function generateWebClientId() {
   const rnd = crypto.getRandomValues(new Uint8Array(32));
   const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 6).toUpperCase();
@@ -211,6 +233,127 @@ async function decryptWithPrivateKey(privateKey, encrypted) {
   );
 
   return new Uint8Array(rsaDecrypted);
+}
+
+
+async function hmac(hashAlgorithm, secret, message) {
+  const enc = new TextEncoder();
+
+  const hmacParams = {
+    name: "HMAC",
+    hash: hashAlgorithm
+  };
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), hmacParams, false, ["sign"]);
+
+  const encoded = enc.encode(message);
+  const signature = await window.crypto.subtle.sign("HMAC", key, encoded);
+  return new Uint8Array(signature);
+}
+
+
+function parseOtpAuth(otpAuthUrl) {
+  try {
+    const url = new URL(otpAuthUrl.toLowerCase());
+    const type = url.hostname;
+    if (type !== "hotp" && type !== "totp") {
+      console.error("Cannot parse OTP auth url, unknown type: " + type, otpAuthUrl);
+      return null;
+    }
+
+    const params = url.searchParams;
+    if (!params || params === null || params.length == 0) {
+      console.error("Cannot parse OTP auth url, no params provided", otpAuthUrl);
+      return null;
+    }
+
+    const secret = params.get("secret");
+    if (!secret || secret === null) {
+      console.error("Cannot parse OTP auth url, no secret provided", otpAuthUrl);
+      return null;
+    }
+    const decodedSecret = base32Decode(secret);
+    if (decodedSecret.length == 0) {
+      console.error("Cannot parse OTP auth url, empty secret provided", otpAuthUrl);
+      return null;
+    }
+
+    let algorithm = params.get("algorithm");
+    if (algorithm === "sha1") {
+      algorithm = "SHA-1";
+    }
+    else if (algorithm === "sha256") {
+      algorithm = "SHA-256";
+    }
+    else if (algorithm === "sha512") {
+      algorithm = "SHA-512";
+    }
+    else {
+      console.error("Cannot parse OTP auth url, no valid algorithm provided: " + algorithm, otpAuthUrl);
+      return null;
+    }
+
+    let digits;
+    if (!params.has("digits")) {
+      console.error("Cannot parse OTP auth url, no digits provided", otpAuthUrl);
+      return null;
+    }
+    else {
+      digits = parseInt(params.get("digits"));
+      if (isNaN(digits) || digits < 1 || digits > 9) {
+        console.error("Cannot parse OTP auth url, invalid digits provided: " + digits, otpAuthUrl);
+        return null;
+      }
+    }
+
+    let counter;
+    let period;
+
+    if (type === "hotp") {
+      if (!params.has("counter")) {
+        console.error("Cannot parse OTP auth url, no counter for HOTP provided", otpAuthUrl);
+        return null;
+      }
+      else {
+        counter = parseInt(params.get("counter"));
+        if (isNaN(counter) || counter < 0) {
+          console.error("Cannot parse OTP auth url, invalid counter provided: " + counter, otpAuthUrl);
+          return null;
+        }
+      }
+    }
+    else if (type === "totp") {
+      if (!params.has("period")) {
+        console.error("Cannot parse OTP auth url, no period for TOTP provided", otpAuthUrl);
+        return null;
+      }
+      else {
+        period = parseInt(params.get("period"));
+        if (isNaN(period) || period < 1) {
+          console.error("Cannot parse OTP auth url, invalid period provided: " + period, otpAuthUrl);
+          return null;
+        }
+      }
+    }
+
+    return {
+      type: type,
+      secret: decodedSecret,
+      algorithm: algorithm,
+      digits: digits,
+      counter: counter,
+      period: period
+    };
+  } catch(e) {
+    console.error("Cannot parse OTP auth url:" + otpAuthUrl, e);
+    return null;
+  }
+}
+
+async function calcOtp(otpAuth) {
+  console.debug("OTPAuth", otpAuth);
+  const counter = otpAuth.counter; //TODO use otpAuth.period for TOTP!
+  return hmac(otpAuth.algorithm, otpAuth.secret, counter);
+  //TODO cast to otpAuth.digits;
 }
 
 function base64ToBytes(base64) {

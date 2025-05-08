@@ -7,7 +7,7 @@ document.getElementById("host").placeholder = chrome.i18n.getMessage("lblAppHost
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const targetTabId = requestData.tabId;
 
-let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "";
+let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "", _otpAuth;
 
 document.addEventListener("click", async (e) => {
 
@@ -64,28 +64,35 @@ document.addEventListener("click", async (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
-    document.getElementById("copy").title = chrome.i18n.getMessage("successMessagePasswordCopied");
-    document.getElementById("copy").innerHTML = `
+    e.target.title = chrome.i18n.getMessage("successMessagePasswordCopied");
+    e.target.innerHTML = `
     <span id="copy" class="material-symbols-outlined size-24">
     check
     </span>
     `;
   }
   else if (e.target.id === "copy_otp") {
-    navigator.clipboard.writeText(calcOtp(_credential.otp));
-    document.getElementById("copy_otp").title = chrome.i18n.getMessage("successMessageOTPCopied");
-    document.getElementById("copy_otp").innerHTML = `
-    <span id="copy_otp" class="material-symbols-outlined size-24">
-    check
-    </span>
-    `;
+    if (_otpAuth) {
+      navigator.clipboard.writeText(await calcOtp(_otpAuth));
+      e.target.title = chrome.i18n.getMessage("successMessageOTPCopied");
+      e.target.innerHTML = `
+      <span id="copy_otp" class="material-symbols-outlined size-24">
+      check
+      </span>
+      `;
+    }
   }
   else if (e.target.id === "password_field") {
-    document.getElementById("password_field").innerText = _credential.password;
+    e.target.innerText = _credential.password;
   }
   else if (e.target.id === "otp_field") {
-    //TODO update TOTP automatically
-    document.getElementById("otp_field").innerText = calcOtp(_credential.otp);
+    //update TOTP automatically
+    if (_otpAuth) {
+      e.target.innerText = await calcOtp(_otpAuth);
+      setInterval(async () => {
+        e.target.innerText = await calcOtp(_otpAuth);
+      }, 1000);
+    }
   }
 });
 
@@ -507,10 +514,11 @@ getLocalValue("linked").then(async (linked) => {
 
         function presentCredential(credential, clientKeyBase64) {
           _credential = credential;
-
+        
 
           let otpContainer = "";
           if (credential.otp) {
+            _otpAuth = parseOtpAuth(_credential.otp);
             otpContainer = 
             `
             <div class="row">
