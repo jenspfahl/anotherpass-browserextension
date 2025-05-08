@@ -23,7 +23,7 @@ function base32Decode(encodedString) {
       }
   }
 
-  return new Uint8Array(output);
+  return new Int8Array(output);
 }
 
 
@@ -237,16 +237,14 @@ async function decryptWithPrivateKey(privateKey, encrypted) {
 
 
 async function hmac(hashAlgorithm, secret, message) {
-  const enc = new TextEncoder();
 
   const hmacParams = {
     name: "HMAC",
     hash: hashAlgorithm
   };
-  const key = await crypto.subtle.importKey("raw", enc.encode(secret), hmacParams, false, ["sign"]);
+  const key = await crypto.subtle.importKey("raw", secret, hmacParams, false, ["sign"]);
 
-  const encoded = enc.encode(message);
-  const signature = await window.crypto.subtle.sign("HMAC", key, encoded);
+  const signature = await crypto.subtle.sign("HMAC", key, message);
   return new Uint8Array(signature);
 }
 
@@ -349,11 +347,35 @@ function parseOtpAuth(otpAuthUrl) {
   }
 }
 
+function byteArrayToDigitsRFC6238(bytes, digits) {
+  const offset = bytes[bytes.length - 1] & 0xf;
+
+  const binary =
+      ((bytes[offset] & 0x7f) << 24) |
+      ((bytes[offset + 1] & 0xff) << 16) |
+      ((bytes[offset + 2] & 0xff) << 8) |
+      (bytes[offset + 3] & 0xff);
+
+  return Math.floor(binary % Math.pow(10, digits));
+}
+
+function longToByteArrayRFC6238(long) {
+  const buffer = new ArrayBuffer(8); 
+  const view = new DataView(buffer);
+  view.setBigInt64(0, BigInt(long));
+  return new Uint8Array(buffer); 
+}
+
 async function calcOtp(otpAuth) {
-  console.debug("OTPAuth", otpAuth);
-  const counter = otpAuth.counter; //TODO use otpAuth.period for TOTP!
-  return hmac(otpAuth.algorithm, otpAuth.secret, counter);
-  //TODO cast to otpAuth.digits;
+
+  let counter = otpAuth.counter; 
+  if (otpAuth.type === "totp") {
+    counter = Math.round( Date.now() / (otpAuth.period * 1000) );
+  }
+  const input = longToByteArrayRFC6238(counter);
+  const bytes = await hmac(otpAuth.algorithm, otpAuth.secret, input);
+
+  return byteArrayToDigitsRFC6238(bytes, otpAuth.digits);
 }
 
 function base64ToBytes(base64) {
