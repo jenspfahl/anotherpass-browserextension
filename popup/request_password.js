@@ -89,11 +89,14 @@ document.addEventListener("click", async (e) => {
     //update TOTP automatically
     if (_otpAuth) {
       if (_otpAuth.type == "totp") {
-        e.target.innerText = indicateTotpRemainingTime(_otpAuth) + " " + (await calcOtp(_otpAuth, true));
+        const otpIndicator = document.getElementById("otp_indicator");
+
+        otpIndicator.innerText = indicateTotpRemainingTime(_otpAuth);
+        e.target.innerText =  await calcOtp(_otpAuth, true);
 
         setInterval(async () => {
-          console.debug(calcTotpRemainingTime(_otpAuth));
-          e.target.innerText = indicateTotpRemainingTime(_otpAuth) + " " + (await calcOtp(_otpAuth, true));
+          otpIndicator.innerText = indicateTotpRemainingTime(_otpAuth);
+          e.target.innerText =  await calcOtp(_otpAuth, true);
         }, 1000);
       }
       else {
@@ -538,9 +541,10 @@ getLocalValue("linked").then(async (linked) => {
               </div>
               <div class="col-8">
                 <div class="mb-1">
+                  <span id="otp_indicator"></span>
                   <b id="otp_field" class="fingerprint_small cursor-pointer">******  </b>
             
-                  <button class="btn pt-0 px-0 mt-0" type="button" id="copy_otp" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
+                  <button class="btn pt-2 px-0 mt-0" type="button" id="copy_otp" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
                     <span id="copy_otp" class="material-symbols-outlined size-24">
                     content_copy
                     </span>
@@ -588,7 +592,7 @@ getLocalValue("linked").then(async (linked) => {
 
                 <div class="row">
                   <div class="col">
-                    <div class="mb-3">
+                    <div class="mb-3 mt-2">
                     ${chrome.i18n.getMessage("lblPassword")}:
                     </div>
                   </div>
@@ -596,7 +600,7 @@ getLocalValue("linked").then(async (linked) => {
                     <div class="mb-1">
                       <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
                 
-                      <button class="btn pt-0 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                      <button class="btn pt-2 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
                         <span id="copy" class="material-symbols-outlined size-24">
                         content_copy
                         </span>
