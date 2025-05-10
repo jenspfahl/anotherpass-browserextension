@@ -366,6 +366,16 @@ function longToByteArrayRFC6238(long) {
   return new Uint8Array(buffer); 
 }
 
+async function parseAndCalcOtp(credential) {
+  if (credential.otp) {
+    const otpAuth = parseOtpAuth(credential.otp);
+    if (otpAuth !== null) {
+      return await calcOtp(otpAuth);
+    }
+  }
+  return null;
+}
+
 async function calcOtp(otpAuth, format) {
 
   let counter = otpAuth.counter; 

@@ -50,13 +50,14 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
 
     if (e.target.id === "recent_credential") {
 
-      getTemporaryKey("last_used_credential").then((credential) => {
+      getTemporaryKey("last_used_credential").then(async (credential) => {
 
         chrome.runtime.sendMessage({ 
           action: "paste_credential", 
           password: credential.password, 
           user: credential.user,
           name: credential.name,
+          otp: await parseAndCalcOtp(credential),
           tabId: requestData.tabId });
 
         // force popup close
