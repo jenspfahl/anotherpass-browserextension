@@ -57,7 +57,7 @@ const requestData = JSON.parse(new URLSearchParams(location.search).get('data'))
           password: credential.password, 
           user: credential.user,
           name: credential.name,
-          otp: await parseAndCalcOtp(credential),
+          otp: credential.otp,
           tabId: requestData.tabId });
 
         // force popup close

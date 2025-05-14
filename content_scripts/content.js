@@ -104,7 +104,7 @@ getTemporaryKey("linked").then(async (linked) => {
 
 
         // store credential in session for the next minute and add an action icon to paste it from mem, used if e.g. username and password is requested in two steps.
-        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password, name: msg.name});
+        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password, name: msg.name, otp: msg.otp});
         // delayed search in case of missing loaded elements
         setTimeout(() => {
           console.log("clear cached credential");
