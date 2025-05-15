@@ -66,7 +66,7 @@ document.addEventListener("click", async (e) => {
     navigator.clipboard.writeText(_credential.password);
     e.target.title = chrome.i18n.getMessage("successMessagePasswordCopied");
     e.target.innerHTML = `
-    <span id="copy" class="material-symbols-outlined size-24">
+    <span id="copy" class="material-icons-outlined size-24">
     check
     </span>
     `;
@@ -76,7 +76,7 @@ document.addEventListener("click", async (e) => {
       navigator.clipboard.writeText(await calcOtp(_otpAuth));
       e.target.title = chrome.i18n.getMessage("successMessageOTPCopied");
       e.target.innerHTML = `
-      <span id="copy_otp" class="material-symbols-outlined size-24">
+      <span id="copy_otp" class="material-icons-outlined size-24">
       check
       </span>
       `;
@@ -546,7 +546,7 @@ getLocalValue("linked").then(async (linked) => {
                   <b id="otp_field" class="fingerprint_small cursor-pointer">******  </b>
             
                   <button class="btn pt-2 px-0 mt-0" type="button" id="copy_otp" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
-                    <span id="copy_otp" class="material-symbols-outlined size-24">
+                    <span id="copy_otp" class="material-icons-outlined size-24">
                     content_copy
                     </span>
                   </button>
@@ -602,7 +602,7 @@ getLocalValue("linked").then(async (linked) => {
                       <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
                 
                       <button class="btn pt-2 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
-                        <span id="copy" class="material-symbols-outlined size-24">
+                        <span id="copy" class="material-icons-outlined size-24">
                         content_copy
                         </span>
                       </button>
