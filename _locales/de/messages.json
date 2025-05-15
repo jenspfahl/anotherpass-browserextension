@@ -289,6 +289,21 @@
     "successMessagePasswordCopied": {
         "message": "Passwort in die Zwischenablage kopiert."
     },
+    "tooltipCopyOTP": {
+        "message": "Kopiere Einmal-Passwort in die Zwischenablage"
+    },
+    "successMessageOTPCopied": {
+        "message": "Einmal-Passwort in die Zwischenablage kopiert."
+    },
+    "tooltipHotpCounter": {
+        "message": "Aktueller Zähler: $counter$",
+        "placeholders": {
+            "counter": {
+              "content": "$1",
+              "example": "3"
+            }
+          }
+    },
     "lblImportedAt": {
         "message": "Importiert am"
     },
@@ -296,7 +311,10 @@
         "message": "Webseite"
     },
     "lblUser": {
-        "message": "Nutzer"
+        "message": "Benutzer"
+    },
+    "lblOTP": {
+        "message": "Einmal-Passwort"
     },
     "lblApplyCredentialToWebsite": {
         "message": "Auf Webseite anwenden"

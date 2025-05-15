@@ -5,6 +5,28 @@ const PREFIX_CREDENTIAL = "credential_"
 const PREFIX_ALT_SERVER = "alternative_server_"
 
 
+
+function base32Decode(encodedString) {
+  const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  const encodedStringUpperCase = encodedString.toUpperCase();
+  let buffer = '';
+  let output = [];
+
+  for (let i = 0; i < encodedStringUpperCase.length; i++) {
+      const index = base32Chars.indexOf(encodedStringUpperCase[i]);
+      if (index === -1) continue; // Skip invalid characters
+
+      buffer += index.toString(2).padStart(5, '0'); // Convert to binary
+      while (buffer.length >= 8) {
+          output.push(parseInt(buffer.slice(0, 8), 2)); // Get byte
+          buffer = buffer.slice(8); // Remove used bits
+      }
+  }
+
+  return new Int8Array(output);
+}
+
+
 function generateWebClientId() {
   const rnd = crypto.getRandomValues(new Uint8Array(32));
   const s = bytesToBase64(rnd).replace(/[^a-z]/gi, '').substring(0, 6).toUpperCase();
@@ -213,6 +235,193 @@ async function decryptWithPrivateKey(privateKey, encrypted) {
   return new Uint8Array(rsaDecrypted);
 }
 
+
+async function hmac(hashAlgorithm, secret, message) {
+
+  const hmacParams = {
+    name: "HMAC",
+    hash: hashAlgorithm
+  };
+  const key = await crypto.subtle.importKey("raw", secret, hmacParams, false, ["sign"]);
+
+  const signature = await crypto.subtle.sign("HMAC", key, message);
+  return new Uint8Array(signature);
+}
+
+
+function parseOtpAuth(otpAuthUrl) {
+  try {
+    const url = new URL(otpAuthUrl.toLowerCase());
+    const type = url.hostname;
+    if (type !== "hotp" && type !== "totp") {
+      console.error("Cannot parse OTP auth url, unknown type: " + type, otpAuthUrl);
+      return null;
+    }
+
+    const params = url.searchParams;
+    if (!params || params === null || params.length == 0) {
+      console.error("Cannot parse OTP auth url, no params provided", otpAuthUrl);
+      return null;
+    }
+
+    const secret = params.get("secret");
+    if (!secret || secret === null) {
+      console.error("Cannot parse OTP auth url, no secret provided", otpAuthUrl);
+      return null;
+    }
+    const decodedSecret = base32Decode(secret);
+    if (decodedSecret.length == 0) {
+      console.error("Cannot parse OTP auth url, empty secret provided", otpAuthUrl);
+      return null;
+    }
+
+    let algorithm = params.get("algorithm");
+    if (algorithm === "sha1") {
+      algorithm = "SHA-1";
+    }
+    else if (algorithm === "sha256") {
+      algorithm = "SHA-256";
+    }
+    else if (algorithm === "sha512") {
+      algorithm = "SHA-512";
+    }
+    else {
+      console.error("Cannot parse OTP auth url, no valid algorithm provided: " + algorithm, otpAuthUrl);
+      return null;
+    }
+
+    let digits;
+    if (!params.has("digits")) {
+      console.error("Cannot parse OTP auth url, no digits provided", otpAuthUrl);
+      return null;
+    }
+    else {
+      digits = parseInt(params.get("digits"));
+      if (isNaN(digits) || digits < 1 || digits > 9) {
+        console.error("Cannot parse OTP auth url, invalid digits provided: " + digits, otpAuthUrl);
+        return null;
+      }
+    }
+
+    let counter;
+    let period;
+
+    if (type === "hotp") {
+      if (!params.has("counter")) {
+        console.error("Cannot parse OTP auth url, no counter for HOTP provided", otpAuthUrl);
+        return null;
+      }
+      else {
+        counter = parseInt(params.get("counter"));
+        if (isNaN(counter) || counter < 0) {
+          console.error("Cannot parse OTP auth url, invalid counter provided: " + counter, otpAuthUrl);
+          return null;
+        }
+      }
+    }
+    else if (type === "totp") {
+      if (!params.has("period")) {
+        console.error("Cannot parse OTP auth url, no period for TOTP provided", otpAuthUrl);
+        return null;
+      }
+      else {
+        period = parseInt(params.get("period"));
+        if (isNaN(period) || period < 1) {
+          console.error("Cannot parse OTP auth url, invalid period provided: " + period, otpAuthUrl);
+          return null;
+        }
+      }
+    }
+
+    return {
+      type: type,
+      secret: decodedSecret,
+      algorithm: algorithm,
+      digits: digits,
+      counter: counter,
+      period: period
+    };
+  } catch(e) {
+    console.error("Cannot parse OTP auth url:" + otpAuthUrl, e);
+    return null;
+  }
+}
+
+function byteArrayToDigitsRFC6238(bytes, digits) {
+  const offset = bytes[bytes.length - 1] & 0xf;
+
+  const binary =
+      ((bytes[offset] & 0x7f) << 24) |
+      ((bytes[offset + 1] & 0xff) << 16) |
+      ((bytes[offset + 2] & 0xff) << 8) |
+      (bytes[offset + 3] & 0xff);
+
+  return Math.floor(binary % Math.pow(10, digits));
+}
+
+function longToByteArrayRFC6238(long) {
+  const buffer = new ArrayBuffer(8); 
+  const view = new DataView(buffer);
+  view.setBigInt64(0, BigInt(long));
+  return new Uint8Array(buffer); 
+}
+
+async function parseAndCalcOtp(credential) {
+  if (credential.otp) {
+    const otpAuth = parseOtpAuth(credential.otp);
+    if (otpAuth !== null) {
+      return await calcOtp(otpAuth);
+    }
+  }
+  return null;
+}
+
+async function calcOtp(otpAuth, format) {
+
+  let counter = otpAuth.counter; 
+  if (otpAuth.type === "totp") {
+    counter = Math.floor( Date.now() / (otpAuth.period * 1000) );
+  }
+  const input = longToByteArrayRFC6238(counter);
+  const bytes = await hmac(otpAuth.algorithm, otpAuth.secret, input);
+
+  const otp = byteArrayToDigitsRFC6238(bytes, otpAuth.digits);
+
+  const otpString = otp.toString().padStart(otpAuth.digits, '0');
+  if (format) {
+    return formatOtp(otpString);
+  }
+  else {
+    return otpString;
+  }
+}
+
+function calcTotpRemainingTime(otpAuth) {
+
+  if (otpAuth.type === "totp") {
+    const periodInMillis = otpAuth.period * 1000;
+    const elapsedMillisOfPeriod = Date.now() % periodInMillis;
+
+    const duration = periodInMillis - elapsedMillisOfPeriod;
+    return duration / periodInMillis;
+  }
+  else {
+    return null;
+  }
+}
+
+function indicateTotpRemainingTime(otpAuth) {
+  const t = calcTotpRemainingTime(otpAuth);
+  if (t == null) {
+    return "";
+  }
+  if (t >= 0.8) return "\u25CB";
+  if (t >= 0.6) return "\u25D4";
+  if (t >= 0.4) return "\u25D1";
+  if (t >= 0.2) return "\u25D5";
+  return "\u25CF";
+}
+
 function base64ToBytes(base64) {
   base64 = base64
             .replace(/=\\n/g, '')
@@ -220,6 +429,20 @@ function base64ToBytes(base64) {
             .replace(/_/g, '/');
   const binString = atob(base64);
   return Uint8Array.from(binString, (m) => m.codePointAt(0));
+}
+
+function formatOtp(otpString) {
+  if (otpString.length === 6) {
+      return otpString.substring(0, 3) + ' ' + otpString.substring(3);
+  } else if (otpString.length === 7) {
+      return otpString.substring(0, 2) + ' ' + otpString.substring(2, 5) + ' ' + otpString.substring(5);
+  } else if (otpString.length === 8) {
+      return otpString.substring(0, 4) + ' ' + otpString.substring(4);
+  } else if (otpString.length === 9) {
+      return otpString.substring(0, 3) + ' ' + otpString.substring(3, 6) + ' ' + otpString.substring(6);
+  } else {
+      return otpString;
+  }
 }
 
 function bytesToBase64(bytes) {

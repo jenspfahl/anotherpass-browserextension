@@ -146,7 +146,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     }
     
     case "paste_credential": {
-      pasteCredential(message.tabId, message.user, message.password, message.name);
+      pasteCredential(message.tabId, message.user, message.password, message.name, message.otp);
 
       return true;  
     }
@@ -318,7 +318,8 @@ async function forwardCredential(tabId, uid) {
     if (encCredential) {
       try {
         const credential = JSON.parse(await decryptMessage(clientKey, encCredential));
-        chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: credential.password, user: credential.user, name: credential.name });
+        chrome.tabs.sendMessage(tabId, 
+          { action: "paste_credential", password: credential.password, user: credential.user, name: credential.name, otp: await parseAndCalcOtp(credential) });
       } catch(e) {
         console.error("cannot decrypt credential with uid " + uid + ". Ignored.", e);
       }
@@ -327,8 +328,8 @@ async function forwardCredential(tabId, uid) {
   }
 }
 
-async function pasteCredential(tabId, user, password, name) {
-  chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user, name: name });
+async function pasteCredential(tabId, user, password, name, otp) {
+  chrome.tabs.sendMessage(tabId, { action: "paste_credential", password: password, user: user, name: name, otp: otp });
 }
 
 async function findLocalByUid(prefix, uid) {

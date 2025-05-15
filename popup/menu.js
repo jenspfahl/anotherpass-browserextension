@@ -487,7 +487,7 @@ getLocalValue("linked").then(async (linked) => {
             </div>
             <div class="col-1">
               <button id="delete_server_${server.host}" class="btn">
-                <span id="delete_server_${server.host}" class="material-symbols-outlined size-24">
+                <span id="delete_server_${server.host}" class="material-icons-outlined size-24">
                   delete
                 </span>
               </button>
@@ -853,6 +853,11 @@ async function loadCredentials(clientKey) {
   credentials.forEach(credential => {
     let uuid = credential.uid;
 
+    let otpAuth;
+    if (credential.otp) {
+      otpAuth = parseOtpAuth(credential.otp);
+    }
+
     const li = document.createElement("li");
 
     let searchable = credential.name.trim().toLowerCase();
@@ -883,20 +888,82 @@ async function loadCredentials(clientKey) {
     document.addEventListener("click", async (e) => {
       if (e.target.id === "copy_" + uuid) {
         navigator.clipboard.writeText(credential.password);
-        document.getElementById("copy_" + uuid).title = chrome.i18n.getMessage("successMessagePasswordCopied");
-        document.getElementById("copy_" + uuid).innerHTML = `
-        <span id="copy_${uuid}" class="material-symbols-outlined size-24">
+        e.target.title = chrome.i18n.getMessage("successMessagePasswordCopied");
+        e.target.innerHTML = `
+        <span id="copy_${uuid}" class="material-icons-outlined size-24">
         check
         </span>
         `;
        
       }
+      if (e.target.id === "copy_otp_" + uuid) {
+        if (otpAuth) {
+          navigator.clipboard.writeText(await calcOtp(otpAuth));
+          e.target.title = chrome.i18n.getMessage("successMessageOTPCopied");
+          e.target.innerHTML = `
+          <span id="copy_otp_${uuid}" class="material-icons-outlined size-24">
+          check
+          </span>
+          `;
+        }
+      
+      }
       if (e.target.id === "password_field_" + uuid) {
-        document.getElementById("password_field_" + uuid).innerText = credential.password;
+        e.target.innerText = credential.password;
+      }
+      if (e.target.id === "otp_field_" + uuid) {
+        //update TOTP automatically
+        if (otpAuth) {
+          if (otpAuth.type == "totp") {
+            const otpIndicator = document.getElementById("otp_indicator_" + uuid);
+            otpIndicator.innerText = indicateTotpRemainingTime(otpAuth);
+            e.target.innerText =  await calcOtp(otpAuth, true);
+
+            setInterval(async () => {
+              otpIndicator.innerText = indicateTotpRemainingTime(otpAuth);
+              e.target.innerText =  await calcOtp(otpAuth, true);
+            }, 1000);
+          }
+          else {
+            e.target.title = chrome.i18n.getMessage("tooltipHotpCounter", otpAuth.counter);
+            e.target.innerText = await calcOtp(otpAuth, true);
+          }
+          
+        }
+        
       }
       if (e.target.id === "credential_dropdown_" + uuid) {
+
+        let otpContainer = "";
+        if (credential.otp) {
+          otpContainer = 
+          `
+          <div class="row">
+              <div class="col">
+                <div class="mb-3">
+                ${chrome.i18n.getMessage("lblOTP")}:
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="mb-1">
+                  <span id="otp_indicator_${uuid}"></span>
+                  <b id="otp_field_${uuid}" class="fingerprint_small cursor-pointer">******  </b>
+            
+                  <button class="btn pt-2 px-0 mt-0" type="button" id="copy_otp_${uuid}" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
+                    <span id="copy_otp_${uuid}" class="material-icons-outlined size-24">
+                    content_copy
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          `;
+        }
+
         bsAlert(
           chrome.i18n.getMessage("lblCredential")+ " '" + credential.name + "'",
+
           `
             <div class="container text-left">
 
@@ -955,7 +1022,7 @@ async function loadCredentials(clientKey) {
            
               <div class="row">
                 <div class="col">
-                  <div class="mb-3">
+                  <div class="mb-3 mt-2">
                   ${chrome.i18n.getMessage("lblPassword")}:
                   </div>
                 </div>
@@ -963,8 +1030,8 @@ async function loadCredentials(clientKey) {
                   <div class="mb-1">
                     <b id="password_field_${uuid}" class="fingerprint_small cursor-pointer">**************  </b>
               
-                    <button class="btn pt-0 px-0 mt-0" type="button" id="copy_${uuid}" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
-                      <span id="copy_${uuid}" class="material-symbols-outlined size-24">
+                    <button class="btn pt-2 px-0 mt-0" type="button" id="copy_${uuid}" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                      <span id="copy_${uuid}" class="material-icons-outlined size-24">
                       content_copy
                       </span>
                     </button>
@@ -972,6 +1039,9 @@ async function loadCredentials(clientKey) {
                 </div>
               </div>
 
+
+              ${otpContainer}
+              
              
 
             </div>

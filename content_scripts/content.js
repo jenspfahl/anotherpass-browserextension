@@ -6,6 +6,7 @@ let _dialog, _x, _y, _url, popupOpen;
 
 const usernameFields = [];
 const passwordFields = [];
+const otpFields = [];
 
 
 getTemporaryKey("linked").then(async (linked) => {
@@ -99,11 +100,11 @@ getTemporaryKey("linked").then(async (linked) => {
       console.debug("content msg received: action=" + msg.action + " currentTabId=" + currentTabId);
 
       if (msg.action === "paste_credential") {
-        pasteCredential(msg.password, msg.user);
+        pasteCredential(msg.password, msg.user, msg.otp);
 
 
         // store credential in session for the next minute and add an action icon to paste it from mem, used if e.g. username and password is requested in two steps.
-        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password, name: msg.name});
+        setTemporaryKey("last_used_credential", {user: msg.user, password: msg.password, name: msg.name, otp: msg.otp});
         // delayed search in case of missing loaded elements
         setTimeout(() => {
           console.log("clear cached credential");
@@ -171,7 +172,7 @@ getTemporaryKey("linked").then(async (linked) => {
       }
     }
 
-    function pasteCredential(password, user) {
+    function pasteCredential(password, user, otp) {
 
       passwordFields.forEach(field => {
         field.value = password;
@@ -183,6 +184,14 @@ getTemporaryKey("linked").then(async (linked) => {
         usernameFields.forEach(field => {
           field.value = user;
           setNativeValue(field, user);
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+      }
+
+      if (otp && otp.trim().length > 0) {
+        otpFields.forEach(field => {
+          field.value = otp;
+          setNativeValue(field, otp);
           field.dispatchEvent(new Event('input', { bubbles: true }));
         });
       }
@@ -218,6 +227,17 @@ function addButton(input, renderIcons, opacityOfContentIcon, positionOfContentIc
     )) {
     console.log("Add to username fields", input);
     usernameFields.push(input);
+  }
+  else if (input.nodeName.toLowerCase() === "input"
+    && (input.type.toLowerCase() === "text" || input.type.toLowerCase() === "email")
+    && (checkOtpField(input.type)
+      || checkOtpField(input.id)
+      || checkOtpField(input.class)
+      || checkOtpField(input.name)
+      || checkOtpField(input.placeholder)
+    )) {
+    console.log("Add to username fields", input);
+    otpFields.push(input);
   }
   else {
     return;
@@ -279,11 +299,23 @@ function checkUsernameField(field) {
     return false;
   }
   const string = field.toString().toLowerCase();
-  console.debug("check field", string);
+  console.debug("check user field", string);
   return (string.includes("login")
     || string.includes("email")
     || string.includes("user")
     || string.includes("account")
+  )
+}
+
+function checkOtpField(field) {
+  if (!field) {
+    return false;
+  }
+  const string = field.toString().toLowerCase();
+  console.debug("check otp field", string);
+  return (string.includes("otp")
+    || string.includes("onetime")
+    || string.includes("code")
   )
 }
 

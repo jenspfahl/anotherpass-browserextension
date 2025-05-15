@@ -7,7 +7,7 @@ document.getElementById("host").placeholder = chrome.i18n.getMessage("lblAppHost
 const requestData = JSON.parse(new URLSearchParams(location.search).get('data'));
 const targetTabId = requestData.tabId;
 
-let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "";
+let _credential, _requestIdentifier, _stopPolling, _lastResponseMsg = "", _otpAuth;
 
 document.addEventListener("click", async (e) => {
 
@@ -64,14 +64,47 @@ document.addEventListener("click", async (e) => {
   }
   else if (e.target.id === "copy") {
     navigator.clipboard.writeText(_credential.password);
-    document.getElementById("copy").innerHTML = `
-    <span id="copy" class="material-symbols-outlined size-24">
+    e.target.title = chrome.i18n.getMessage("successMessagePasswordCopied");
+    e.target.innerHTML = `
+    <span id="copy" class="material-icons-outlined size-24">
     check
     </span>
     `;
   }
+  else if (e.target.id === "copy_otp") {
+    if (_otpAuth) {
+      navigator.clipboard.writeText(await calcOtp(_otpAuth));
+      e.target.title = chrome.i18n.getMessage("successMessageOTPCopied");
+      e.target.innerHTML = `
+      <span id="copy_otp" class="material-icons-outlined size-24">
+      check
+      </span>
+      `;
+    }
+  }
   else if (e.target.id === "password_field") {
-    document.getElementById("password_field").innerText = _credential.password;
+    e.target.innerText = _credential.password;
+  }
+  else if (e.target.id === "otp_field") {
+    //update TOTP automatically
+    if (_otpAuth) {
+      if (_otpAuth.type == "totp") {
+        const otpIndicator = document.getElementById("otp_indicator");
+
+        otpIndicator.innerText = indicateTotpRemainingTime(_otpAuth);
+        e.target.innerText =  await calcOtp(_otpAuth, true);
+
+        setInterval(async () => {
+          otpIndicator.innerText = indicateTotpRemainingTime(_otpAuth);
+          e.target.innerText =  await calcOtp(_otpAuth, true);
+        }, 1000);
+      }
+      else {
+        e.target.title = chrome.i18n.getMessage("tooltipHotpCounter", _otpAuth.counter);
+        e.target.innerText = await calcOtp(_otpAuth, true);
+      }
+      
+    }
   }
 });
 
@@ -359,7 +392,7 @@ getLocalValue("linked").then(async (linked) => {
               }
 
               if (targetTabId) {
-                sendPasteCredentialMessage(targetTabId, credential.password, credential.user, credential.name.substring(0, 25));
+                sendPasteCredentialMessage(targetTabId, credential.password, credential.user, credential.name.substring(0, 25), await parseAndCalcOtp(credential));
               }
               else {
                 console.error("No target tabId but expected");
@@ -463,14 +496,15 @@ getLocalValue("linked").then(async (linked) => {
         });
 
 
-        function sendPasteCredentialMessage(tabId, password, user, name) {
+        function sendPasteCredentialMessage(tabId, password, user, name, otp) {
 
           console.debug("send to tabId", tabId);
           chrome.tabs.sendMessage(tabId, { 
             action: "paste_credential", 
             password: password,
             user: user,
-            name: name
+            name: name,
+            otp: otp
           }, function () {
             window.close();
           });    
@@ -493,7 +527,35 @@ getLocalValue("linked").then(async (linked) => {
 
         function presentCredential(credential, clientKeyBase64) {
           _credential = credential;
+        
 
+          let otpContainer = "";
+          if (credential.otp) {
+            _otpAuth = parseOtpAuth(_credential.otp);
+            otpContainer = 
+            `
+            <div class="row">
+              <div class="col">
+                <div class="mb-3">
+                ${chrome.i18n.getMessage("lblOTP")}:
+                </div>
+              </div>
+              <div class="col-8">
+                <div class="mb-1">
+                  <span id="otp_indicator"></span>
+                  <b id="otp_field" class="fingerprint_small cursor-pointer">******  </b>
+            
+                  <button class="btn pt-2 px-0 mt-0" type="button" id="copy_otp" title="${chrome.i18n.getMessage("tooltipCopyOTP")}">
+                    <span id="copy_otp" class="material-icons-outlined size-24">
+                    content_copy
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            `;
+          }
 
           bsConfirm(
             chrome.i18n.getMessage("lblCredential") + " '" + credential.name + "'", 
@@ -531,7 +593,7 @@ getLocalValue("linked").then(async (linked) => {
 
                 <div class="row">
                   <div class="col">
-                    <div class="mb-3">
+                    <div class="mb-3 mt-2">
                     ${chrome.i18n.getMessage("lblPassword")}:
                     </div>
                   </div>
@@ -539,14 +601,17 @@ getLocalValue("linked").then(async (linked) => {
                     <div class="mb-1">
                       <b id="password_field" class="fingerprint_small cursor-pointer">**************  </b>
                 
-                      <button class="btn pt-0 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
-                        <span id="copy" class="material-symbols-outlined size-24">
+                      <button class="btn pt-2 px-0 mt-0" type="button" id="copy" title="${chrome.i18n.getMessage("tooltipCopyPassword")}">
+                        <span id="copy" class="material-icons-outlined size-24">
                         content_copy
                         </span>
                       </button>
                     </div>
                   </div>
                 </div>
+
+
+                ${otpContainer}
 
 
               </div>
